@@ -1,0 +1,78 @@
+<?php
+header("Content-type: text/html; charset=utf-8");
+
+require_once("../db/DbMysql.inc");
+require_once("../com/common.inc");
+
+$Var = array();
+if(isset($_GET["m"]))  $Var["method"] = $_GET["m"];
+else {
+    dolog("Method's Name is empty!");
+    exit(0);
+}
+
+$Var['mob'] = $Var['pw'] = $Var['npw'] = $Var['msg'] = '';
+if(isset($_GET["mob"]))  $Var["mob"] = $_GET["mob"];   //用户名，即手机号码
+if(isset($_GET["pw"]))  $Var["pw"] = $_GET["pw"];   //用户密码
+if(isset($_GET["npw"]))  $Var["npw"] = $_GET["npw"];   //用户新密码
+if(isset($_GET["msg"]))  $Var["msg"] = $_GET["msg"];   //验证短信
+if(isset($_GET["toysn"]))  $Var["toysn"] = $_GET["toysn"];   //玩具唯一标识码
+if(isset($_GET["mobsn"]))  $Var["mobsn"] = $_GET["mobsn"];   //手机唯一标识码
+
+$DB = new DbMysql('localhost', 'mysql', '123456', 'qihao');
+
+switch( $Var['method'] ){
+    case 'login':
+        if(empty($Var["mob"]) || empty($Var["pw"])){
+            doLog('mob or pw is empty!', 'user:switch:login');
+            return false;
+        }
+        $sql = "SELECT id, name, nickname FROM user WHERE mobile = {$Var["mob"]} AND password = {$Var["pw"]};";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+    case 'reg':
+        if(empty($Var["mob"]) || empty($Var["pw"]) || empty($Var['msg'])){
+            doLog('mob or pw or msg is empty!', 'user:switch:reg');
+            return false;
+        }
+        
+        if(!verifyMsg($Var['msg'])){
+            doLog('verify msg fail!', 'user:switch:reg');
+            return false;
+        }
+        
+        $tm = date('Y-m-d h:i:s');
+        regOpenfireUser($Var['mob'], $Var['mob']);   //为用户注册xmpp服务帐号
+        $sql = "INSERT INTO user(mobile, password, createtime) VALUES({$Var['mob']}, {$Var['pw']}, \"{$tm}\");";
+        if(!$query = $DB->query($sql)){
+            doLog("insert table user fail!", "user:switch:reg: " . $sql);
+            return false;
+        }
+
+        return true;
+    case 'modpw':
+        break;
+    case 'bind':
+        if(empty($Var["mobsn"]) || empty($Var["toysn"])){
+            doLog('mobsn or toysn is empty!', 'user:switch:bind');
+            return false;
+        }
+
+        regOpenfireUser($Var['toysn'], $Var['toysn']);   //为玩具注册xmpp服务帐号
+        regOpenfireUser($Var['mobsn'], $Var['mobsn']);   //为手机注册xmpp服务帐号 
+
+        $sql = "INSERT INTO toy_mobile(toysn, mobilesn, xmppmobile) VALUES({$Var['toysn']}, {$Var['mobsn']}, {$Var['mobsn']});";
+
+        if(!$query = $DB->query($sql)){
+            doLog("insert table toy_mobile fail!", "user:switch:bind: " . $sql);
+            return false;
+        }
+        return ture;
+        break;
+    default:
+        break;
+}
+?>
