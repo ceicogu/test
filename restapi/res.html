@@ -1,0 +1,364 @@
+<?php
+header("Content-type: text/html; charset=utf-8");
+
+require_once("../db/DbMysql.inc");
+require_once("../com/common.inc");
+require_once("../csft/sphinxapi.php");
+
+$Var = array();
+if(isset($_GET["m"]))  $Var["method"] = $_GET["m"];
+else {
+    doLog("Method's Name is empty!");
+    exit(0);
+}
+if(isset($_GET["resid"]))  $Var["resid"] = $_GET["resid"];   //资源id
+if(isset($_GET["catid"]))  $Var["catid"] = $_GET["catid"];   //主分类
+if(isset($_GET["subcatid"]))  $Var["subcatid"] = $_GET["subcatid"]; //子分类
+if(isset($_GET["name"]))  $Var["name"] = $_GET["name"];
+if(isset($_GET["uid"]))  $Var["uid"] = $_GET["uid"];    //用户id
+if(isset($_GET["alid"]))  $Var["alid"] = $_GET["alid"];   //专辑id
+if(isset($_GET["opid"]))  $Var["opid"] = $_GET["opid"];   //运营推荐列表id
+if(isset($_GET["agid"]))  $Var["agid"] = $_GET["agid"];   //年龄标签id
+if(isset($_GET["plid"]))  $Var["plid"] = $_GET["plid"];   //播放列表id
+
+//搜索选项
+if(isset($_GET["wd"]))  $Var["wd"] = $_GET["wd"];   //搜索词
+if(isset($_GET["tp"]))  $Var["tp"] = $_GET["tp"];   //资源分类
+if(isset($_GET["fd"]))  $Var["fd"] = $_GET["fd"];   //需要搜素的字段
+
+//翻页选项
+if(isset($_GET["bn"]))  $Var["bn"] = $_GET["bn"];   //起始偏移量
+else $Var["bn"] = 0;
+
+$Var['bo'] = 20;          //页面包含结果的数量
+
+$ResListField = 'id, title, categoryid, subcategoryid, url ';  //列表形势下输出的资源字段
+$ResListFieldB = 'B.id, B.title, B.categoryid, B.subcategoryid, B.url ';  //同上,用户resource表外连时
+$ResDetailField = 'id, title, subtitle, author, composer, singer, categoryid, subcategoryid, url, summary, content ';  //详情形式下输出的资源字段
+
+$DB = new DbMysql('localhost', 'mysql', '123456', 'qihao');
+
+switch( $Var["method"] ){
+    case 'search':
+        if(empty($Var['wd'])){
+            doLog('wd is empty!', 'switch:search');
+            exit(0);
+        }
+
+        $sch = new SphinxClient ();
+        $sch->SetServer ('localhost', 9312);
+
+        $sch->SetConnectTimeout ( 3 );
+        $sch->SetArrayResult ( true );
+        //$sch->SetMatchMode ( SPH_MATCH_ALL);
+        $sch->SetMatchMode ( SPH_MATCH_EXTENDED );
+
+        //需要查询的分类
+        $cats = explode('|', $Var["tp"]); 
+        if(is_array($cats) && !empty($cats[0])) $sch->SetFilter('categoryid', $cats);
+
+        //需要查询的字段
+        $fields = explode('|', $Var["fd"]);
+        $word = '';
+        if(is_array($fields) && !empty($fields[0])){
+            foreach($fields as $field){
+                if($field == 'CP') $word .= 'caption,';                //标题
+                else if($field == 'SC') $word .= 'subcaption,';        //子标题
+                else if($field == 'AB') $word .= 'summary,';          //摘要
+                else if($field == 'CT') $word .= 'content,';           //内容
+                else continue;
+            }
+
+           //组织多字段查询 
+            if(!empty($word)){
+                $word = substr($word, 0, -1);
+                $word = '@(' . $word . ') ' . $Var['wd'];
+            }
+            else $word = $Var['wd'];
+        } 
+        else $word = $Var['wd'];
+
+        //翻页查询的偏移
+        if(is_numeric($Var['bn'])) $sch->setLimits($Var['bn'], $Var['bo']);
+
+        $index = '*';
+        $res = $sch->Query ( $word, $index );
+
+        $ids = '';
+        for($i=0; $i<$res['total']; $i++){
+            $ids .= $res['matches'][$i]['id'] . ',';
+        }
+        $ids = substr($ids, 0, -1);
+        $ids = '(' . $ids . ')';
+
+        $sql = "SELECT * FROM resource WHERE id IN {$ids};"; 
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+//print_r($sch);
+//print_r($res);
+        break;
+    case 'getOneRes':    //获取一条资源的详细信息
+        if(empty($Var['resid'])){
+            doLog('resid is empty!', 'switch:getOneRes');
+            exit(0);
+        }
+
+        $sql = "SELECT {$ResDetailField} FROM resource WHERE id = {$Var["resid"]};";
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+        break;
+    case 'getCatList':
+        if(empty($Var['catid']))
+            $sql = "SELECT * FROM category;";       //取得主分类列表
+        else
+            $sql = "SELECT * FROM subcategory WHERE categoryid = {$Var['catid']};";   //取得指定分类的子分类列表
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+        break;
+    case 'getCatResList':   //获取一个指定分类的资源的列表
+        if(empty($Var['catid'])){
+            doLog("catid is empty!", "switch:getCatResList");
+            exit(0);
+        }
+
+        if(empty($Var['subcatid']))
+            $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']}";
+        else
+            $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']} AND subcategoryid={$Var['subcatid']}";
+
+        if(is_numeric($Var['bn'])){
+            $sql .= " LIMIT {$Var['bn']}, {$Var['bo']}";
+        }
+        $sql .= ';';
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getAlbumList':  //获取指定分类专辑列表
+        if(empty($Var['catid'])){
+            doLog("catid is empty!", "switch:getAlbumList");
+            exit(0);
+        }
+
+        if(empty($Var['subcatid']))
+            $sql = "SELECT * FROM album WHERE categoryid = {$Var['catid']};";
+        else
+            $sql = "SELECT * FROM album WHERE categoryid = {$Var['catid']} AND subcategoryid={$Var['subcatid']};";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getAlbumResList':  //获取指定专辑包含的资源列表
+        if(empty($Var['alid'])){
+            doLog("alid is empty!", "switch:getAlbumResList");
+            exit(0);
+        }
+
+        $sql = "SELECT {$ResListFieldB} FROM album_resource A LEFT JOIN resource B ON A.resourceid = B.id WHERE A.albumid = {$Var['alid']};";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getOperateList':   //获取运营推荐列表
+        if(empty($Var['tp']))
+            $sql = "SELECT * FROM operate GROUP BY type;";
+        else
+            $sql = "SELECT * FROM operate WHERE type = {$Var['tp']};";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getOperateResList':
+        if(empty($Var['opid']) || empty($Var['tp'])){
+            doLog("opid or tp is empty!", "switch:getOperateResList");
+            exit(0);
+        }
+
+        if($Var['tp'] == 1)   //资源榜单，比如歌曲榜单，故事榜单
+            $sql = "SELECT {$ResListFieldB} FROM operate_resource A LEFT JOIN resource B ON A.varyid = B.id WHERE A.operateid={$Var['opid']};";
+        else if($Var['tp'] == 2)        //合集榜单
+            $sql = "SELECT * FROM operate_resource A LEFT JOIN album B ON A.varyid = B.id WHERE A.operateid = {$Var['opid']};";
+        else if($Var['tp'] == 3)        //播放列表榜单
+            $sql = "SELECT * FROM operate_resource A LEFT JOIN playlist B ON A.varyid = B.id WHERE A.operateid = {$Var['opid']};";
+        else{
+            doLog("tp is wrong!", "switch:getOperateResList");
+            exit(0);
+        }
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+        break;
+
+    case 'getPlayList':   //获取指定用户的播放列表
+        if(empty($Var['uid'])){
+            doLog("uid is empty!", "switch:getPlayList");
+            exit(0);
+        }
+
+        $sql = "SELECT * FROM playlist WHERE userid = {$Var['uid']};";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getPlayResList':   //获取指定播放列表的所包含的资源的列表
+        if(empty($Var['plid'])){
+            doLog("plid is empty!", "switch:getPlayResList");
+            exit(0);
+        }
+
+        $sql = "SELECT {$ResListFieldB} FROM playlist_resource A LEFT JOIN resource B ON A.resourceid = B.id WHERE A.playlistid={$Var['plid']}";
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'createPlayList':   //创建一个播放列表
+        if(isset($_POST["uid"]))  $Var["uid"] = $_POST["uid"];    //用户id
+        if(isset($_POST["name"]))  $Var["name"] = $_POST["name"];    //用户创建的播放列表的名称
+        if(isset($_POST["ab"]))  $Var["ab"] = $_POST["ab"];    //用户关于播放列表的描述
+        if(empty($Var['uid']) || empty($Var['name'])){
+            doLog("uid or name is empty!", "switch:createPlayList");
+            exit(0);
+        }
+
+        $Var['ctime'] = date('Y-m-d h:i:s');
+        $sql = "INSERT INTO playlist(name, userid, summary, createtime) VALUES({$Var['name']}, {$Var['uid']}, {$Var['ab']}, \"{$Var['ctime']}\");";
+        if(!$query = $DB->query($sql)){
+            doLog("insert is failure!", "switch:insertrecentlist: " . $sql);
+            exit(0);
+        }
+
+        break;
+
+    case 'insertPlayList':  //为一个播放列表添加一个资源
+        if(empty($Var['plid']) || empty($Var['resid'])){
+            doLog("plid or resid is empty!", "switch:insertPlayList");
+            exit(0);
+        }
+        $sql = "INSERT INTO playlist_resource(playlistid, resourceid) VALUES({$Var['plid']}, {$Var['resid']});";
+        if(!$query = $DB->query($sql)){
+            doLog("insert is failure!", "switch:insertrecentlist: " . $sql);
+            exit(0);
+        }
+
+        break;
+
+    case 'getAgetagList':    //选择全部年龄标签
+        $sql = "SELECT * FROM agetag;";
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getAgetagResList':     //根据年龄标签，在某个分类下面过滤资源
+        if(empty($Var['catid'])){
+            doLog("catid or agid is empty!", "switch:getAgetagResList");
+            exit(0);
+        }
+        if(empty($Var['agid'])){
+            if(empty($Var['subcatid']))
+                $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']};";
+            else
+                $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']} AND subcatgoryid = {$Var['subcatid']};";
+        }
+        else{
+            if(empty($Var['subcatid']))
+                $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']} AND FIND_IN_SET(\'{$Var['agid']}\', agetagid)>0;";
+            else
+                $sql = "SELECT {$ResListField} FROM resource WHERE categoryid = {$Var['catid']} AND subcatgoryid = {$Var['subcatid']} AND FIND_IN_SET(\'{$Var['agid']}\', agetagid)>0;";
+        }
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+        break;
+
+    case 'getRecentList':    //获取用户最近试听的资源列表
+        if(empty($Var['uid'])){
+            doLog("uid is empty!", "switch:getRecentList");
+            exit(0);
+        }
+
+        $sql = "SELECT {$ResListFieldB} FROM recent A LEFT JOIN resource B ON A.resourceid = B.id WHERE A.userid={$Var['uid']}";
+        if(is_numeric($Var['bn'])){
+            $sql .= " LIMIT {$Var['bn']}, {$Var['bo']}";
+        }
+        $sql .= ';';
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+        break;
+    case 'insertRecentList':   //插入用户最近试听过的资源到试听列表
+        if(empty($Var['uid']) || empty($Var['resid'])){
+            doLog("uid or resid is empty!", "switch:insertRecentList");
+            exit(0);
+        }
+
+        $Var['ctime'] = date('Y-m-d h:i:s');
+        $sql = "INSERT INTO recent(resourceid, userid, createtime) VALUES({$Var['resid']}, {$Var['uid']}, \"{$Var['ctime']}\");";
+        if(!$query = $DB->query($sql)){
+            doLog("insert is failure!", "switch:insertrecentlist: " . $sql);
+            exit(0);
+        }
+
+        break;
+    case 'getFavoriteList':     //获取指定用户的收藏列表
+        if(empty($Var['uid'])){
+            doLog("uid is empty!", "switch:getFavoriteList");
+            exit(0);
+        }
+
+        $sql = "SELECT {$ResListFieldB} FROM favorite A LEFT JOIN resource B ON A.resourceid = B.id WHERE A.userid={$Var['uid']}";
+        if(is_numeric($Var['bn'])){
+            $sql .= " LIMIT {$Var['bn']}, {$Var['bo']}";
+        }
+        $sql .= ';';
+
+
+        $query = $DB->query($sql);
+        $queryResult = $DB->get_result_array($query);
+        echo json_encode($queryResult);
+
+        break;
+
+    case 'insertFavoriteList':   //插入资源到用户的收藏列表
+        if(empty($Var['uid']) || empty($Var['resid'])){
+            doLog("uid or resid is empty!", "switch:insertFavoriteList");
+            exit(0);
+        }
+
+        $Var['ctime'] = date('Y-m-d h:i:s');
+        $sql = "INSERT INTO favorite(resourceid, userid, createtime) VALUES({$Var['resid']}, {$Var['uid']}, \"{$Var['ctime']}\");";
+        if(!$query = $DB->query($sql)){
+            doLog("insert is failure!", "switch:inserttemplist: " . $sql);
+            exit(0);
+        }
+
+        break;
+    default:
+        doLog("method can't be matched!", "switch");
+        exit(0);
+}
+?>
