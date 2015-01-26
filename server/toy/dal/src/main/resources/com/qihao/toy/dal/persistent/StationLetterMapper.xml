@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.StationLetterMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,sender_id,acceptor_type,acceptor_id,type,content,url,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.StationLetterDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM station_letter
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.StationLetterDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO station_letter (
+         sender_id,acceptor_type,acceptor_id,type,content,url,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{senderId},#{acceptorType},#{acceptorId},#{type},#{content},#{url},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.StationLetterDO">
+        UPDATE station_letter
+        SET
+        gmt_modified=now()
+         <if test="isDeleted != null"> , is_deleted=#{isDeleted}</if>
+         <if test="acceptorType != null"> , acceptor_type=#{acceptorType}</if>
+         <if test="acceptorId != null"> , acceptor_id=#{acceptorId}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.StationLetterDO"
+        parameterType="com.qihao.toy.dal.domain.StationLetterDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM station_letter
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="senderId != null"> AND sender_id=#{senderId}</if>
+            <if test="acceptorType != null"> AND acceptor_type=#{acceptorType}</if>
+            <if test="acceptorId != null"> AND acceptor_id=#{acceptorId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

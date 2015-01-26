@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.TagMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,tag_type,tag_name,tag_parent_id,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.TagDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM tag
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.TagDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tag (
+         tag_type,tag_name,tag_parent_id,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{tagType},#{tagName},#{tagParentId},,now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.TagDO">
+        UPDATE tag
+        SET
+        gmt_modified=now()
+        <if test="tagType != null"> ,tag_type=#{tagType}</if>
+        <if test="tagName != null"> ,tag_name=#{tagName}</if>
+        <if test="tagParentId != null"> ,tag_parent_id=#{tagParentId}</if>
+        WHERE id=#{id}
+    </update>
+    <update id="deleteById" parameterType="long">
+        UPDATE tag
+        SET
+        gmt_modified=now(),is_deleted=0
+        WHERE id=#{id}
+    </update>    
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.TagDO"
+        parameterType="com.qihao.toy.dal.domain.TagDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM tag
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+	        <if test="tagType != null"> AND tag_type=#{tagType}</if>
+	        <if test="tagName != null"> AND tag_name=#{tagName}</if>
+	        <if test="tagParentId != null"> AND tag_parent_id=#{tagParentId}</if>
+        </where>
+    </select>    
+</mapper>
+        

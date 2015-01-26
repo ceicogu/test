@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+xsi:schemaLocation="
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+default-lazy-init="true">
+
+	<bean id="abcOplogAop" class="com.aliyun.abc.client.aop.OplogAop">
+		<property name="appKey" value="idc"></property>
+	</bean>
+	<aop:config>
+		<aop:aspect id="abcOplogAopAspect" ref="abcOplogAop">
+			<aop:pointcut id="idcScreen" expression="execution(* com.aliyun.idc.web.module.screen..*.*(..))" />
+			<aop:before method="beforeSendOpLog" pointcut-ref="idcScreen" />
+		</aop:aspect>
+	</aop:config>
+</beans>
