@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.AlbumResourceMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,album_id,resourceId,gmt_created,gmt_modified]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.AlbumResourceDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album_resource
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.AlbumResourceDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO album_resource (
+         album_id,resource_id,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{albumId},#{resourceId},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.AlbumResourceDO">
+        UPDATE album_resource
+        SET
+        gmt_modified=now()
+        <if test="albumId != null"> ,album_id=#{albumId}</if>
+        <if test="resourceId != null"> ,resource_id=#{resourceId}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.AlbumResourceDO"
+        parameterType="com.qihao.toy.dal.domain.AlbumResourceDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album_resource
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        <if test="albumId != null"> ,album_id=#{albumId}</if>
+        <if test="resourceId != null"> ,resource_id=#{resourceId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

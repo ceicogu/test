@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.UserMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,login_name,status,nick_name,photo,mobile,email,xmpp_account,come_from,come_sn,invitor_id,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.UserDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        WHERE id=#{id}
+    </select>    
+    <select id="getValidItem" resultType="com.qihao.toy.dal.domain.UserDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        WHERE mobile=#{mobile} and code=#{code} and status=0
+    </select>        
+    <!-- 登录 -->
+    <select id="login" resultType="com.qihao.toy.dal.domain.UserDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        WHERE login_name=#{loginName} AND password=#{password} AND is_deleted=0
+    </select>
+    <!-- 注册 -->    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.UserDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (
+         login_name,password,status,nick_name,mobile,photo,email,xmpp_account,come_from,come_sn,invitor_id,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{loginName},#{password},#{status},#{nickName},#{mobile},#{photo},#{email},#{xmppAccount},#{comeFrom},#{comeSN},#{invitorId},now(),now()
+        )
+    </insert>
+    <!-- 修改密码 -->
+    <update id="modifyPassword">
+        UPDATE user
+        SET
+        password=#{password},gmt_modified=now()
+        WHERE id=#{id} AND password=#{oldPassword} 
+    </update>    
+    <update id="update" parameterType="com.qihao.toy.dal.domain.UserDO">
+        UPDATE user
+        SET
+        	gmt_modified=now()
+        	<if test="loginName != null"> ,login_name=#{loginName}</if>
+        	<if test="nickName != null"> ,nick_name=#{nickName}</if>
+        	<if test="photo != null"> ,photo=#{photo}</if>
+        	<if test="comeFrom != null"> ,comeFrom=#{comeFrom}</if>
+        	<if test="comeSN != null"> ,come_sn=#{comeSN}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.UserDO"
+        parameterType="com.qihao.toy.dal.domain.UserDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="loginName != null"> AND login_name=#{loginName}</if>
+        	<if test="status != null"> AND status=#{status}</if>
+        	<if test="mobile != null"> AND mobile=#{mobile}</if>
+        	<if test="comeFrom != null"> AND come_from=#{comeFrom}</if>
+        	<if test="comeSN != null"> AND come_sn=#{comeSN}</if>
+        	<if test="invitorId != null"> AND invitor_id=#{invitorId}</if>
+        	<if test="xmppAccount != null"> AND xmpp_account=#{xmppAccount}</if>
+        	<if test="userIds != null"> AND id IN 
+        	  <foreach collection="userIds"  item="userId" open="("    separator="," close=")">
+   						#{userId}
+  				</foreach>
+  			</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        
