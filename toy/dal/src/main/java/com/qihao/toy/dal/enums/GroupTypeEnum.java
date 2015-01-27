@@ -7,11 +7,7 @@
  */
 package com.qihao.toy.dal.enums;
 
-/**
- * 类AuditStatus.java的实现描述：TODO 类实现描述
- * 
- * @author muchen.lh 2014年6月18日 下午3:47:43
- */
+
 public enum GroupTypeEnum implements DescedEnum{
 	Family(1,"我的家庭群"),
 	General(9,"普通用户群");

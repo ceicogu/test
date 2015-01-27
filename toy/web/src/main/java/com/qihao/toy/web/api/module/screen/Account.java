@@ -36,6 +36,7 @@ import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.citrus.turbine.dataresolver.Params;
 import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
@@ -144,6 +145,7 @@ public class Account {
     	userDO.setNickName(requestParams.getString("nickName"));
     	userDO.setComeFrom(comeFrom);
     	userDO.setComeSN(comeSN);
+    	userDO.setType(0);//帐号类型:0-手机注册
     	if(StringUtils.isNumeric(requestParams.getString("invitorId"))) {
     		userDO.setInvitorId(requestParams.getLong("invitorId",-1));
     	}
@@ -163,7 +165,7 @@ public class Account {
     		log.error("注册失败!userDO={},exception={}",userDO, e);
     		result.setSuccess(false);
     		result.setErrorCode(10002);
-    		result.setMessage("注册失败！");
+    		result.setMessage("注册失败！原因:"+e.getMessage());
     		response.getWriter().println(JSON.toJSONString(result));
     		return;    		
     	}
@@ -355,7 +357,7 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyToys(ParameterParser requestParams) throws IOException {
-    	DataResult<List<ToyDO>> result = new DataResult<List<ToyDO>>();
+    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
     	String authToken= requestParams.getString("authToken");
     	UserDO userDO = accountService.validateAuthToken(authToken);
     	if(null == userDO) {
@@ -365,7 +367,18 @@ public class Account {
             response.getWriter().println(JSON.toJSONString(result));
             return;    		
     	}    	
-    	List<ToyDO>  data = accountService.getMyToys(userDO.getId());
+    	List<ToyDO>  resp = accountService.getMyToys(userDO.getId());
+    	
+    	List<Map<String,String>> data = Lists.newArrayList();    	
+    	for(ToyDO toy : resp) {
+    		Map<String,String> item = Maps.newTreeMap();
+    		item.put("toyName", toy.getToyName());
+    		item.put("kidName", toy.getKidName());
+    		item.put("kidGender", toy.getKidGender().toString());
+    		item.put("kidAge", toy.getKidAge().toString());
+    		item.put("ownerId", toy.getOwnerId().toString());
+    		data.add(item);
+    	}
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -376,7 +389,7 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyFriends(ParameterParser requestParams) throws IOException {
-    	DataResult<List<UserDO>> result = new DataResult<List<UserDO>>();
+    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
     	String authToken= requestParams.getString("authToken");
     	UserDO userDO = accountService.validateAuthToken(authToken);
     	if(null == userDO) {
@@ -386,7 +399,15 @@ public class Account {
             response.getWriter().println(JSON.toJSONString(result));
             return;    		
     	}    	
-    	List<UserDO>  data = accountService.getMyFriends(userDO.getId());
+    	List<UserDO>  resp = accountService.getMyFriends(userDO.getId());
+    	List<Map<String,String>> data = Lists.newArrayList();    	
+    	for(UserDO user : resp) {
+    		Map<String,String> item = Maps.newTreeMap();
+    		item.put("nickName", user.getNickName());
+    		item.put("userId",user.getId().toString());
+    		item.put("status",user.getStatus().toString());
+    		data.add(item);
+    	}
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -472,6 +493,7 @@ public class Account {
     	String content			= requestParams.getString("content");
     	String url						= requestParams.getString("url");
     	result = stationLetterService.createLetter(userDO.getId(), acceptorType, acceptorId, type,content, url);
+    	
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
     }
@@ -529,6 +551,35 @@ public class Account {
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
     }
+    /**
+     * 更新当前帐号的miRegId
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doSaveMiRegId(ParameterParser requestParams) throws IOException {
+    	SimpleResult result = new SimpleResult();
+    	String authToken= requestParams.getString("authToken");
+    	UserDO userDO = accountService.validateAuthToken(authToken);
+    	if(null == userDO) {
+            result.setSuccess(false);
+            result.setErrorCode(1000);
+            result.setMessage("请登录！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    		
+    	}    	
+    	String miRegId = requestParams.getString("miRegId");
+    	if(StringUtils.isBlank(miRegId)) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("miRegId不能为空！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    		    		
+    	}
+    	userDO.setMiRegId(miRegId);
+    	accountService.update(userDO);//保存miRegId
+    	result.setSuccess(true);
+    	response.getWriter().println(JSON.toJSONString(result));    	
+    }    
     private SimpleResult signature(ParameterParser requestParams) {
     	String[] keyList = requestParams.getKeys();
     	DataResult<Map<String,Object>> result =new DataResult<Map<String,Object>>();

@@ -29,16 +29,17 @@ public class UserDO  extends PageDO {
 
 	private String   loginName;	//登录帐号
     private String   password;	//登录密码
+    private Integer type;				//帐号类型  0-手机注册/1-Toy注册
     private Integer status;			//帐号状态：0-正常/1-冻结
     private String 	nickName;	//昵称
     private String	mobile;			//手机号
     private String	email;			//邮箱
     private String	photo;			//头像
-    private String	xmppAccount;//用户的xmpp服务帐号
     private Integer comeFrom;	//来源:0-扫码注册/1-邀请注册
     private String	comeSN;		//ToySN或注册邀请码
     private Long		invitorId;		//邀请人ID
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常
+    private String	miRegId;		//miPushRegId
     
     //查询专用
     private List<Long>  userIds;
