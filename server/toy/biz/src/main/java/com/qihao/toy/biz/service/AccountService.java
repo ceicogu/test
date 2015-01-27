@@ -61,6 +61,18 @@ public interface AccountService {
      */
     UserDO getUser(long userId);
     /**
+     * 获取指令用户ID列表的用户详情
+     * @param userIds
+     * @return
+     */
+    List<UserDO>  getUserList(List<Long> userIds);
+    /**
+     * 获取某群所有用户ＩＤ列表
+     * @param groupId
+     * @return
+     */
+    public List<Long>  getAllUserIdsByGroupId(Long groupId);
+    /**
      * 创建用户认证token
      * @param user
      * @return

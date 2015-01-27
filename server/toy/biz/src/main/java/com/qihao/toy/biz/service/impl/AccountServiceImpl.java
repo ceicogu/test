@@ -20,6 +20,7 @@ import com.qihao.shared.base.utils.CryptoCoder;
 import com.qihao.shared.base.utils.MD5Algorithm;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
+import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
@@ -41,6 +42,7 @@ import com.qihao.toy.dal.persistent.MyToyMapper;
 import com.qihao.toy.dal.persistent.ToyMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
+import com.xiaomi.xmpush.server.Message;
 @Slf4j
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -78,16 +80,26 @@ public class AccountServiceImpl implements AccountService{
 		Preconditions.checkArgument(StringUtils.isNotBlank(user.getPassword()),"密码不能为空");
 		Preconditions.checkArgument(StringUtils.isNotBlank(user.getNickName()),"昵称不能为空");
 		Preconditions.checkArgument(null != user.getComeFrom(),"注册来源未指明");
-		Preconditions.checkArgument(StringUtils.isNotBlank(user.getComeSN()),"SN不能为空");
+		Preconditions.checkArgument(StringUtils.isNotBlank(user.getComeSN()),"SN不能为空");	
+		Preconditions.checkArgument(null != user.getType(),"帐号类型未指定");
 		
 		if(null == user.getStatus()) user.setStatus(RegStatusEnum.Normal.numberValue());
-		
+		{//检查是否已注册
+			UserDO existUser = new UserDO();
+			existUser.setLoginName(user.getLoginName());
+			existUser.setIsDeleted(0);
+			List<UserDO> resp = userMapper.getAll(existUser);
+			if(!CollectionUtils.isEmpty(resp)){
+				throw new IllegalArgumentException("帐号已注册，请更换帐号!");
+			}
+		}
 		String md5pwd;
 		try {
 			md5pwd = MD5Algorithm.digest(user.getPassword(), globalConfig.getMd5Key());
 		} catch (Exception e) {
 			throw new IllegalArgumentException("系统配置参数错误！");
-		}		
+		}	
+		
 		user.setPassword(md5pwd);
 		userMapper.insert(user);//注册
 		
@@ -122,19 +134,24 @@ public class AccountServiceImpl implements AccountService{
 				return user.getId();
 			}			
 		}else {//彼此成为好友 
-			//获取邀请码
-			VerifyCodeDO verifyCode = new VerifyCodeDO();
-			verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
-			verifyCode.setCode(user.getComeSN());
-			verifyCode.setMobile(user.getMobile());
-			verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
-			List<VerifyCodeDO> resp = verifyCodeMapper.getAll(verifyCode);
-			if(CollectionUtils.isEmpty(resp)){
-				return user.getId();
+			Long invitorId= null;
+			if(user.getType() == 0 ) {
+				//获取邀请码
+				VerifyCodeDO verifyCode = new VerifyCodeDO();
+				verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
+				verifyCode.setCode(user.getComeSN());
+				verifyCode.setMobile(user.getMobile());
+				verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
+				List<VerifyCodeDO> resp = verifyCodeMapper.getAll(verifyCode);
+				if(CollectionUtils.isEmpty(resp)){
+					return user.getId();
+				}
+				verifyCode = resp.get(0);
+				verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeStatusEnum.Verified.numberValue());//标记为已验证，不得再次使用
+				invitorId= verifyCode.getInvitorId();
+			}else {
+				invitorId = user.getInvitorId();
 			}
-			verifyCode = resp.get(0);
-			verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeStatusEnum.Verified.numberValue());//标记为已验证，不得再次使用
-			Long invitorId= verifyCode.getInvitorId();
 			if(null != invitorId) {	//互相添加为好友
 				this.focusA2B(invitorId, user.getId());
 				this.focusA2B(user.getId(),invitorId);
@@ -150,12 +167,13 @@ public class AccountServiceImpl implements AccountService{
 		toyMapper.update(toy);
 		//注册Toy到用户表
 		UserDO userForToy = new UserDO();
-		userForToy.setComeFrom(RegFromEnum.Scan.numberValue());
+		userForToy.setComeFrom(RegFromEnum.Invite.numberValue());
 		userForToy.setComeSN(toy.getToySN());
-		userForToy.setInvitorId(user.getId());
+		userForToy.setInvitorId(user.getId());//邀请者
 		userForToy.setLoginName("toy_"+toy.getToySN());
 		userForToy.setPassword(toy.getToySN());
-		userForToy.setNickName(toy.getToyName());
+		userForToy.setNickName(toy.getToySN());
+		userForToy.setType(1);//帐号类型:1-TOY注册
 		userForToy.setStatus(RegStatusEnum.Normal.numberValue());
 		 this.register(userForToy);
 		 //加入玩具用户表
@@ -163,9 +181,6 @@ public class AccountServiceImpl implements AccountService{
 		myToy.setMyId(user.getId());
 		myToy.setToySN(toy.getToySN());				
 		myToyMapper.insert(myToy);
-		//将Toy&owner设置为互为好友
-		this.focusA2B(user.getId(), userForToy.getId());
-		this.focusA2B(userForToy.getId(),user.getId());
 		//创建我的家庭
 		MyGroupDO myGroup = new MyGroupDO();
 		myGroup.setGroupName("我的家庭群");
@@ -191,6 +206,14 @@ public class AccountServiceImpl implements AccountService{
 
 	public UserDO getUser(long userId) {
 		return userMapper.getById(userId);
+	}
+	public List<UserDO>  getUserList(List<Long> userIds){
+		if(CollectionUtils.isEmpty(userIds)){
+			return null;
+		}
+		UserDO user = new UserDO();
+		user.setUserIds(userIds);
+		return userMapper.getAll(user);
 	}
 	public ToyDO getToyBySN(String toySN) {
 		return toyMapper.getItemByToySN(toySN);
@@ -238,7 +261,17 @@ public class AccountServiceImpl implements AccountService{
 			}
 		}
 		if(needPushMessage) {//推送消息给userBId
-			//TODO 调用miPush接口推送消息给userBId
+			//调用miPush接口推送消息给userBId			
+			UserDO userA =this.getUser(userAId);
+			UserDO userB =this.getUser(userBId);
+			if(null != userB && !StringUtils.isBlank(userB.getMiRegId())) {				
+				try {
+					Message message = MiPushUtils.buildMessage("好友", userA.getNickName()+"成为您的好友!", "关注好友消息");
+					MiPushUtils.sendMessage(message, userB.getMiRegId());
+				} catch (Exception e) {
+					log.error("推送消息异常!e={}",e.getMessage());
+				}				
+			}
 		}
 		
 	}
@@ -278,6 +311,7 @@ public class AccountServiceImpl implements AccountService{
 	public List<ToyDO> getMyToys(long myId) {
 		ToyDO toy = new ToyDO();
 		toy.setOwnerId(myId);
+		
 		return toyMapper.getAll(toy);
 	}
 
@@ -323,7 +357,16 @@ public class AccountServiceImpl implements AccountService{
 		myGroupMember.setGroupId(myGroupId);
 		return myGroupMemberMapper.getAll(myGroupMember);
 	}
-
+	public List<Long>  getAllUserIdsByGroupId(Long groupId){
+		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
+		myGroupMember.setGroupId(groupId);
+		List<MyGroupMemberDO> resp = myGroupMemberMapper.getAll(myGroupMember);
+		List<Long>  userIds = Lists.newArrayList();
+		for(MyGroupMemberDO member : resp){
+			userIds.add(member.getMemberId());
+		}
+		return userIds;
+	}
 	public Boolean isGroupMember(long groupId, long userId) {
 		MyGroupMemberDO member = new MyGroupMemberDO();
 		member.setGroupId(groupId);

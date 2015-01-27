@@ -1,16 +1,23 @@
 package com.qihao.toy.biz.service.impl;
 
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.qihao.shared.base.DataResult;
+import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.StationLetterService;
+import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.StationLetterDO;
+import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
+import com.xiaomi.xmpush.server.Message;
 
 
 @Slf4j
@@ -20,12 +27,39 @@ public class StationLetterServiceImpl implements StationLetterService {
 	private StationLetterMapper stationLetterMapper;
 	@Autowired
 	private MyGroupMemberMapper myGroupMemberMapper;
+	@Autowired
+	private AccountService accountService;
 
 	public DataResult<Long> createLetter(StationLetterDO letter) {
 		DataResult<Long> result = new DataResult<Long>();
 		stationLetterMapper.insert(letter);
-		{//TODO 调用miPush推送消息接口，将消息ID推送给acceptorType的每一个人
-			//Message message = MiPushUtils.buildMessage(title, description, messagePayload);
+		{//调用miPush推送消息接口，将消息ID推送给acceptorType的每一个人
+			try {
+				Message message = MiPushUtils.buildMessage("推送消息", letter.getId().toString(), "推送消息");
+				Integer acceptorType = letter.getAcceptorType();
+				
+				if(acceptorType.equals(0)){//直接发送给好友
+					UserDO user = accountService.getUser(letter.getAcceptorId());
+					if(null != user) {
+						MiPushUtils.sendMessage(message, user.getMiRegId());
+					}
+				}else {
+					List<Long>  userIds = accountService.getAllUserIdsByGroupId(letter.getAcceptorId());					
+					if(!CollectionUtils.isEmpty(userIds)){
+						userIds.remove(letter.getSenderId());
+						List<UserDO> resp = accountService.getUserList(userIds);
+						for(UserDO user : resp){						
+							if(user.getId().equals(letter.getSenderId())) continue;
+							
+							MiPushUtils.sendMessage(message, user.getMiRegId());
+						}
+					}
+				}
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}		
 		result.setSuccess(true);
 		result.setData(letter.getId());
