@@ -24,33 +24,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import com.alibaba.citrus.turbine.Navigator;
 import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.fastjson.JSON;
 import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
-import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.biz.utils.AnnexUtils;
 import com.qihao.toy.dal.domain.UserDO;
+import com.qihao.toy.web.base.BaseScreenAction;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class Resource {
-    @Autowired
-    private HttpServletRequest request;
-    @Autowired
-    private HttpServletResponse response;
+public class Resource  extends BaseScreenAction{
     @Autowired
     private AccountService accountService;
-    @Autowired
-    private GlobalConfig globalConfig;
     @Autowired
     private DefaultSolrOperator solrOperator;
     
