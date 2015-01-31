@@ -21,13 +21,13 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 	private VerifyCodeMapper verifyCodeMapper;
 	@Autowired
 	private MessageChannelService messageChannelManager;
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile) {
-		return this.createVerifyCode(codeType, mobile, null, null);
+	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile) {
+		return this.createVerifyCode(invitorId,codeType, mobile, null, null);
 	}
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile, Integer codeLength) {
-		return this.createVerifyCode(codeType, mobile, codeLength, null);
+	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile, Integer codeLength) {
+		return this.createVerifyCode(invitorId, codeType, mobile, codeLength, null);
 	}
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile,  Integer codeLength,Integer duration) {
+	public boolean createVerifyCode( Long invitorId, VerifyCodeTypeEnum codeType, String mobile,  Integer codeLength,Integer duration) {
 		Preconditions.checkArgument(StringUtils.isNotBlank(mobile),"请指定手机号码！");
 
 		VerifyCodeDO verifyCode = new VerifyCodeDO();
@@ -35,6 +35,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 		verifyCode.setMobile(mobile);
 		verifyCode.setDuration(null==duration?-1:duration);		
 		verifyCode.setGmtInvited(new Date());
+		verifyCode.setInvitorId(invitorId);
 		//生成验证码
 		String code = RandomStringHelper.getRandomNum(null==codeLength? 6: codeLength);
 		verifyCode.setCode(code);

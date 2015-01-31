@@ -30,8 +30,8 @@ public interface VerifyCodeService {
 	 * @param verifyCode				验证码对象
 	 * @return
 	 */
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile);
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile, Integer codeLength);
+	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile);
+	public boolean createVerifyCode(Long invitorId, VerifyCodeTypeEnum codeType, String mobile, Integer codeLength);
 	/**
 	 * 创建注册验证码或邀请码
 	 * @param codeType      注册验证码／注册邀请码
@@ -40,7 +40,7 @@ public interface VerifyCodeService {
 	 * @param duration       失效时长（秒，缺失永久)
 	 * @return
 	 */
-	public boolean createVerifyCode(VerifyCodeTypeEnum codeType, String mobile, Integer codeLength, Integer duration);
+	public boolean createVerifyCode(Long invitorId, VerifyCodeTypeEnum codeType, String mobile, Integer codeLength, Integer duration);
     /**
      * 校验手机验证码是否有效
      * @param mobile

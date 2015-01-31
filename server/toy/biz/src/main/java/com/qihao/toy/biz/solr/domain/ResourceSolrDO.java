@@ -12,6 +12,7 @@ public class ResourceSolrDO {
 	private String author;
 	private String composer;
 	private String singer;
+	private String url_type;
 	private String url;
 	private String summary;
 	private String content;
