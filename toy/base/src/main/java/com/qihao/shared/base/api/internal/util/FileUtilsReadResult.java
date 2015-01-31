@@ -12,7 +12,6 @@ import java.io.Serializable;
 /**
  * 类FileUtilsReadResult.java的实现描述：TODO 类实现描述
  * 
- * @author zhihua.zhangzh Mar 14, 2014 1:55:54 PM
  */
 public class FileUtilsReadResult implements Serializable {
     private static final long serialVersionUID = -6996902663761840770L;
