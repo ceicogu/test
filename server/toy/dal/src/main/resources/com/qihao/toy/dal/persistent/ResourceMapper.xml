@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.ResourceMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,title,sub_title,author,composer,singer,url,summary,content,photo,creator_id,biz_flag,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,title,sub_title,author,composer,singer,url_type,url,summary,content,photo,creator_id,biz_flag,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.ResourceDO"
         parameterType="java.lang.Long">
@@ -14,10 +14,10 @@
     </select>    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.ResourceDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO resource (
-         title,sub_title,author,composer,singer,url,summary,content,photo,creator_id,biz_flag,gmt_created,gmt_modified
+         title,sub_title,author,composer,singer,url_type,url,summary,content,photo,creator_id,biz_flag,gmt_created,gmt_modified
         )
         VALUES (
-        #{title},#{subTitle},#{author},#{composer},#{singer},#{url},#{summary},#{content},#{photo},#{creatorId},#{bizFlag},now(),now()
+        #{title},#{subTitle},#{author},#{composer},#{singer},#{urlType},#{url},#{summary},#{content},#{photo},#{creatorId},#{bizFlag},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.ResourceDO">
@@ -29,6 +29,7 @@
         <if test="author != null"> ,author=#{author}</if>
         <if test="composer != null"> ,composer=#{composer}</if>
         <if test="singer != null"> ,singer=#{singer}</if>
+        <if test="urlType!= null"> ,url_type=#{urlType}</if>
         <if test="url != null"> ,url=#{url}</if>
         <if test="summary != null"> ,summary=#{summary}</if>
         <if test="content != null"> ,content=#{content}</if>
@@ -55,6 +56,7 @@
 	        <if test="author != null"> AND author=#{author}</if>
 	        <if test="composer != null"> AND composer=#{composer}</if>
 	        <if test="singer != null"> AND singer=#{singer}</if>
+	        <if test="urlType!= null"> AND url_type=#{urlType}</if>
 	        <if test="url != null"> AND url=#{url}</if>
 	        <if test="summary != null"> AND summary=#{summary}</if>
 	        <if test="content != null"> AND content=#{content}</if>

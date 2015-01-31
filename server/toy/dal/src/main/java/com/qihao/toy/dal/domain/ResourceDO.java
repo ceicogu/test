@@ -36,6 +36,7 @@ public class ResourceDO  extends PageDO {
 	private String	author;				//作者
 	private String	composer;		//作曲
 	private String	singer;				//演唱者＆演奏者
+	private Integer urlType;			//资源类型:0-无额外资源／1-关联文字资源/2-关联图片资源/3-关联语音资源
     private String	url;						//资源的存储地址
     private String	summary;		//摘要
     private String	content;			//内容
