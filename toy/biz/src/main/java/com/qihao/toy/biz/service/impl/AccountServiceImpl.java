@@ -28,6 +28,7 @@ import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.enums.AccountTypeEnum;
 import com.qihao.toy.dal.enums.FriendStatusEnum;
 import com.qihao.toy.dal.enums.GroupTypeEnum;
 import com.qihao.toy.dal.enums.RegFromEnum;
@@ -101,8 +102,7 @@ public class AccountServiceImpl implements AccountService{
 		}	
 		
 		user.setPassword(md5pwd);
-		userMapper.insert(user);//注册
-		
+		userMapper.insert(user);//注册		
 		if(user.getComeFrom().equals(RegFromEnum.Scan.numberValue())) {//扫描ToySN注册
 			String toySN = user.getComeSN();
 			ToyDO toy = toyMapper.getItemByToySN(toySN);

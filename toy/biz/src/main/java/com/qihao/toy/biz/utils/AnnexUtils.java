@@ -11,7 +11,7 @@ import org.apache.commons.fileupload.FileItem;
 import com.alibaba.citrus.util.io.StreamUtil;
 
 public class AnnexUtils {
-	 private final static String UPLOAD_DIR = "/tmp/qihao/upload";
+	 private final static String UPLOAD_DIR = "/data/resource/res";
 	 
 	public static String saveAnnex(FileItem inFileItem) throws IOException {
 		if(null == inFileItem) return null;
@@ -19,7 +19,7 @@ public class AnnexUtils {
         String imageFileName = null;
         File uploadDir = null;
         try {
-        	uploadDir = new File(UPLOAD_DIR);
+        	uploadDir = new File(UPLOAD_DIR+"/upload");
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
@@ -27,7 +27,7 @@ public class AnnexUtils {
                 throw new IOException("Could not create directory " + uploadDir.getAbsolutePath());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Could not get upload directory from ResourceLoader: " + UPLOAD_DIR);
+            throw new RuntimeException("Could not get upload directory from ResourceLoader: " + UPLOAD_DIR+"/upload");
         }
 
         String fileName = inFileItem.getName().replace('\\', '/');
@@ -46,7 +46,7 @@ public class AnnexUtils {
         OutputStream os = new BufferedOutputStream(new FileOutputStream(imageFile));
 
         StreamUtil.io(is, os, true, true);
-        return imageFileName;
+        return "upload/"+imageFileName;
 	}
 
 	public static File getAnnexFile(String fileName) {
