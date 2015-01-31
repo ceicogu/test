@@ -3,6 +3,7 @@ package com.qihao.toy.web.valve;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import com.alibaba.citrus.turbine.TurbineRunData;
 import com.alibaba.citrus.turbine.util.TurbineUtil;
 import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.qihao.shared.base.SimpleResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;
@@ -27,9 +29,18 @@ public class AuthorizationValve extends AbstractValve {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private List<String>		targetWhiteList;
+    private HttpServletResponse response;
     @Autowired
     private AccountService accountService;
+    //无需进行authToken验证的api白名单
+    private final static List<String>		targetWhiteList = Lists.newArrayList();
+    static{
+    	targetWhiteList.add("account_login");
+    	targetWhiteList.add("account_register");
+    	targetWhiteList.add("account_validateQrCode");
+    	targetWhiteList.add("account_createVerifyCode");
+    	targetWhiteList.add("account_checkInvitionCode");    	
+    }
     
 	public void invoke(PipelineContext pipelineContext) throws Exception {
 
@@ -54,16 +65,19 @@ public class AuthorizationValve extends AbstractValve {
                     result.setSuccess(false);
                     result.setErrorCode(1000);
                     result.setMessage("请登录！");
-                    rundata.getResponse().getWriter().println(JSON.toJSONString(result));
-                    return;    	
-            	}
-            }
+                    String jsonContent = JSON.toJSONString(result);
+                    response.setContentLength(jsonContent.length());
+                    response.setContentType("application/json; charset=utf-8");
+                    response.setCharacterEncoding("utf-8");
+                    response.getWriter().print(jsonContent);        
+                    pipelineContext.breakPipeline(1);//level=1，中断上一级pipeline
+            	}            	
+            	request.setAttribute("authUser", user);
+            }            
+            pipelineContext.invokeNext();
         } catch (Exception e) {
             logger.error("check_permisson_error" + e);
-        } finally {
-            pipelineContext.invokeNext();
         }
-
     }
 	/**
 	 * 检查用户权限
@@ -71,6 +85,7 @@ public class AuthorizationValve extends AbstractValve {
 	 * @return
 	 */
     public UserDO checkUserPermission(String authToken) {
+    	if(StringUtils.isBlank(authToken)) return null;
     	UserDO userDO = accountService.validateAuthToken(authToken);
         return userDO;
     }
@@ -79,6 +94,6 @@ public class AuthorizationValve extends AbstractValve {
         if (StringUtils.isBlank(nowBucPermisson)) {
             return false;
         }
-        return targetWhiteList.contains(nowBucPermisson); 
+        return targetWhiteList.contains(nowBucPermisson);
     }
 }

@@ -21,15 +21,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.dataresolver.Param;
@@ -40,8 +37,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
-import com.qihao.shared.base.utils.MD5Algorithm;
-import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.StationLetterService;
@@ -54,6 +49,7 @@ import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
 import com.qihao.toy.dal.enums.RegFromEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
+import com.qihao.toy.web.base.BaseScreenAction;
 
 /**
  * 这个例子演示了用一个screen类处理多个事件的方法。
@@ -61,11 +57,7 @@ import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
  * @author Michael Zhou
  */
 @Slf4j
-public class Account {
-    @Autowired
-    private HttpServletRequest request;
-    @Autowired
-    private HttpServletResponse response;
+public class Account extends BaseScreenAction{
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -73,19 +65,8 @@ public class Account {
     @Autowired
     private StationLetterService stationLetterService;    
     @Autowired
-    private GlobalConfig globalConfig;
-    @Autowired
     private MessageChannelService messageChannelService;
-    
-    /** 此方法会在所有的event handler之前执行。 */
-    public void beforeExecution() {
-        response.setContentType("application/json");
-    }
 
-    /** 此方法会在所有的event handler之后执行。 */
-    public void afterExecution() throws IOException {
-        response.flushBuffer(); // 此调用并非必须，只是用来演示afterExecution方法而已
-    }
     /**验证二维码是否有效*/
     public void doValidateQRCode(ParameterParser requestParams) throws IOException{
     	//签名验证
@@ -202,20 +183,14 @@ public class Account {
         response.getWriter().println(JSON.toJSONString(result));
     }
     /** 获取登录用户信息     */
-    public void doGetUserInfo(@Param("authToken") String authToken) throws IOException {
+    public void doGetUserInfo() throws IOException {    	
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Map<String,Object>> result = new DataResult<Map<String, Object>>();
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}
+
         Map<String,Object> data = Maps.newTreeMap();
-        data.put("userId", userDO.getId());
-        data.put("nickName", userDO.getNickName());
-        data.put("photo", userDO.getPhoto());
+        data.put("userId", currentUser.getId());
+        data.put("nickName", currentUser.getNickName());
+        data.put("photo", currentUser.getPhoto());
         result.setSuccess(true);
         result.setData(data);
         response.getWriter().println(JSON.toJSONString(result));
@@ -226,7 +201,7 @@ public class Account {
     	SimpleResult result = new SimpleResult();
     	//1.创建验证码，并发送
     	try{
-    		verifyCodeService.createVerifyCode(VerifyCodeTypeEnum.Reg_VerifyCode, mobile);
+    		verifyCodeService.createVerifyCode(null, VerifyCodeTypeEnum.Reg_VerifyCode, mobile);
     		result.setSuccess(true);
     	}catch(Exception e) {
     		result.setSuccess(false);
@@ -239,22 +214,15 @@ public class Account {
      * @param authToken
      * @throws IOException
      */
-    public void doRenameToy(ParameterParser requestParams) throws IOException {
+    public void doRenameToy(ParameterParser requestParams) throws IOException {    	
+    	Assert.notNull(currentUser, "用户未登录!");
     	//签名验证
     	SimpleResult result = this.signature(requestParams);
     	if(!result.isSuccess()) {
     		response.getWriter().println(JSON.toJSONString(result));
     		return;    		
     	}
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}
+    	
     	String toySN= requestParams.getString("toySN");
     	if(StringUtil.isBlank(toySN)){
     		result.setSuccess(false);
@@ -272,7 +240,7 @@ public class Account {
     	kidParams.put("kidAge", requestParams.getInt("kidAge",-1));
     	kidParams.put("kidBirth", requestParams.getDate("kidBirth", null));
     	try{
-	    	accountService.renameToy(userDO.getId(), toySN, toyName, kidParams);
+	    	accountService.renameToy(currentUser.getId(), toySN, toyName, kidParams);
 			result.setSuccess(true);
 			response.getWriter().println(JSON.toJSONString(result));
 			return;
@@ -291,16 +259,8 @@ public class Account {
      * @throws IOException
      */
     public void doInviteFriend(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	SimpleResult result = new SimpleResult();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
     	String mobile= requestParams.getString("mobile");
     	if(StringUtil.isBlank(mobile)){
             result.setSuccess(false);
@@ -311,7 +271,7 @@ public class Account {
     	}
     	//1.好友邀请
     	try{
-    		verifyCodeService.createVerifyCode(VerifyCodeTypeEnum.Reg_InviteCode, mobile);
+    		verifyCodeService.createVerifyCode(currentUser.getId(), VerifyCodeTypeEnum.Reg_InviteCode, mobile);
     		result.setSuccess(true);
     	}catch(Exception e) {
     		result.setSuccess(false);
@@ -357,17 +317,9 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyToys(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
-    	List<ToyDO>  resp = accountService.getMyToys(userDO.getId());
+    	List<ToyDO>  resp = accountService.getMyToys(currentUser.getId());
     	
     	List<Map<String,String>> data = Lists.newArrayList();    	
     	for(ToyDO toy : resp) {
@@ -389,17 +341,10 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyFriends(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
-    	List<UserDO>  resp = accountService.getMyFriends(userDO.getId());
+
+    	List<UserDO>  resp = accountService.getMyFriends(currentUser.getId());
     	List<Map<String,String>> data = Lists.newArrayList();    	
     	for(UserDO user : resp) {
     		Map<String,String> item = Maps.newTreeMap();
@@ -418,19 +363,12 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyGroups(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<MyGroupDO>> result = new DataResult<List<MyGroupDO>>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
+	
     	//获取群类型(0-自己创建的群，1-我参加的群)
     	Integer type = requestParams.getInt("type",0);
-    	List<MyGroupDO>  data = accountService.getMyGroups(type, userDO.getId());
+    	List<MyGroupDO>  data = accountService.getMyGroups(type, currentUser.getId());
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -441,16 +379,8 @@ public class Account {
      * @throws IOException
      */
     public void doGetMyGroupMembers(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<MyGroupMemberDO>> result = new DataResult<List<MyGroupMemberDO>>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
     	if(StringUtils.isBlank(requestParams.getString("groupId"))){
             result.setSuccess(false);
             result.setErrorCode(2000);
@@ -459,7 +389,7 @@ public class Account {
             return;
     	}
     	Long groupId = requestParams.getLong("groupId");
-    	List<MyGroupMemberDO>  data = accountService.getMyGroupMembers(userDO.getId(), groupId);
+    	List<MyGroupMemberDO>  data = accountService.getMyGroupMembers(currentUser.getId(), groupId);
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -469,16 +399,9 @@ public class Account {
         return;    	
     }
     public void doSendLetter(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Long> result = new DataResult<Long>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
+
     	if(StringUtils.isBlank(requestParams.getString("acceptorId"))) {
             result.setSuccess(false);
             result.setErrorCode(2000);
@@ -492,7 +415,7 @@ public class Account {
     	long acceptorId		=	requestParams.getLong("acceptorId");
     	String content			= requestParams.getString("content");
     	String url						= requestParams.getString("url");
-    	result = stationLetterService.createLetter(userDO.getId(), acceptorType, acceptorId, type,content, url);
+    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, type,content, url);
     	
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
@@ -505,16 +428,9 @@ public class Account {
      * @throws IOException
      */
     public void doGetLetter(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<StationLetterDO> result = new DataResult<StationLetterDO>();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
+
     	if(StringUtils.isBlank(requestParams.getString("letterId"))) {
             result.setSuccess(false);
             result.setErrorCode(2000);
@@ -530,7 +446,7 @@ public class Account {
         	Integer    acceptorType = letter.getAcceptorType();
         	Long		   acceptorId	  = letter.getAcceptorId();    		
     		if(acceptorType.equals(0)) {
-    			if(!acceptorId.equals(userDO.getId())) {
+    			if(!acceptorId.equals(currentUser.getId())) {
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);
     	            result.setMessage("无权查看该消息！");
@@ -538,7 +454,7 @@ public class Account {
     	            return;        				
     			}
     		}else {
-    			Boolean bOK = accountService.isGroupMember(acceptorId, userDO.getId());
+    			Boolean bOK = accountService.isGroupMember(acceptorId, currentUser.getId());
     			if(bOK == false){
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);
@@ -557,16 +473,8 @@ public class Account {
      * @throws IOException
      */
     public void doSaveMiRegId(ParameterParser requestParams) throws IOException {
-    	SimpleResult result = new SimpleResult();
-    	String authToken= requestParams.getString("authToken");
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}    	
+    	Assert.notNull(currentUser, "用户未登录!");
+    	SimpleResult result = new SimpleResult(); 	
     	String miRegId = requestParams.getString("miRegId");
     	if(StringUtils.isBlank(miRegId)) {
             result.setSuccess(false);
@@ -575,51 +483,10 @@ public class Account {
             response.getWriter().println(JSON.toJSONString(result));
             return;    		    		
     	}
-    	userDO.setMiRegId(miRegId);
-    	accountService.update(userDO);//保存miRegId
+    	currentUser.setMiRegId(miRegId);
+    	accountService.update(currentUser);//保存miRegId
     	result.setSuccess(true);
     	response.getWriter().println(JSON.toJSONString(result));    	
     }    
-    private SimpleResult signature(ParameterParser requestParams) {
-    	String[] keyList = requestParams.getKeys();
-    	DataResult<Map<String,Object>> result =new DataResult<Map<String,Object>>();
-
-    	Map<String,String> args = new TreeMap<String,String>();
-        for(String key : keyList) {
-        	if(key.equalsIgnoreCase("sign")) continue;
-            args.put(key,  requestParams.getString(key));
-        }
-        StringBuilder buf = new StringBuilder();
-        for (Map.Entry<String, String> entry : args.entrySet()) {
-            if(StringUtils.isNotBlank(entry.getValue())) {
-                buf.append(entry.getKey()).append(entry.getValue());
-            }
-        }
-        if(!StringUtils.isNotBlank(buf.toString())) {
-            log.warn("参数错误！");
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("参数错误!");
-    		return result;
-        } 
-        //2.签名比对
-        String sign = requestParams.getString("sign");        
-        String newSign = null;
-        try {
-        	newSign = MD5Algorithm.digest(buf.toString(), globalConfig.getMd5Key());
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-//		if(null == newSign || !sign.equals(newSign)) {
-//			    log.warn("签名失败！");
-//			    result.setSuccess(false);
-//			    result.setErrorCode(1000);
-//			    result.setMessage("签名失败！");
-//				return result;
-//		}
-    	
-        result.setSuccess(true);
-        return result;
-    }
 }
 
