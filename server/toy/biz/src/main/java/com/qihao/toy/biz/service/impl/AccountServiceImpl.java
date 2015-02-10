@@ -20,15 +20,14 @@ import com.qihao.shared.base.utils.CryptoCoder;
 import com.qihao.shared.base.utils.MD5Algorithm;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
+import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
-import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
-import com.qihao.toy.dal.enums.AccountTypeEnum;
 import com.qihao.toy.dal.enums.FriendStatusEnum;
 import com.qihao.toy.dal.enums.GroupTypeEnum;
 import com.qihao.toy.dal.enums.RegFromEnum;
@@ -37,8 +36,6 @@ import com.qihao.toy.dal.enums.ToyStatusEnum;
 import com.qihao.toy.dal.enums.VerifyCodeStatusEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.dal.persistent.MyFriendMapper;
-import com.qihao.toy.dal.persistent.MyGroupMapper;
-import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import com.qihao.toy.dal.persistent.MyToyMapper;
 import com.qihao.toy.dal.persistent.ToyMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
@@ -54,11 +51,10 @@ public class AccountServiceImpl implements AccountService{
 	@Autowired
 	private MyToyMapper myToyMapper;
 	@Autowired
+	
 	private MyFriendMapper myFriendMapper;
 	@Autowired
-	private MyGroupMapper myGroupMapper;
-	@Autowired
-	private MyGroupMemberMapper myGroupMemberMapper;
+	private GroupService groupService;
 	@Autowired
 	private VerifyCodeMapper  verifyCodeMapper;
 	@Autowired
@@ -117,20 +113,22 @@ public class AccountServiceImpl implements AccountService{
 				if(toy.getOwnerId().equals(user.getId())) {//是Toy的激活人，就直接返回
 					return user.getId();
 				}
-				//加入Toy－Owner的家庭群
-				MyGroupDO myGroup = new MyGroupDO();
-				myGroup.setMyId(toy.getOwnerId());
-				myGroup.setGroupType(GroupTypeEnum.Family.numberValue());
-				List<MyGroupDO> resp = myGroupMapper.getAll(myGroup);
+				//加入Toy－Owner的家庭群				
+				List<MyGroupDO> resp = groupService.getMyCreatedGroups(toy.getOwnerId());
 				if(CollectionUtils.isEmpty(resp)) {
 						throw new IllegalArgumentException("用户群不存在！");
 				}
-				myGroup = resp.get(0);			
-				MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
-				myGroupMember.setGroupId(myGroup.getId());
-				myGroupMember.setMemberId(user.getId());
-				myGroupMember.setMemberName(user.getNickName());
-				myGroupMemberMapper.insert(myGroupMember);
+				MyGroupDO myGroup = null;
+				for(MyGroupDO group: resp) {
+					if(group.getGroupType().equals(GroupTypeEnum.Family.numberValue())) {
+						myGroup = group;
+						break;
+					}
+				}
+				if(null == myGroup) {
+					throw new IllegalArgumentException("用户群不存在！");
+				}				
+				groupService.insertGroupMember(myGroup.getId(), user.getId(), user.getNickName());
 				return user.getId();
 			}			
 		}else {//彼此成为好友 
@@ -182,22 +180,11 @@ public class AccountServiceImpl implements AccountService{
 		myToy.setToySN(toy.getToySN());				
 		myToyMapper.insert(myToy);
 		//创建我的家庭
-		MyGroupDO myGroup = new MyGroupDO();
-		myGroup.setGroupName("我的家庭群");
-		myGroup.setGroupType(GroupTypeEnum.Family.numberValue());
-		myGroup.setMyId(user.getId());
-		myGroupMapper.insert(myGroup);
+		Long groupId = groupService.createGroup(user.getId(),"我的家庭群", GroupTypeEnum.Family);
 		//将自己添加为家庭成员
-		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
-		myGroupMember.setGroupId(myGroup.getId());
-		myGroupMember.setMemberId(user.getId());
-		myGroupMember.setMemberName(user.getNickName());
-		myGroupMemberMapper.insert(myGroupMember);
+		groupService.insertGroupMember(groupId, user.getId(), user.getNickName());
 		//将Toy用户自动添加成我的家庭群中来
-		myGroupMember.setGroupId(myGroup.getId());
-		myGroupMember.setMemberId(userForToy.getId());
-		myGroupMember.setMemberName(userForToy.getNickName());
-		myGroupMemberMapper.insert(myGroupMember);
+		groupService.insertGroupMember(groupId, userForToy.getId(), userForToy.getNickName());
 		return true;
 	}
 	public boolean update(UserDO user) {
@@ -298,13 +285,14 @@ public class AccountServiceImpl implements AccountService{
 			//Long ts	= param.get("ts");
 			UserDO user = this.getUser(uid);
 			if(null == user) {
-				return null;
+				throw new RuntimeException("用户不存在!");
 			}
 			return user;
-		} catch (Exception e) {
+		} catch(RuntimeException e) {
+			throw e;
+		}catch (Exception e) {		
 			log.warn("验证失败！exception={}",e);
-			//throw new RuntimeException("验证失败!");
-			return null;
+			throw new RuntimeException("验证失败! 原因："+e.getMessage());
 		}		
 	}
 
@@ -332,46 +320,12 @@ public class AccountServiceImpl implements AccountService{
 		return data;
 	}
 
-	public List<MyGroupDO> getMyGroups(int type,long myId) {
-		MyGroupDO myGroup = new MyGroupDO();
-		if(type ==0) {
-			myGroup.setMyId(myId);
-		}else {
-			MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
-			myGroupMember.setMemberId(myId);
-			List<MyGroupMemberDO> resp = myGroupMemberMapper.getAll(myGroupMember);
-			if(CollectionUtils.isEmpty(resp)){
-				return null;
-			}
-			List<Long> groupIds = Lists.newArrayList();
-			for(MyGroupMemberDO member : resp) {
-				groupIds.add(member.getGroupId());
-			}
-			myGroup.setGroupIds(groupIds);
-		}
-		return myGroupMapper.getAll(myGroup);
-	}
-	public List<MyGroupMemberDO> getMyGroupMembers(long myId, long myGroupId) {
-		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
-		myGroupMember.setMemberId(myId);
-		myGroupMember.setGroupId(myGroupId);
-		return myGroupMemberMapper.getAll(myGroupMember);
-	}
-	public List<Long>  getAllUserIdsByGroupId(Long groupId){
-		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
-		myGroupMember.setGroupId(groupId);
-		List<MyGroupMemberDO> resp = myGroupMemberMapper.getAll(myGroupMember);
-		List<Long>  userIds = Lists.newArrayList();
-		for(MyGroupMemberDO member : resp){
-			userIds.add(member.getMemberId());
-		}
-		return userIds;
-	}
-	public Boolean isGroupMember(long groupId, long userId) {
-		MyGroupMemberDO member = new MyGroupMemberDO();
-		member.setGroupId(groupId);
-		member.setMemberId(userId);
-		List<MyGroupMemberDO> resp = myGroupMemberMapper.getAll(member);
-		return !CollectionUtils.isEmpty(resp); 
+
+	public Boolean isMyFriend(long myId, long friendId) {
+		MyFriendDO myFriend = new MyFriendDO();
+		myFriend.setMyId(myId);
+		myFriend.setFriendId(friendId);
+		List<MyFriendDO> resp = myFriendMapper.getAll(myFriend);
+		return !CollectionUtils.isEmpty(resp);
 	}
 }

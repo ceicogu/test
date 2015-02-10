@@ -51,20 +51,17 @@
         FROM resource
         <where>
         	<if test="id != null"> AND id=#{id}</if>
-	        <if test="title != null"> AND title=#{title}</if>
-	        <if test="subTitle != null"> AND sub_title=#{subTitle}</if>
 	        <if test="author != null"> AND author=#{author}</if>
 	        <if test="composer != null"> AND composer=#{composer}</if>
 	        <if test="singer != null"> AND singer=#{singer}</if>
 	        <if test="urlType!= null"> AND url_type=#{urlType}</if>
 	        <if test="url != null"> AND url=#{url}</if>
 	        <if test="summary != null"> AND summary=#{summary}</if>
-	        <if test="content != null"> AND content=#{content}</if>
 	        <if test="photo != null"> AND photo=#{photo}</if>
 	        <if test="creatorId != null"> AND creatorId=#{creatorId}</if>
 	        <if test="bizFlag != null"> ,biz_flag=#{bizFlag}</if>
-        	<if test="resourceIds != null"> AND id IN 
-        	  <foreach collection="resourceIds"  item="resourceId" open="("    separator="," close=")">
+        	<if test="ids != null"> AND id IN 
+        	  <foreach collection="ids"  item="resourceId" open="("    separator="," close=")">
    						#{resourceId}
   				</foreach>
   			</if>	        

@@ -30,7 +30,7 @@ import lombok.Setter;
 public class ResourceDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
-	
+	private Long		id;
 	private String	title;					//主标题
 	private String	subTitle;			//副标题
 	private String	author;				//作者
@@ -45,5 +45,5 @@ public class ResourceDO  extends PageDO {
     private Integer bizFlag;				//业务标识：0-公开／1-只对好友公开/2-不公开
     
     //查询专用
-    private List<Long>  resourceIds;
+    private List<Long>  ids;
 }

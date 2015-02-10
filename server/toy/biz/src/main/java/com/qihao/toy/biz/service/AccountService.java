@@ -20,8 +20,6 @@ package com.qihao.toy.biz.service;
 import java.util.List;
 import java.util.Map;
 
-import com.qihao.toy.dal.domain.MyGroupDO;
-import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 
@@ -67,12 +65,6 @@ public interface AccountService {
      */
     List<UserDO>  getUserList(List<Long> userIds);
     /**
-     * 获取某群所有用户ＩＤ列表
-     * @param groupId
-     * @return
-     */
-    public List<Long>  getAllUserIdsByGroupId(Long groupId);
-    /**
      * 创建用户认证token
      * @param user
      * @return
@@ -112,24 +104,10 @@ public interface AccountService {
      */
     List<UserDO> getMyFriends(long myId);
     /**
-     * 获取我的群
-     * @param type      类型:0-我管理的群/1-我参加的群
+     * 判断是否是我的好友
      * @param myId
+     * @param firendId
      * @return
      */
-    List<MyGroupDO> getMyGroups(int type, long myId);
-
-    /**
-     * 获取我某个群所有成员
-     * @param myGroupId
-     * @return
-     */
-    List<MyGroupMemberDO> getMyGroupMembers(long myId, long myGroupId);
-    /**
-     * 判断是否是该群成员
-     * @param groupId
-     * @param userId
-     * @return
-     */
-    Boolean isGroupMember(long groupId, long userId);
+    Boolean isMyFriend(long myId, long friendId);
 }
