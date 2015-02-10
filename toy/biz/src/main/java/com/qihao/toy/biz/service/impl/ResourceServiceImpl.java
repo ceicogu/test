@@ -77,7 +77,7 @@ public class ResourceServiceImpl implements ResourceService {
 			data.add(item.getResourceId());
 		}
 		ResourceDO resource = new ResourceDO();
-		resource.setResourceIds(data);
+		resource.setIds(data);
 		return resourceMapper.getAll(resource);		
 	}
 

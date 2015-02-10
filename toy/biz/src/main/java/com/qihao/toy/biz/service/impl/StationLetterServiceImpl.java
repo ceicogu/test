@@ -1,6 +1,7 @@
 package com.qihao.toy.biz.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
+import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
 import com.xiaomi.xmpush.server.Message;
 
@@ -26,41 +28,69 @@ public class StationLetterServiceImpl implements StationLetterService {
 	@Autowired
 	private StationLetterMapper stationLetterMapper;
 	@Autowired
-	private MyGroupMemberMapper myGroupMemberMapper;
+	private GroupService groupService;
 	@Autowired
 	private AccountService accountService;
 
 	public DataResult<Long> createLetter(StationLetterDO letter) {
 		DataResult<Long> result = new DataResult<Long>();
-		stationLetterMapper.insert(letter);
-		{//调用miPush推送消息接口，将消息ID推送给acceptorType的每一个人
-			try {
-				Message message = MiPushUtils.buildMessage("推送消息", letter.getId().toString(), "推送消息");
-				Integer acceptorType = letter.getAcceptorType();
-				
-				if(acceptorType.equals(0)){//直接发送给好友
-					UserDO user = accountService.getUser(letter.getAcceptorId());
-					if(null != user) {
-						MiPushUtils.sendMessage(message, user.getMiRegId());
-					}
-				}else {
-					List<Long>  userIds = accountService.getAllUserIdsByGroupId(letter.getAcceptorId());					
-					if(!CollectionUtils.isEmpty(userIds)){
-						userIds.remove(letter.getSenderId());
-						List<UserDO> resp = accountService.getUserList(userIds);
-						for(UserDO user : resp){						
-							if(user.getId().equals(letter.getSenderId())) continue;
-							
-							MiPushUtils.sendMessage(message, user.getMiRegId());
-						}
-					}
-				}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		//对接收人进行校验，只能是自己的好友或自己所在的群发送消息
+		//1.若接收者是个人的话，判断是否在其好友列表		
+		//2.若接收者是群的话，判断该群是senderId所在的群吗？
+		Integer acceptorType = letter.getAcceptorType();
+		Long		 acceptorId		=	letter.getAcceptorId();
+		Long		senderId			=	letter.getSenderId();
+		
+		if(acceptorType.equals(1)){//我的好友
+			if(!accountService.isMyFriend(senderId, acceptorId)) {//不是好友
+				result.setSuccess(false);
+				result.setMessage("不能给不是好友者发送消息!");
+				return result;				
+			}
+		}else if(acceptorType.equals(2)) {//群			
+			if(!groupService.isGroupMember(acceptorId, senderId)){
+				result.setSuccess(false);
+				result.setMessage("不能给非自己所在群发送消息!");
+				return result;								
 			}
 		}		
+		stationLetterMapper.insert(letter);
+		
+		//调用miPush推送消息接口，将消息ID推送给acceptorType的每一个人
+		Map<Long, String> handleMap = Maps.newLinkedHashMap();
+		try {
+			Message message = MiPushUtils.buildMessage("推送消息", letter.getId().toString(), "推送消息");				
+			if(acceptorType.equals(0)){//直接发送给好友
+				UserDO user = accountService.getUser(letter.getAcceptorId());
+				if(null != user) {
+					String messageId = MiPushUtils.sendMessage(message, user.getMiRegId());
+					if(null != messageId) {
+						handleMap.put(user.getId(), messageId);
+					}
+				}
+			}else {
+				List<Long>  userIds = groupService.getUserIdsByGroupId(letter.getAcceptorId());					
+				if(!CollectionUtils.isEmpty(userIds)){
+					userIds.remove(letter.getSenderId());
+					List<UserDO> resp = accountService.getUserList(userIds);
+					for(UserDO user : resp){						
+						if(user.getId().equals(letter.getSenderId())) continue;
+						String messageId = 	MiPushUtils.sendMessage(message, user.getMiRegId());
+						if(null != messageId) handleMap.put(user.getId(), messageId);;
+					}
+				}
+			}
+			if(CollectionUtils.isEmpty(handleMap)) {
+				log.error("推送消息失败！message={},letter={}",message,letter);
+			}
+			else {
+				log.debug("推送消息！message={},handleMap={}",message,handleMap);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
 		result.setSuccess(true);
 		result.setData(letter.getId());
 		return result;

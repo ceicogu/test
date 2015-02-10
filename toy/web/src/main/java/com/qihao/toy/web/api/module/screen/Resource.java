@@ -24,25 +24,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.alibaba.citrus.turbine.Navigator;
-import com.alibaba.citrus.turbine.dataresolver.Param;
-import com.alibaba.fastjson.JSON;
-import com.qihao.shared.base.DataResult;
-import com.qihao.shared.base.SimpleResult;
-import com.qihao.toy.biz.service.AccountService;
-import com.qihao.toy.biz.solr.DefaultSolrOperator;
-import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
-import com.qihao.toy.biz.utils.AnnexUtils;
-import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.web.base.BaseScreenAction;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
+import com.alibaba.citrus.turbine.Navigator;
+import com.alibaba.citrus.turbine.dataresolver.Param;
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.qihao.shared.base.DataResult;
+import com.qihao.toy.biz.service.AccountService;
+import com.qihao.toy.biz.service.ResourceService;
+import com.qihao.toy.biz.solr.DefaultSolrOperator;
+import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
+import com.qihao.toy.biz.utils.AnnexUtils;
+import com.qihao.toy.dal.domain.ResourceDO;
+import com.qihao.toy.web.base.BaseScreenAction;
 
 public class Resource  extends BaseScreenAction{
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private ResourceService resourceService;
     @Autowired
     private DefaultSolrOperator solrOperator;
     
@@ -52,15 +57,9 @@ public class Resource  extends BaseScreenAction{
      * @throws IOException
      */
     public void doUpload(@Param("authToken") String authToken, @Param("myFile") FileItem myFile) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<String> result =  new DataResult<String>();
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}   
+
     	if(null == myFile){
             result.setSuccess(false);
             result.setErrorCode(1000);
@@ -77,15 +76,7 @@ public class Resource  extends BaseScreenAction{
     }
     
     public void doDownload(@Param("authToken") String authToken, @Param("fileName") String fileName, Navigator nav) throws Exception {
-    	SimpleResult result = new SimpleResult();
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}       	
+    	Assert.notNull(currentUser, "用户未登录!"); 	    	
         try {
             OutputStream out = response.getOutputStream();
             File downloadFile = AnnexUtils.getAnnexFile(fileName);
@@ -115,28 +106,38 @@ public class Resource  extends BaseScreenAction{
 
         }
     }
-    public void doSearch(@Param("authToken") String authToken, @Param("q") String query, Navigator nav) throws Exception {
-    	DataResult<List<Object>> result  = new DataResult<List<Object>>();
-    	UserDO userDO = accountService.validateAuthToken(authToken);
-    	if(null == userDO) {
-            result.setSuccess(false);
-            result.setErrorCode(1000);
-            result.setMessage("请登录！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		
-    	}       
+    public void doSearch(@Param("q") String query, Navigator nav) throws Exception {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
     	ResourceSolrDO resourceSolrDO =  new ResourceSolrDO();
     	resourceSolrDO.setTitle(query);
     	resourceSolrDO.setContent(query);
     	ResourceSolrDO compositorDO = new ResourceSolrDO();
-    	compositorDO.setTitle(SolrQuery.ORDER.desc.toString());
+    	compositorDO.setId(SolrQuery.ORDER.desc.toString());
     	
  //   	 Long count = solrOperator.querySolrResultCount(resourceSolrDO,null);
-    	 List<Object> resp = solrOperator.querySolrResult((Object)resourceSolrDO, null, null, null);
+    	 List<Object> resp = solrOperator.querySolrResult((Object)resourceSolrDO, compositorDO, null, null);
      	result.setSuccess(true);
      	result.setMessage("搜索成功!");
      	result.setData(resp);
          response.getWriter().println(JSON.toJSONString(result));
          return;    
     }
+    public void doGetResourceItems(@Param("ids") String ids, Navigator nav) throws Exception {
+    	Assert.notNull(currentUser, "用户未登录!");    	
+    	DataResult<List<ResourceDO>> result  = new DataResult<List<ResourceDO>>();
+    	Iterable<String> split = Splitter.on(',').split(ids);
+    	List<Long>  resourceIds = Lists.newArrayList();
+    	for(String id : split) {
+    		resourceIds.add(Long.valueOf(id));
+    	}
+    	ResourceDO resource =  new ResourceDO();
+    	resource.setIds(resourceIds);
+    	 List<ResourceDO> resp = resourceService.getAll(resource);
+     	result.setSuccess(true);
+     	result.setMessage("成功!");
+     	result.setData(resp);
+         response.getWriter().println(JSON.toJSONString(result));
+         return;    
+    }    
 }

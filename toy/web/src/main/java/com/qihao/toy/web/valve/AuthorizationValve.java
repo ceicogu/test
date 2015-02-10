@@ -16,7 +16,9 @@ import com.alibaba.citrus.turbine.TurbineRunData;
 import com.alibaba.citrus.turbine.util.TurbineUtil;
 import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;
@@ -59,12 +61,15 @@ public class AuthorizationValve extends AbstractValve {
             //排除JS CSS 图片和白名单页面等
             if (nowBucPermisson.lastIndexOf(".") <= 0 && !isInWhite(nowBucPermisson)) {
             	String authToken = rundata.getParameters().getString("authToken");
-            	UserDO user = checkUserPermission(authToken);
-            	if(null == user) {//非有效登录
+            	try{
+	            	UserDO user = checkUserPermission(authToken);
+	            	request.setAttribute("currentUser", user);
+            	}
+            	catch(Exception e) {
             		SimpleResult result = new SimpleResult();
                     result.setSuccess(false);
                     result.setErrorCode(1000);
-                    result.setMessage("请登录！");
+                    result.setMessage("请登录！原因:"+e.getMessage());
                     String jsonContent = JSON.toJSONString(result);
                     response.setContentLength(jsonContent.length());
                     response.setContentType("application/json; charset=utf-8");
@@ -72,7 +77,6 @@ public class AuthorizationValve extends AbstractValve {
                     response.getWriter().print(jsonContent);        
                     pipelineContext.breakPipeline(1);//level=1，中断上一级pipeline
             	}            	
-            	request.setAttribute("authUser", user);
             }            
             pipelineContext.invokeNext();
         } catch (Exception e) {
@@ -85,9 +89,10 @@ public class AuthorizationValve extends AbstractValve {
 	 * @return
 	 */
     public UserDO checkUserPermission(String authToken) {
-    	if(StringUtils.isBlank(authToken)) return null;
+    	Preconditions.checkArgument(StringUtils.isNotBlank(authToken),"AuthToken不能为空");
+
     	UserDO userDO = accountService.validateAuthToken(authToken);
-        return userDO;
+    	return userDO;
     }
     //白名单列表
     public boolean isInWhite(String nowBucPermisson) {    	

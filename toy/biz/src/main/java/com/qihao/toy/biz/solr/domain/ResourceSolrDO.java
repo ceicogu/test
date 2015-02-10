@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Setter @Getter
 public class ResourceSolrDO {
-	private String resourceId;
+	private String id;
 	private String title;
 	private String subTitle;
 	private String desc;

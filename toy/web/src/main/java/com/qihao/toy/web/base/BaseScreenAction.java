@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.params.CoreProtocolPNames;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
@@ -38,6 +39,7 @@ public class BaseScreenAction {
     
     /** 此方法会在所有的event handler之前执行。 */
     public void beforeExecution() {
+    	request.setAttribute(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
         response.setContentType("application/json");
         currentUser = (UserDO) request.getAttribute("currentUser");
     }

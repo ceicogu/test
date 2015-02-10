@@ -100,7 +100,7 @@ public class AlbumServiceImpl implements AlbumService {
 			data.add(item.getResourceId());
 		}
 		ResourceDO resource = new ResourceDO();
-		resource.setResourceIds(data);
+		resource.setIds(data);
 		return resourceMapper.getAll(resource);
 	}
 

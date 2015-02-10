@@ -38,6 +38,7 @@ import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
 import com.qihao.toy.biz.service.AccountService;
+import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.VerifyCodeService;
@@ -60,6 +61,8 @@ import com.qihao.toy.web.base.BaseScreenAction;
 public class Account extends BaseScreenAction{
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private GroupService groupService;
     @Autowired
     private VerifyCodeService verifyCodeService;    
     @Autowired
@@ -351,6 +354,7 @@ public class Account extends BaseScreenAction{
     		item.put("nickName", user.getNickName());
     		item.put("userId",user.getId().toString());
     		item.put("status",user.getStatus().toString());
+    		item.put("type", user.getType().toString());
     		data.add(item);
     	}
     	result.setSuccess(true);
@@ -366,9 +370,8 @@ public class Account extends BaseScreenAction{
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<MyGroupDO>> result = new DataResult<List<MyGroupDO>>();
 	
-    	//获取群类型(0-自己创建的群，1-我参加的群)
-    	Integer type = requestParams.getInt("type",0);
-    	List<MyGroupDO>  data = accountService.getMyGroups(type, currentUser.getId());
+    	//获取自己创建的群    	
+    	List<MyGroupDO>  data = groupService.getMyCreatedGroups(currentUser.getId());
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -389,7 +392,7 @@ public class Account extends BaseScreenAction{
             return;
     	}
     	Long groupId = requestParams.getLong("groupId");
-    	List<MyGroupMemberDO>  data = accountService.getMyGroupMembers(currentUser.getId(), groupId);
+    	List<MyGroupMemberDO>  data = groupService.getGroupMembersByGroupId(groupId);
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -409,8 +412,8 @@ public class Account extends BaseScreenAction{
             response.getWriter().println(JSON.toJSONString(result));
             return;    
     	}
+    	
     	Integer	type			=	requestParams.getInt("type",0);
-
     	int     acceptorType = requestParams.getInt("acceptorType",0);
     	long acceptorId		=	requestParams.getLong("acceptorId");
     	String content			= requestParams.getString("content");
@@ -454,7 +457,7 @@ public class Account extends BaseScreenAction{
     	            return;        				
     			}
     		}else {
-    			Boolean bOK = accountService.isGroupMember(acceptorId, currentUser.getId());
+    			Boolean bOK = groupService.isGroupMember(acceptorId, currentUser.getId());
     			if(bOK == false){
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);

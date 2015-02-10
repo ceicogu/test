@@ -6,15 +6,17 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.api.internal.util.WebUtils;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
-
+@Slf4j
 @Service
 public class MessageChannelServiceImpl implements MessageChannelService {	
 	@Autowired
@@ -45,10 +47,10 @@ public class MessageChannelServiceImpl implements MessageChannelService {
 		
 		try {
 			String resp = WebUtils.doGet(globalConfig.getMessageChannelURL(), param);
-			
+			log.debug(resp);
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("发送消息异常！exception={}",e);
 			return false;
 		}
 	}

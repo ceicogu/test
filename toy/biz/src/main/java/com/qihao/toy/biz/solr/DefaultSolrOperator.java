@@ -25,9 +25,9 @@ public class DefaultSolrOperator implements SolrjOperator {
             throws Exception {  
         Map<String, String> propertyMap = new TreeMap<String, String>();  
         Map<String, String> compositorMap = new TreeMap<String, String>();  
-        try {  
-            propertyMap = SolrjCommonUtil.getSearchProperty(propertyDO);  
-            compositorMap = SolrjCommonUtil.getSearchProperty(compositorDO);  
+        try {
+        	if(null != propertyDO)  propertyMap = SolrjCommonUtil.getSearchProperty(propertyDO);  
+            if(null != compositorDO)  compositorMap = SolrjCommonUtil.getSearchProperty(compositorDO);  
         } catch (Exception e) {  
             log.error("SolrjCommonUtil.getSearchProperty() is error !"+ e);  
         }  
