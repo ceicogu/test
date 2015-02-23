@@ -2,6 +2,7 @@ package com.qihao.toy.biz.solr;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
@@ -14,9 +15,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.util.CollectionUtils;
+
+import com.google.common.base.Joiner;
 @Setter @Getter
 public class SolrjQuery {
-	   private String url;  
+	    private String url;  
 	    private Integer soTimeOut;  
 	    private Integer connectionTimeOut;  
 	    private Integer maxConnectionsPerHost;  
@@ -24,7 +27,7 @@ public class SolrjQuery {
 	    private Integer maxRetries;  
 	    private HttpSolrServer solrServer = null;  
 	    private final static String ASC = "asc";  
-	  
+
 	    public void init() throws MalformedURLException {  
 	        solrServer = new HttpSolrServer(url);  
 	        solrServer.setSoTimeout(soTimeOut);  
@@ -62,8 +65,11 @@ public class SolrjQuery {
 				e.printStackTrace();
 			}
 	    }
-	    public SolrDocumentList query(Map<String, String> propertyMap,  
-	            Map<String, String> compositorMap, Integer startIndex, Integer pageSize)  
+	    public SolrDocumentList query(
+	    		Map<String, String> propertyMap, 
+	    		Map<String, String> compositorMap, 
+	    		List<String>  fields,
+	    		Integer startIndex, Integer pageSize)  
 	            throws Exception {  
 	        SolrQuery query = new SolrQuery();  
 	        // 设置搜索字段  
@@ -89,7 +95,11 @@ public class SolrjQuery {
 	                }  
 	            }  
 	        }  
-	          
+	        //设置索引显示哪些fileds
+	        if(!CollectionUtils.isEmpty(fields)){
+	        	String fq = Joiner.on(",").join(fields);
+	        	query.addField(fq);
+	        }
 	        if (null != startIndex) {  
 	            query.setStart(startIndex);  
 	        }  

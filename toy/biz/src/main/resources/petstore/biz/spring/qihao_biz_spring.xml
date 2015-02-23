@@ -8,26 +8,23 @@
 	default-autowire="byName">
 	<context:annotation-config />
 	<!-- 
-	<context:component-scan base-package="com.alibaba.sample.petstore.biz.service" />
-	 -->
+		<context:component-scan base-package="com.alibaba.sample.petstore.biz.service" />
+	-->
 	<context:component-scan base-package="com.qihao.toy" />
 	<!-- 配置信息 -->
 	<bean id="globalConfig" class="com.qihao.toy.biz.config.GlobalConfig">
 		<property name="md5Key" value="1f8b638841b06b291d41" />
 		<property name="aesKey" value="FZG4XCMSTTXU9NBS" />
 		<property name="aesIv" value="D1EW3JSQLCH2DWKV" />
-		
+
 		<property name="messageChannelURL" value="http://dx.ipyy.net/sms.aspx" />
 		<property name="messageChannelAccount" value="caixin5" />
 		<property name="messageChannelPassword" value="a123456" />
 	</bean>
 	<!-- Solrj -->
-	<bean name="solrjQuery" class="com.qihao.toy.biz.solr.SolrjQuery" init-method="init">
-		<property name="url" value="http://localhost:18080/solr/collection1" />
-		<property name="soTimeOut" value="3000" />
-		<property name="connectionTimeOut" value="1000" />  
-		<property name="maxConnectionsPerHost" value="1000" />  
-		<property name="maxTotalConnections" value="10" />  
-		<property name="maxRetries"  value="1"/>  
+	<!-- 
+	<bean name="solrjQueryFactory" class="com.qihao.toy.biz.solr.SolrjQueryFactory">
+		<property name="baseUrl" value="http://localhost:18080/solr" />
 	</bean>
+	 -->
 </beans>
