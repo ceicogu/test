@@ -25,6 +25,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -42,6 +43,9 @@ import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.VerifyCodeService;
+import com.qihao.toy.biz.solr.DefaultSolrOperator;
+import com.qihao.toy.biz.solr.domain.AccountSolrDO;
+import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.domain.StationLetterDO;
@@ -69,7 +73,9 @@ public class Account extends BaseScreenAction{
     private StationLetterService stationLetterService;    
     @Autowired
     private MessageChannelService messageChannelService;
-
+    @Autowired
+    private DefaultSolrOperator solrOperator;
+    
     /**验证二维码是否有效*/
     public void doValidateQRCode(ParameterParser requestParams) throws IOException{
     	//签名验证
@@ -453,6 +459,7 @@ public class Account extends BaseScreenAction{
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);
     	            result.setMessage("无权查看该消息！");
+    	            result.setData(null);
     	            response.getWriter().println(JSON.toJSONString(result));
     	            return;        				
     			}
@@ -462,6 +469,7 @@ public class Account extends BaseScreenAction{
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);
     	            result.setMessage("无权查看该消息！");
+    	            result.setData(null);
     	            response.getWriter().println(JSON.toJSONString(result));
     	            return;         				
     			}
@@ -491,5 +499,29 @@ public class Account extends BaseScreenAction{
     	result.setSuccess(true);
     	response.getWriter().println(JSON.toJSONString(result));    	
     }    
+    /**
+     * 帐号搜索
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doSearch(@Param("q") String query) throws Exception {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
+    	AccountSolrDO accountSolrDO =  new AccountSolrDO();
+    	accountSolrDO.setMemberName(query);    	
+//    	AccountSolrDO compositorDO = new AccountSolrDO();
+//    	compositorDO.setGroupId(SolrQuery.ORDER.desc);
+    	
+//    	 Long count = solrOperator.querySolrResultCount(accountSolrDO,null);
+    	List<String>  fields = Lists.newArrayList();
+    	fields.add("groupId");
+    	fields.add("memberId");
+    	List<Object> resp = solrOperator.querySolrResult("account",(Object)accountSolrDO, null, fields,null, null);
+     	result.setSuccess(true);
+     	result.setMessage("搜索成功!");
+     	result.setData(resp);
+         response.getWriter().println(JSON.toJSONString(result));
+         return;   
+    }
 }
 
