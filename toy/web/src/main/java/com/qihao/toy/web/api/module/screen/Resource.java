@@ -116,7 +116,9 @@ public class Resource  extends BaseScreenAction{
     	compositorDO.setId(SolrQuery.ORDER.desc.toString());
     	
  //   	 Long count = solrOperator.querySolrResultCount(resourceSolrDO,null);
-    	 List<Object> resp = solrOperator.querySolrResult((Object)resourceSolrDO, compositorDO, null, null);
+    	List<String>  fields = Lists.newArrayList();
+    	fields.add("id");
+    	List<Object> resp = solrOperator.querySolrResult("resource",(Object)resourceSolrDO, compositorDO, fields,null, null);
      	result.setSuccess(true);
      	result.setMessage("搜索成功!");
      	result.setData(resp);
