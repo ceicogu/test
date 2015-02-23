@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.solr.common.SolrDocumentList;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
@@ -16,12 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class DefaultSolrOperator implements SolrjOperator {
-	@Autowired
-    private SolrjQuery solrjQuery;  
+
 	public void writeSolrDO(Object propertyDO){
 
 	}
-    public List<Object> querySolrResult(Object propertyDO,  Object compositorDO, Integer startIndex, Integer pageSize)  
+    public List<Object> querySolrResult(String coreName, Object propertyDO,  Object compositorDO, List<String> fields, Integer startIndex, Integer pageSize)  
             throws Exception {  
         Map<String, String> propertyMap = new TreeMap<String, String>();  
         Map<String, String> compositorMap = new TreeMap<String, String>();  
@@ -31,7 +29,8 @@ public class DefaultSolrOperator implements SolrjOperator {
         } catch (Exception e) {  
             log.error("SolrjCommonUtil.getSearchProperty() is error !"+ e);  
         }  
-        SolrDocumentList solrDocumentList = solrjQuery.query(propertyMap, compositorMap,  startIndex, pageSize);  
+        SolrjQuery solrjQuery = SolrjQueryFactory.getServer(coreName);
+        SolrDocumentList solrDocumentList = solrjQuery.query(propertyMap, compositorMap,  fields, startIndex, pageSize);  
         List<Object> resultList = new ArrayList<Object>();  
         for (int i = 0; i < solrDocumentList.size(); i++) {  
             resultList.add(solrDocumentList.get(i));  
@@ -39,7 +38,7 @@ public class DefaultSolrOperator implements SolrjOperator {
         return resultList;  
     }  
  
-    public Long querySolrResultCount(ResourceSolrDO propertyDO, Object compositorDO) throws Exception {  
+    public Long querySolrResultCount(String coreName,ResourceSolrDO propertyDO, Object compositorDO) throws Exception {  
         Map<String, String> propertyMap = new TreeMap<String, String>();  
         Map<String, String> compositorMap = new TreeMap<String, String>();  
         try {  
@@ -48,7 +47,8 @@ public class DefaultSolrOperator implements SolrjOperator {
         } catch (Exception e) {  
             log.error("SolrjCommonUtil.getSearchProperty() is error !" + e);  
         }  
-        SolrDocumentList solrDocument = solrjQuery.query(propertyMap, compositorMap,  null, null);  
+        SolrjQuery solrjQuery = SolrjQueryFactory.getServer(coreName);
+        SolrDocumentList solrDocument = solrjQuery.query(propertyMap, compositorMap,  null, null, null);  
         return solrDocument.getNumFound();  
     }  
 

@@ -9,6 +9,7 @@ public interface SolrjOperator {
     /** 
      * 获得搜索结果 
      *  
+     * @param coreName				coreName
      * @param propertyDO 			搜索条件对象
      * @param compositorDO 		排序条件对象
      * @param startIndex 				分页查询－开始点
@@ -16,7 +17,7 @@ public interface SolrjOperator {
      * @return 
      * @throws Exception 
      */  
-    public List<Object> querySolrResult(Object propertyDO,  Object compositorDO, Integer startIndex, Integer pageSize)  throws Exception;  
+    public List<Object> querySolrResult(String coreName, Object propertyDO,  Object compositorDO, List<String> filterFields, Integer startIndex, Integer pageSize)  throws Exception;  
   
     /** 
      * 获得搜索结果条数 
@@ -26,5 +27,5 @@ public interface SolrjOperator {
      * @return 
      * @throws Exception 
      */  
-    public Long querySolrResultCount(ResourceSolrDO propertyDO, Object compositorDO) throws Exception;  
+    public Long querySolrResultCount(String coreName,ResourceSolrDO propertyDO, Object compositorDO) throws Exception;  
 }
