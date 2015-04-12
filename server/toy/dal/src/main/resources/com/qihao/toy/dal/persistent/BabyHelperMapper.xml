@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.BabyHelperMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,toy_user_id,operator_id,act_time,repeats,tags,url,gmt_created,gmt_modified]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.BabyHelperDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM baby_helper
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.BabyHelperDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO baby_helper (
+         toy_user_id,operator_id,act_time,repeats,tags,url,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{toyUserId},#{operatorId},#{actTime},#{repeats},#{tags},#{url},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.BabyHelperDO">
+        UPDATE baby_helper
+        SET
+        gmt_modified=now()
+        <if test="actTime != null"> , act_time=#{actTime}</if>
+        <if test="repeats != null"> , repeats=#{repeats}</if>
+        <if test="tags != null"> , tags=#{tags}</if>
+        <if test="url != null"> , url=#{url}</if>
+        WHERE id=#{id} AND operator_id=#{operatorId}
+    </update>    
+    <delete id="deleteById" parameterType="long">
+        DELETE baby_helper  WHERE id=#{id}
+    </delete>    
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.BabyHelperDO"
+        parameterType="com.qihao.toy.dal.domain.BabyHelperDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM baby_helper
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="toyUserId != null"> AND toy_user_id=#{toyUserId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

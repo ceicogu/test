@@ -30,6 +30,8 @@ public class SubscribeMessageDO  extends PageDO {
 	private static final long serialVersionUID = 1L;
 	
 	private Long		messageId;	//消息ID
+	private Long 	senderId;//消息发送者ID
     private Long		userId;	//订阅者		
-    private Integer status;		//消息阅读状态：0-未阅,1-已阅
+    private Integer status;		//消息阅读状态：0-未投递,1-已投递,2-已阅
+    private String 	miMessageId;//推送到小米的messageId
 }

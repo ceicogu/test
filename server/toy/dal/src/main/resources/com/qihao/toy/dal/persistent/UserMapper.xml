@@ -12,6 +12,12 @@
         FROM user
         WHERE id=#{id}
     </select>    
+   <select id="getByLoginName" resultType="com.qihao.toy.dal.domain.UserDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        WHERE login_name=#{loginName} AND is_deleted=0
+    </select>
     <select id="getValidItem" resultType="com.qihao.toy.dal.domain.UserDO">
         SELECT
         <include refid="All_Fields" />
@@ -25,6 +31,7 @@
         FROM user
         WHERE login_name=#{loginName} AND password=#{password} AND is_deleted=0
     </select>
+
     <!-- 注册 -->    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.UserDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (

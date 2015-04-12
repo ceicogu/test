@@ -32,7 +32,7 @@ public class StationLetterDO  extends PageDO {
     private Long			senderId;					//消息发送者		
     private Integer		acceptorType;		//消息接收者类型:0-单个用户/1-我的好友/2-我的交流群
     private Long			acceptorId;				//好友ID/我的交流群ID(当type=1是记得是userId)
-    private Integer		type;							//类型0-文字/1-语音/2-图片/3-视屏
+    private Integer		type;							//类型0-文字/1-语音
     private String		content;					//消息内容
     private String		url;								//资源存储URL
 }

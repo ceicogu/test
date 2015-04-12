@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
 	}
 	public Long insertGroupMember(long groupId, long memberId, String memberName) {
 		boolean bExist = this.isGroupMember(groupId, memberId);
-		Preconditions.checkArgument(true ==bExist,"该用户已是群成员");
+		Preconditions.checkArgument(false ==bExist,"该用户已是群成员");
 		
 		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
 		myGroupMember.setGroupId(groupId);
@@ -67,9 +67,10 @@ public class GroupServiceImpl implements GroupService {
 		myGroupMember.setMemberName(memberName);
 		return myGroupMemberMapper.insert(myGroupMember)>0? myGroupMember.getId() : null;
 	}
-	public List<MyGroupDO> getMyCreatedGroups(long myId) {
+	public List<MyGroupDO> getMyCreatedGroups(long myId, GroupTypeEnum groupType) {
 		MyGroupDO myGroup = new MyGroupDO();
 		myGroup.setMyId(myId);
+		myGroup.setGroupType(groupType.numberValue());
 		return myGroupMapper.getAll(myGroup);
 	}
 

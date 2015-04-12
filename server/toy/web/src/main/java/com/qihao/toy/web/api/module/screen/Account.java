@@ -25,7 +25,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -34,6 +33,7 @@ import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.citrus.turbine.dataresolver.Params;
 import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
@@ -42,19 +42,20 @@ import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.StationLetterService;
+import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.solr.domain.AccountSolrDO;
-import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.enums.AccountTypeEnum;
 import com.qihao.toy.dal.enums.RegFromEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
-import com.qihao.toy.web.base.BaseScreenAction;
+import com.qihao.toy.web.base.BaseApiScreenAction;
 
 /**
  * 这个例子演示了用一个screen类处理多个事件的方法。
@@ -62,9 +63,11 @@ import com.qihao.toy.web.base.BaseScreenAction;
  * @author Michael Zhou
  */
 @Slf4j
-public class Account extends BaseScreenAction{
+public class Account extends BaseApiScreenAction{
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private ToyService toyService;
     @Autowired
     private GroupService groupService;
     @Autowired
@@ -85,7 +88,7 @@ public class Account extends BaseScreenAction{
     		return;    		
     	}
     	String toySN = requestParams.getString("code");
-    	ToyDO toy = accountService.getToyBySN(toySN);
+    	ToyDO toy = toyService.getItemByToySN(toySN);
     	if(null == toy) {
     		result.setSuccess(false);
     		result.setMessage("二维码无效!");
@@ -95,8 +98,11 @@ public class Account extends BaseScreenAction{
 		response.getWriter().println(JSON.toJSONString(result));
 		return;  
     }
-    /** 手机注册 */
-    public void doRegister(ParameterParser requestParams, @Params UserDO userDO) throws IOException {    	
+    /** 手机/Toy注册 */
+    public void doRegister(ParameterParser requestParams) throws IOException {    	
+//    	if(!"POST".equals(request.getMethod())){
+//    		throw new InvalidParamException("token error");
+//    	}
     	//签名验证
     	SimpleResult result1 = this.signature(requestParams);
     	if(!result1.isSuccess()) {
@@ -105,43 +111,23 @@ public class Account extends BaseScreenAction{
     	}
     	//参数校验
     	DataResult<Map<String,Object>> result =new DataResult<Map<String,Object>>();
-
-		//1.参数校验
-    	if(StringUtil.isBlank(requestParams.getString("code"))) {
-    		result.setSuccess(false);
-    		result.setErrorCode(1000);
-    		result.setMessage("验证码不能为空");
-    		response.getWriter().println(JSON.toJSONString(result));
-    		return;
-    	}
-    	String mobile = requestParams.getString("mobile");
-    	String code	=	requestParams.getString("code");
+		//1.参数校验(0-手機註冊/1-Toy註冊
+    	int type = requestParams.getInt("type", 0);
+    	UserDO userDO = null;
     	try{
-    		verifyCodeService.checkVerifyCode(VerifyCodeTypeEnum.Reg_VerifyCode, mobile, code);
-    	}catch(Exception e) {
+	    	if(type==0) {
+	    		userDO = this.regFromMobile(requestParams);
+	    	}else {
+	    		userDO = this.regFromToy(requestParams);
+	    	}
+    	}catch(Exception e){
     		result.setSuccess(false);
-    		result.setErrorCode(1000);
-    		result.setMessage("验证码错误！");
+    		result.setErrorCode(2001);
+    		result.setMessage(e.getMessage());
     		response.getWriter().println(JSON.toJSONString(result));
     		return;
-    	}
-    	//获取注册来源方式
-    	Integer comeFrom 	=  requestParams.getInt("comeFrom", RegFromEnum.Scan.numberValue());
-    	String    comeSN		=	requestParams.getString("comeSN");
-    	//UserDO userDO = new UserDO();    	
-    	userDO.setLoginName(requestParams.getString("loginName"));
-    	userDO.setPassword(requestParams.getString("pwd"));//在biz层进行md5
-    	userDO.setMobile(mobile);
-    	userDO.setNickName(requestParams.getString("nickName"));
-    	userDO.setComeFrom(comeFrom);
-    	userDO.setComeSN(comeSN);
-    	userDO.setType(0);//帐号类型:0-手机注册
-    	if(StringUtils.isNumeric(requestParams.getString("invitorId"))) {
-    		userDO.setInvitorId(requestParams.getLong("invitorId",-1));
     	}
     	try {
-    		accountService.register(userDO);
-    		verifyCodeService.comfirmVerifyCode(VerifyCodeTypeEnum.Reg_VerifyCode, mobile, code);//将验证码修改为已使用
     		Map<String,Object> data = Maps.newTreeMap();
         	String authToken = accountService.createAuthToken(userDO);
         	data.put("authToken", authToken);
@@ -160,7 +146,81 @@ public class Account extends BaseScreenAction{
     		return;    		
     	}
     }
-
+    /**
+     * 手机注册
+     * @param userDO
+     * @param requestParams
+     */
+    private UserDO regFromMobile(ParameterParser requestParams) {
+    	//1.参数校验
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("loginName")), "%s不能为空","登录名");
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("pwd")), "%s不能为空","登录密码");
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("code")), "%s不能为空","验证码");
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("mobile")), "%s不能为空","手机号码");
+    	//2.校验手机验证码是否有效
+    	String mobile = requestParams.getString("mobile");
+    	String code	=	requestParams.getString("code");
+    	try{
+    		verifyCodeService.checkVerifyCode(VerifyCodeTypeEnum.Reg_VerifyCode, mobile, code);
+    	}catch(Exception e) {
+    		throw new RuntimeException("验证码无效！");
+    	}    	
+    	//3.监测邀请者或Toy已注册
+    	Integer comeFrom 	=  requestParams.getInt("comeFrom", RegFromEnum.Scan.numberValue());
+    	String    comeSN		=	requestParams.getString("comeSN");
+    	//获取注册来源方式
+    	UserDO userDO = new UserDO();    	
+    	userDO.setLoginName(requestParams.getString("loginName"));
+    	userDO.setPassword(requestParams.getString("pwd"));//在biz层进行md5
+    	userDO.setMobile(mobile);
+    	userDO.setNickName(requestParams.getString("nickName"));
+    	userDO.setComeFrom(comeFrom);
+    	userDO.setComeSN(comeSN);
+    	userDO.setType(AccountTypeEnum.MOBILE_REG.numberValue());//帐号类型:0-手机注册
+    	userDO.setMiRegId(requestParams.getString("miRegId"));
+    	if(StringUtils.isNumeric(requestParams.getString("invitorId"))) {
+    		userDO.setInvitorId(requestParams.getLong("invitorId",-1));
+    	}
+    	//注册Toy
+    	userDO.setType(AccountTypeEnum.MOBILE_REG.numberValue());
+    	accountService.register(userDO);
+    	try{
+    		verifyCodeService.comfirmVerifyCode(VerifyCodeTypeEnum.Reg_VerifyCode,mobile, code);//将验证码修改为已使用
+    	}catch(Exception e){
+    		log.error("验证码错误");
+    	}
+    	return userDO;
+    }
+    /**
+     * 故事机注册
+     * @param userDO
+     * @param requestParams
+     */
+    private UserDO regFromToy(ParameterParser requestParams) {
+    	//1.参数校验
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("loginName")), "%s不能为空","登录名");
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("pwd")), "%s不能为空","登录密码");
+    	Preconditions.checkState(!StringUtil.isBlank(requestParams.getString("comeSN")), "%s不能为空","故事机二维码");
+    	
+    	//2.注册:检查Toy是否已激活,若激活就不能重复注册(此时会抛出异常)
+    	String    comeSN		=	requestParams.getString("comeSN");//toySN    	
+    	UserDO userDO = new UserDO();    	
+    	userDO.setType(AccountTypeEnum.TOY_REG.numberValue());//玩具注册
+    	userDO.setLoginName(requestParams.getString("loginName"));//toy-mac地址
+    	userDO.setPassword(requestParams.getString("pwd"));//在biz层进行md5
+    	userDO.setMobile(null);
+    	userDO.setNickName(null);
+    	userDO.setComeFrom(RegFromEnum.Scan.numberValue());
+    	userDO.setComeSN(comeSN);
+    	userDO.setMiRegId(requestParams.getString("miRegId"));
+    	if(StringUtils.isNumeric(requestParams.getString("invitorId"))) {
+    		userDO.setInvitorId(requestParams.getLong("invitorId",-1));
+    	}
+    	//注册Toy
+    	accountService.register(userDO);
+    	
+    	return userDO;
+    }    
     /** 登录 */
     public void doLogin(ParameterParser requestParams) throws IOException {
     	DataResult<Map<String,String>> result =new DataResult<Map<String,String>>();
@@ -182,6 +242,26 @@ public class Account extends BaseScreenAction{
 	    	resp.put("nickName", userDO.getNickName());
 	    	result.setSuccess(true);
 	    	result.setData(resp);
+    	} catch(Exception e){
+    		log.error("exception={}",e);
+    		result.setSuccess(false);
+    		result.setErrorCode(1000);
+    		result.setMessage("帐号或密码错误！");
+    	}
+
+        response.getWriter().println(JSON.toJSONString(result));
+    }
+    /** 修改用户信息 */
+    public void doModifyProfile(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	SimpleResult result = new SimpleResult();
+    	
+		String miRegId	=	requestParams.getString("miRegId");
+		
+		currentUser.setMiRegId(miRegId);
+    	try{
+    		 accountService.update(currentUser);
+	    	result.setSuccess(true);
     	} catch(Exception e){
     		log.error("exception={}",e);
     		result.setSuccess(false);
@@ -243,14 +323,15 @@ public class Account extends BaseScreenAction{
     	//1.首先认领Toy
     	//给玩具和宝宝设置基本信息
     	String toyName	=	requestParams.getString("toyName");
-    	Map<String,Object> kidParams = Maps.newLinkedHashMap();
+    	Map<String,String> kidParams = Maps.newLinkedHashMap();
     	kidParams.put("kidName", requestParams.getString("kidName"));
-    	kidParams.put("kidGender", requestParams.getInt("kidGender",-1));
-    	kidParams.put("kidAge", requestParams.getInt("kidAge",-1));
-    	kidParams.put("kidBirth", requestParams.getDate("kidBirth", null));
+    	kidParams.put("kidGender", requestParams.getString("kidGender","-1"));
+    	kidParams.put("kidAge", requestParams.getString("kidAge","-1"));
+    	kidParams.put("kidBirth", requestParams.getString("kidBirth", null));
     	try{
-	    	accountService.renameToy(currentUser.getId(), toySN, toyName, kidParams);
+	    	toyService.toNameToy(currentUser.getId(), toySN, toyName, kidParams);
 			result.setSuccess(true);
+			result.setMessage("给故事机取名成功!");
 			response.getWriter().println(JSON.toJSONString(result));
 			return;
     	}catch(Exception e){
@@ -328,8 +409,9 @@ public class Account extends BaseScreenAction{
     public void doGetMyToys(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
-    	List<ToyDO>  resp = accountService.getMyToys(currentUser.getId());
-    	
+    	ToyDO findToy = new ToyDO();
+    	findToy.setOwnerId(currentUser.getId());
+    	List<ToyDO> resp = toyService.getAll(findToy);    	
     	List<Map<String,String>> data = Lists.newArrayList();    	
     	for(ToyDO toy : resp) {
     		Map<String,String> item = Maps.newTreeMap();
@@ -377,7 +459,7 @@ public class Account extends BaseScreenAction{
     	DataResult<List<MyGroupDO>> result = new DataResult<List<MyGroupDO>>();
 	
     	//获取自己创建的群    	
-    	List<MyGroupDO>  data = groupService.getMyCreatedGroups(currentUser.getId());
+    	List<MyGroupDO>  data = groupService.getMyCreatedGroups(currentUser.getId(),null);
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -429,8 +511,74 @@ public class Account extends BaseScreenAction{
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
     }
+    /**
+     * 分页获取群消息
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doGetGroupLetters(ParameterParser requestParams) throws IOException{
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<StationLetterDO>> result = new DataResult<List<StationLetterDO>>();
 
-    
+    	if(StringUtils.isBlank(requestParams.getString("groupId"))) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请自己所在的群！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    
+    	}
+    	//判断自己是否在该群
+    	Long groupId = requestParams.getLong("groupId");
+    	boolean bOK = groupService.isGroupMember(groupId, currentUser.getId());
+    	if(false == bOK){
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请自己所在的群！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;        		
+    	}
+    	//分页获取群信息
+    	int page = requestParams.getInt("page",1);
+    	
+    	result= stationLetterService.getMyLetters(1, groupId, page, 20);
+    	
+        response.getWriter().println(JSON.toJSONString(result));
+        return;       
+    }
+    /**
+     * 分页获取群消息
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doGetO2OLetters(ParameterParser requestParams) throws IOException{
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<StationLetterDO>> result = new DataResult<List<StationLetterDO>>();
+
+    	if(StringUtils.isBlank(requestParams.getString("o2oId"))) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请自己所在的群！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    
+    	}
+    	//判断自己是否是好友
+    	Long o2oId = requestParams.getLong("o2oId");
+    	boolean bOK =accountService.isMyFriend(currentUser.getId(), o2oId);
+    	if(false == bOK){
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("不是好友！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;        		
+    	}
+    	//分页获取群信息
+    	int page = requestParams.getInt("page",1);
+    	
+    	result= stationLetterService.getMyLetters(currentUser.getId(), o2oId, page,  20);
+    	
+        response.getWriter().println(JSON.toJSONString(result));
+        return;       
+    }
     /**
      * 获取指定消息信息
      * @param requestParams

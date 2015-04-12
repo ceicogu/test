@@ -21,37 +21,36 @@ import com.qihao.shared.base.utils.MD5Algorithm;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.GroupService;
-import com.qihao.toy.biz.utils.MiPushUtils;
+import com.qihao.toy.biz.service.StationLetterService;
+import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
-import com.qihao.toy.dal.domain.MyToyDO;
+import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.enums.AccountTypeEnum;
 import com.qihao.toy.dal.enums.FriendStatusEnum;
 import com.qihao.toy.dal.enums.GroupTypeEnum;
+import com.qihao.toy.dal.enums.MediaTypeEnum;
 import com.qihao.toy.dal.enums.RegFromEnum;
 import com.qihao.toy.dal.enums.RegStatusEnum;
 import com.qihao.toy.dal.enums.ToyStatusEnum;
 import com.qihao.toy.dal.enums.VerifyCodeStatusEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.dal.persistent.MyFriendMapper;
-import com.qihao.toy.dal.persistent.MyToyMapper;
-import com.qihao.toy.dal.persistent.ToyMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
-import com.xiaomi.xmpush.server.Message;
 @Slf4j
 @Service
 public class AccountServiceImpl implements AccountService{
 	@Autowired
 	private UserMapper userMapper;
 	@Autowired
-	private ToyMapper toyMapper;
+	private ToyService toyService;
 	@Autowired
-	private MyToyMapper myToyMapper;
-	@Autowired
-	
+	private StationLetterService stationLetterService;
+	@Autowired	
 	private MyFriendMapper myFriendMapper;
 	@Autowired
 	private GroupService groupService;
@@ -73,83 +72,81 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	public Long register(UserDO user) {
+		//1.参数校验
 		Preconditions.checkArgument(StringUtils.isNotBlank(user.getLoginName()),"用户名不能为空");
 		Preconditions.checkArgument(StringUtils.isNotBlank(user.getPassword()),"密码不能为空");
-		Preconditions.checkArgument(StringUtils.isNotBlank(user.getNickName()),"昵称不能为空");
+		//Preconditions.checkArgument(StringUtils.isNotBlank(user.getNickName()),"昵称不能为空");
 		Preconditions.checkArgument(null != user.getComeFrom(),"注册来源未指明");
 		Preconditions.checkArgument(StringUtils.isNotBlank(user.getComeSN()),"SN不能为空");	
 		Preconditions.checkArgument(null != user.getType(),"帐号类型未指定");
 		
 		if(null == user.getStatus()) user.setStatus(RegStatusEnum.Normal.numberValue());
-		{//检查是否已注册
-			UserDO existUser = new UserDO();
-			existUser.setLoginName(user.getLoginName());
-			existUser.setIsDeleted(0);
-			List<UserDO> resp = userMapper.getAll(existUser);
-			if(!CollectionUtils.isEmpty(resp)){
-				throw new IllegalArgumentException("帐号已注册，请更换帐号!");
-			}
+		//2.检查是否已注册
+		UserDO existUser = new UserDO();
+		existUser.setLoginName(user.getLoginName());
+		existUser.setIsDeleted(0);
+		List<UserDO> resp = userMapper.getAll(existUser);
+		if(!CollectionUtils.isEmpty(resp)){
+			throw new IllegalArgumentException("帐号已注册，请更换帐号!");
 		}
+		//3.密码md5
 		String md5pwd;
 		try {
 			md5pwd = MD5Algorithm.digest(user.getPassword(), globalConfig.getMd5Key());
+			user.setPassword(md5pwd);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("系统配置参数错误！");
-		}	
-		
-		user.setPassword(md5pwd);
-		userMapper.insert(user);//注册		
+		}		
+		//4.注册（创建用户）
+		userMapper.insert(user);//注册
+		//5.根据注册帐号类型，进行设定
+		//5-1若是Toy注册，就不做后继动作
+		if(user.getType().equals(AccountTypeEnum.TOY_REG.numberValue())) {//Toy注册
+	    	//激活Toy
+	    	toyService.toAcitvateToy( user.getId(), user.getComeSN(), user.getLoginName());
+			//创建一个家庭群
+			Long groupId = groupService.createGroup(user.getId(),"我的家庭群", GroupTypeEnum.Family);
+			groupService.insertGroupMember(groupId, user.getId(),  "宝贝");
+			return user.getId();
+		}		
+		//5-2若是手机注册，就要进一步检查是否扫码注册，是就要看该码对应的Toy是否已激活，若无就激活
 		if(user.getComeFrom().equals(RegFromEnum.Scan.numberValue())) {//扫描ToySN注册
+			//获取Ｔｏｙ帐号
 			String toySN = user.getComeSN();
-			ToyDO toy = toyMapper.getItemByToySN(toySN);
-			//若Toy未激活，就激活该Toy并设定Toy的监管人是自己
-			//否则，就将自己与该Toy的监管人互相设置为好友
-			if(toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
-				//激活Toy
-				this.activeToy(user, toy);
+			ToyDO toy = toyService.getItemByToySN(toySN);
+			if(null == toy || toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
 				return user.getId();
 			}
-			else{
-				if(toy.getOwnerId().equals(user.getId())) {//是Toy的激活人，就直接返回
-					return user.getId();
-				}
-				//加入Toy－Owner的家庭群				
-				List<MyGroupDO> resp = groupService.getMyCreatedGroups(toy.getOwnerId());
-				if(CollectionUtils.isEmpty(resp)) {
-						throw new IllegalArgumentException("用户群不存在！");
-				}
-				MyGroupDO myGroup = null;
-				for(MyGroupDO group: resp) {
-					if(group.getGroupType().equals(GroupTypeEnum.Family.numberValue())) {
-						myGroup = group;
-						break;
-					}
-				}
-				if(null == myGroup) {
-					throw new IllegalArgumentException("用户群不存在！");
-				}				
-				groupService.insertGroupMember(myGroup.getId(), user.getId(), user.getNickName());
-				return user.getId();
+			if(toy.getStatus().equals(ToyStatusEnum.Activated.numberValue())) {
+				//认领Toy				
+				toyService.toClaimToy(user.getId(), toy.getToySN());	
+			}
+			//加入Toy家庭群
+			List<MyGroupDO> resp4 = groupService.getMyCreatedGroups(toy.getActivatorId(), GroupTypeEnum.Family);
+			if(!CollectionUtils.isEmpty(resp4)){
+				groupService.insertGroupMember(resp4.get(0).getId(), user.getId(), "妈妈");
 			}			
-		}else {//彼此成为好友 
+			//验证码
+			//与Toy互为好友
+			this.focusA2B(toy.getActivatorId(), user.getId());
+			this.focusA2B(user.getId(),toy.getActivatorId());
+			return user.getId();					
+		}
+		else {//邀请注册用户,注册成功后邀请者和被邀请者互为好友 
 			Long invitorId= null;
-			if(user.getType() == 0 ) {
-				//获取邀请码
-				VerifyCodeDO verifyCode = new VerifyCodeDO();
-				verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
-				verifyCode.setCode(user.getComeSN());
-				verifyCode.setMobile(user.getMobile());
-				verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
-				List<VerifyCodeDO> resp = verifyCodeMapper.getAll(verifyCode);
-				if(CollectionUtils.isEmpty(resp)){
-					return user.getId();
-				}
-				verifyCode = resp.get(0);
-				verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeStatusEnum.Verified.numberValue());//标记为已验证，不得再次使用
-				invitorId= verifyCode.getInvitorId();
-			}else {
-				invitorId = user.getInvitorId();
+			VerifyCodeDO verifyCode = new VerifyCodeDO();
+			verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
+			verifyCode.setCode(user.getComeSN());
+			verifyCode.setMobile(user.getMobile());
+			verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
+			List<VerifyCodeDO> resp2 = verifyCodeMapper.getAll(verifyCode);
+			if(CollectionUtils.isEmpty(resp2)){
+				return user.getId();
 			}
+			verifyCode = resp2.get(0);
+			verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeStatusEnum.Verified.numberValue());//标记为已验证，不得再次使用
+			invitorId= verifyCode.getInvitorId();
+
 			if(null != invitorId) {	//互相添加为好友
 				this.focusA2B(invitorId, user.getId());
 				this.focusA2B(user.getId(),invitorId);
@@ -158,35 +155,6 @@ public class AccountServiceImpl implements AccountService{
 		return user.getId();
 	}
 
-	private boolean activeToy(UserDO user,  ToyDO toy) {
-		toy.setStatus(ToyStatusEnum.Activated.numberValue());
-		toy.setOwnerId(user.getId());
-		toy.setGmtOwned(new Date());
-		toyMapper.update(toy);
-		//注册Toy到用户表
-		UserDO userForToy = new UserDO();
-		userForToy.setComeFrom(RegFromEnum.Invite.numberValue());
-		userForToy.setComeSN(toy.getToySN());
-		userForToy.setInvitorId(user.getId());//邀请者
-		userForToy.setLoginName("toy_"+toy.getToySN());
-		userForToy.setPassword(toy.getToySN());
-		userForToy.setNickName(toy.getToySN());
-		userForToy.setType(1);//帐号类型:1-TOY注册
-		userForToy.setStatus(RegStatusEnum.Normal.numberValue());
-		 this.register(userForToy);
-		 //加入玩具用户表
-		MyToyDO myToy = new MyToyDO();
-		myToy.setMyId(user.getId());
-		myToy.setToySN(toy.getToySN());				
-		myToyMapper.insert(myToy);
-		//创建我的家庭
-		Long groupId = groupService.createGroup(user.getId(),"我的家庭群", GroupTypeEnum.Family);
-		//将自己添加为家庭成员
-		groupService.insertGroupMember(groupId, user.getId(), user.getNickName());
-		//将Toy用户自动添加成我的家庭群中来
-		groupService.insertGroupMember(groupId, userForToy.getId(), userForToy.getNickName());
-		return true;
-	}
 	public boolean update(UserDO user) {
 		return userMapper.update(user);
 	}
@@ -194,6 +162,9 @@ public class AccountServiceImpl implements AccountService{
 	public UserDO getUser(long userId) {
 		return userMapper.getById(userId);
 	}
+	public UserDO getUserByLoginName(String loginName) {
+		return userMapper.getByLoginName(loginName);
+	}	
 	public List<UserDO>  getUserList(List<Long> userIds){
 		if(CollectionUtils.isEmpty(userIds)){
 			return null;
@@ -201,25 +172,6 @@ public class AccountServiceImpl implements AccountService{
 		UserDO user = new UserDO();
 		user.setUserIds(userIds);
 		return userMapper.getAll(user);
-	}
-	public ToyDO getToyBySN(String toySN) {
-		return toyMapper.getItemByToySN(toySN);
-	}
-	public ToyDO renameToy(long userId, String toySN, String toyName, Map<String, Object> kidParams) {
-		ToyDO toy = this.getToyBySN(toySN);		
-		Preconditions.checkArgument(null != toy, "SN参数错误,toySN=%s",toySN);
-		UserDO user = this.getUser(userId);
-		Preconditions.checkArgument(null != user,"用户不存在,userId=%s",userId);
-		Preconditions.checkArgument(toy.getOwnerId().equals(userId),"您不是故事机的监护人,userId=%s,toySN=%s",userId,toySN);
-
-		Preconditions.checkArgument(StringUtils.isNotBlank(toyName), "玩具姓名不能为空");
-		toy.setToyName(toyName);
-		if(kidParams.containsKey("kidName")) toy.setKidName(kidParams.get("kidName").toString());
-		if(kidParams.containsKey("kidAge")) toy.setKidAge((Integer)kidParams.get("kidAge"));
-		if(kidParams.containsKey("kidGender")) toy.setKidGender((Integer)kidParams.get("kidGender"));
-		if(kidParams.containsKey("kidBirth")) toy.setKidBirth((Date)kidParams.get("kidBirth"));
-		toyMapper.update(toy);
-		return toy;
 	}
 	/**
 	 * A==>B 好友
@@ -251,13 +203,14 @@ public class AccountServiceImpl implements AccountService{
 			//调用miPush接口推送消息给userBId			
 			UserDO userA =this.getUser(userAId);
 			UserDO userB =this.getUser(userBId);
-			if(null != userB && !StringUtils.isBlank(userB.getMiRegId())) {				
-				try {
-					Message message = MiPushUtils.buildMessage("好友", userA.getNickName()+"成为您的好友!", "关注好友消息");
-					MiPushUtils.sendMessage(message, userB.getMiRegId());
-				} catch (Exception e) {
-					log.error("推送消息异常!e={}",e.getMessage());
-				}				
+			if(null != userB && !StringUtils.isBlank(userB.getMiRegId())) {			
+				StationLetterDO letter = new StationLetterDO();
+				letter.setAcceptorId(userB.getId());
+				letter.setAcceptorType(0);
+				letter.setContent(userA.getNickName()+"成为您的好友!");
+				letter.setSenderId(userA.getId());
+				letter.setType(MediaTypeEnum.TEXT.numberValue());
+				stationLetterService.createLetter(letter);
 			}
 		}
 		
@@ -294,13 +247,6 @@ public class AccountServiceImpl implements AccountService{
 			log.warn("验证失败！exception={}",e);
 			throw new RuntimeException("验证失败! 原因："+e.getMessage());
 		}		
-	}
-
-	public List<ToyDO> getMyToys(long myId) {
-		ToyDO toy = new ToyDO();
-		toy.setOwnerId(myId);
-		
-		return toyMapper.getAll(toy);
 	}
 
 	public List<UserDO> getMyFriends(long myId) {

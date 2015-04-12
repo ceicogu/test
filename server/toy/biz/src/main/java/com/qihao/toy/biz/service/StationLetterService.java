@@ -19,7 +19,8 @@ public interface StationLetterService {
 	 * @param acceptorId
 	 * @return
 	 */
-	DataResult<List<StationLetterDO>> getMyLetters( int acceptorType, long acceptorId);
+	DataResult<List<StationLetterDO>> getMyLetters( int acceptorType, long acceptorId, Integer page , Integer maxPageSize);
+	DataResult<List<StationLetterDO>> getMyLetters( long o2oId1, long o2oId2, Integer page , Integer maxPageSize);
 	/**
 	 * 按站内信ID获取消息具体内容
 	 * @param letterId

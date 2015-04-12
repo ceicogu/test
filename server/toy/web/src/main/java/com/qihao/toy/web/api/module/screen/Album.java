@@ -18,6 +18,7 @@
 package com.qihao.toy.web.api.module.screen;
 
 import java.io.IOException;
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,19 +28,24 @@ import org.springframework.util.Assert;
 
 import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.AlbumService;
+import com.qihao.toy.biz.solr.DefaultSolrOperator;
+import com.qihao.toy.biz.solr.domain.AlbumSolrDO;
 import com.qihao.toy.dal.domain.AlbumDO;
-import com.qihao.toy.web.base.BaseScreenAction;
+import com.qihao.toy.web.base.BaseApiScreenAction;
 
 @Slf4j
-public class Album extends BaseScreenAction{
+public class Album extends BaseApiScreenAction{
     @Autowired
     private AccountService accountService;
     @Autowired
     private AlbumService albumService;
+    @Autowired
+    private DefaultSolrOperator solrOperator;
     /**
      * 创建专辑
      * @param requestParams
@@ -149,6 +155,27 @@ public class Album extends BaseScreenAction{
     	}
         response.getWriter().println(JSON.toJSONString(result));
         return;     
+    }
+    /**
+     * 专辑搜索
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doSearch(@Param("q") String query) throws Exception {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
+    	AlbumSolrDO albumSolrDO =  new AlbumSolrDO();
+    	albumSolrDO.setTitle(query);    	
+    	albumSolrDO.setSummary(query);
+
+    	List<String>  fields = Lists.newArrayList();
+    	fields.add("id");
+    	List<Object> resp = solrOperator.querySolrResult("album",(Object)albumSolrDO, null, fields,null, null);
+     	result.setSuccess(true);
+     	result.setMessage("搜索成功!");
+     	result.setData(resp);
+         response.getWriter().println(JSON.toJSONString(result));
+         return;   
     }
 }
 
