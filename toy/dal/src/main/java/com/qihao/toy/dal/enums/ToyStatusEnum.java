@@ -14,7 +14,8 @@ package com.qihao.toy.dal.enums;
  */
 public enum ToyStatusEnum implements DescedEnum{
 	Initial(0,"初始状态"),
-    Activated(1,"已激活");
+    Activated(1,"已激活"),
+    Claimed(2,"已認領"),;
     
     private int    num;
     private String desc;

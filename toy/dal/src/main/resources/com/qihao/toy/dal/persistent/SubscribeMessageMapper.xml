@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.SubscribeMessageMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,user_id,message_id,status,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,user_id,message_id,status,mi_message_id,gmt_created,gmt_modified,sender_id,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.SubscribeMessageDO"
         parameterType="java.lang.Long">
@@ -14,10 +14,10 @@
     </select>    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.SubscribeMessageDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO subscribe_message (
-         user_id,message_id,status,gmt_created,gmt_modified
+         user_id,message_id,mi_message_id,status,sender_id,gmt_created,gmt_modified
         )
         VALUES (
-        #{userId},#{messageId},#{status},#{content},now(),now()
+        #{userId},#{messageId},#{miMessageId},#{status},#{senderId},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.SubscribeMessageDO">
@@ -35,7 +35,9 @@
         <where>
         	<if test="id != null"> AND id=#{id}</if>
         	<if test="userId != null"> AND user_id=#{userId}</if>
+        	<if test="senderId != null"> AND sender_id=#{senderId}</if>
 	        <if test="messageId != null"> AND message_id=#{messageId}</if>
+	        <if test="miMessageId != null"> AND mi_message_id=#{miMessageId}</if>
         </where>
         limit #{offset},#{limit}
     </select>    

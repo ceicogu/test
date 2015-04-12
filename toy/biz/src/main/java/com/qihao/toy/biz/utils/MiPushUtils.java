@@ -2,9 +2,10 @@ package com.qihao.toy.biz.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
+import com.alibaba.fastjson.JSON;
 import com.xiaomi.xmpush.server.Constants;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
@@ -15,7 +16,7 @@ import com.xiaomi.xmpush.server.TargetedMessage;
 public class MiPushUtils {
 	private final static String PACKAGENAME = "box.qihao.com.qihaohao";
 	private final static String APP_SECRET_KEY = "eGZnHPky5HHDXGwN1+ON9Q==";
-
+	
 	/**
 	 * 构造推送消息体
 	 * @param messagePayload
@@ -24,27 +25,18 @@ public class MiPushUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Message buildMessage(String title, String description,String messagePayload) throws Exception {
+	public static Message buildMessage(String title, String description,Object commandMessage) throws Exception {
 	     Message message = new Message.Builder()
 	             .title(title)
 	             .description(description)
-	             .payload(messagePayload)
+	             .payload(JSON.toJSONString(commandMessage))
 	             .restrictedPackageName(PACKAGENAME)
 	             .passThrough(1)  //消息使用透传方式
 	             .notifyType(1)     // 使用默认提示音提示
 	             .build();
 	     return message;
 	}
-	public static Message buildMessage( String title, String description, String messagePayload,Map<String, Object> extraMaps) throws Exception {
-	     Message message = new Message.Builder()
-	             .title(title)
-	             .description(description).payload(messagePayload)
-	             .restrictedPackageName(PACKAGENAME)
-	             .passThrough(1)  //消息使用透传方式
-	             .notifyType(1)     // 使用默认提示音提示
-	             .build();
-	     return message;
-	}	
+
 	public static List<TargetedMessage> buildMessages(Message message) throws Exception {
 	     List<TargetedMessage> messages = new ArrayList<TargetedMessage>();
 	     TargetedMessage message1 = new TargetedMessage();
@@ -103,12 +95,11 @@ public class MiPushUtils {
 	     return result.getMessageId();
 	}
 	public static void main(String args[]) {
-	     String messagePayload = "This is a message";
 	     String title = "notification title";
 	     String description = "notification description";
 	     String regId="Wi3fQCBrI6JHU6gnsqfKdDc3SHkr01XnH3/afTPglWJmdbU3mQ6GzM/jX5lpa0ypMvhM1y0Db1XVu1Ra1JAlJtB4gaOaGziVLjUyOHBzO8o=";
 		try {
-			Message message = buildMessage(messagePayload, title, description);
+			Message message = buildMessage(title, description,null);
 			sendMessage(message,regId);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -12,6 +12,8 @@ public interface UserMapper extends CRUDMapper<UserDO> {
 	 * 登录
 	 */
 	UserDO login(@Param("loginName") String loginName, @Param("password") String password);
+	
+	UserDO getByLoginName(@Param("loginName") String loginName);
 
 	/**
 	 * 修改密码（知道老密码）

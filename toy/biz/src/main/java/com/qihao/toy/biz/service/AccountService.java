@@ -18,9 +18,7 @@
 package com.qihao.toy.biz.service;
 
 import java.util.List;
-import java.util.Map;
 
-import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 
 /**
@@ -59,6 +57,12 @@ public interface AccountService {
      */
     UserDO getUser(long userId);
     /**
+     * 根据登录名获取用户信息
+     * @param loginName
+     * @return
+     */
+    UserDO getUserByLoginName(String loginName);
+    /**
      * 获取指令用户ID列表的用户详情
      * @param userIds
      * @return
@@ -76,27 +80,7 @@ public interface AccountService {
      * @return
      */
     UserDO validateAuthToken(String authToken);
-    /**
-     * 根据toySN获取其归属ownerId
-     * @param toySN
-     * @return
-     */
-    ToyDO getToyBySN(String toySN);
-    /**
-     * 给Toy及宝宝命名
-     * @param userId  用户ID
-     * @param toySN   故事机唯一编码
-     * @param toyName   可选　　 故事机名称
-     * @param kidParams 可选			宝宝名称等信息
-     * @return
-     */
-    ToyDO renameToy(long userId, String toySN,String toyName, Map<String, Object> kidParams);
-    /**
-     * 获取我的Toy列表
-     * @param toy
-     * @return
-     */
-    List<ToyDO> getMyToys(long myId);
+
     /**
      * 获取我的好友列表
      * @param userId
@@ -110,4 +94,5 @@ public interface AccountService {
      * @return
      */
     Boolean isMyFriend(long myId, long friendId);
+    
 }

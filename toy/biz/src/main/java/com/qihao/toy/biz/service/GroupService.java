@@ -73,7 +73,7 @@ public interface GroupService {
      * @param myId
      * @return
      */
-    List<MyGroupDO> getMyCreatedGroups(long myId);
+    List<MyGroupDO> getMyCreatedGroups(long myId, GroupTypeEnum groupType);
     /**
      * 获取我加入的群
      * @param myId

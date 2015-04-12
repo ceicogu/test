@@ -12,9 +12,7 @@ package com.qihao.toy.dal.enums;
  */
 public enum MediaTypeEnum implements DescedEnum{
 	TEXT(0,"文字"),
-	SOUND(1,"语音"),
-	PHOTO(2,"图片"),
-	VIEDO(3,"视屏");
+	SOUND(1,"语音");
     
     private int    num;
     private String desc;

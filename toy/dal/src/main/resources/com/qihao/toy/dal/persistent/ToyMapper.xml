@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.ToyMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,toy_sn,toy_name,status,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,toy_sn,toy_name,toy_mac,activator_id,status,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.ToyDO"
         parameterType="java.lang.Long">
@@ -20,10 +20,10 @@
     </select>        
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.ToyDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO toy (
-         toy_sn,toy_name,status,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified
+         toy_sn,toy_name,toy_mac,status,activator_id,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified
         )
         VALUES (
-        #{toySN},#{toyName},#{status},#{kidName},#{kidGender},#{kidAge},#{kidBirth},#{ownerId},#{gmtOwned},now(),now()
+        #{toySN},#{toyName},#{toyMac},#{status},#{activatorId},#{kidName},#{kidGender},#{kidAge},#{kidBirth},#{ownerId},#{gmtOwned},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.ToyDO">
@@ -32,14 +32,16 @@
         gmt_modified=now()
         <if test="isDeleted != null"> , is_deleted=#{isDeleted}</if>
         <if test="status != null"> , status=#{status}</if>
+        <if test="activatorId != null"> , activator_id=#{activatorId}</if>
         <if test="toyName != null"> , toy_name=#{toyName}</if>
+        <if test="toyMac != null"> , toy_mac=#{toyMac}</if>
         <if test="kidName != null"> , kid_name=#{kidName}</if>
         <if test="kidGender != null"> , kid_gender=#{kidGender}</if>
         <if test="kidAge != null"> , kid_age=#{kidAge}</if>
         <if test="kidBirth != null"> , kid_birth=#{kidBirth}</if>
         <if test="ownerId != null"> , owner_id=#{ownerId}</if>
         <if test="gmtOwned != null"> , gmt_owned=#{gmtOwned}</if>
-        WHERE id=#{id}
+        WHERE toy_sn=#{toySN}
     </update>    
     <select id="getAll" resultType="com.qihao.toy.dal.domain.ToyDO"
         parameterType="com.qihao.toy.dal.domain.ToyDO">
@@ -50,7 +52,9 @@
         	<if test="id != null"> AND id=#{id}</if>
         	<if test="toySN != null"> AND toy_sn=#{toySN}</if>
         	<if test="toyName != null"> AND toy_name=#{toyName}</if>
+        	<if test="toyMac != null"> AND toy_mac=#{toyMac}</if>
         	<if test="status != null"> AND status=#{status}</if>
+        	<if test="activatorId != null"> AND activator_id=#{activatorId}</if>
         	<if test="ownerId != null"> AND owner_id=#{ownerId}</if>
         </where>
         limit #{offset},#{limit}

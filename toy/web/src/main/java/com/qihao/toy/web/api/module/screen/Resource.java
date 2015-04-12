@@ -41,9 +41,9 @@ import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.biz.utils.AnnexUtils;
 import com.qihao.toy.dal.domain.ResourceDO;
-import com.qihao.toy.web.base.BaseScreenAction;
+import com.qihao.toy.web.base.BaseApiScreenAction;
 
-public class Resource  extends BaseScreenAction{
+public class Resource  extends BaseApiScreenAction{
     @Autowired
     private AccountService accountService;
     @Autowired

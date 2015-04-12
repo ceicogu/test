@@ -29,12 +29,14 @@ public class ToyDO  extends PageDO {
 
     private String	toySN;			//玩具唯一编码
     private String	toyName;	//玩具名称
-    private Integer	 status;			//状态0-初始状态/1-已激活
+    private String	toyMac;		//玩具MAC地址
+    private Integer	 status;			//状态0-初始状态/1-已激活/2-已綁定
+    private Long		activatorId;  //激活者ID(toy自己的帐号ID)
+    private Long		ownerId;		//绑定者
     private String	kidName;		//宝宝的名字
     private Integer	kidGender;	//宝宝性别-1待定／0-女/1-男
     private Integer	kidAge;			//宝宝年龄
     private Date		kidBirth;		//宝宝出生日期
-    private Long		ownerId;		//绑定者
     private Date		gmtOwned;	//绑定时间
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常
 }

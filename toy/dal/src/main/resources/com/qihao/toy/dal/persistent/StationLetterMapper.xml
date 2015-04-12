@@ -42,5 +42,12 @@
         </where>
         limit #{offset},#{limit}
     </select>    
+     <select id="getAllForO2O" resultType="com.qihao.toy.dal.domain.StationLetterDO"   parameterType="java.util.Map">
+        SELECT
+        <include refid="All_Fields" />
+        FROM station_letter
+        WHERE acceptor_type=0 and ((sender_id=#{senderId} AND acceptor_id=#{acceptorId}) OR (sender_id=#{acceptorId} AND acceptor_id=#{senderId}))
+        limit #{offset},#{limit}
+    </select>       
 </mapper>
         
