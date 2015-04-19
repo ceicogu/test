@@ -1,0 +1,53 @@
+1.部署jetty8
+	a.下载http://download.eclipse.org/jetty
+	b.解压命令：tar -xvf jetty-distribution-8.1.16.v20140903.tar.gz　-d /opt/
+	c.ln -s jetty-distribution-8.1.16.v20140903/ jetty8
+	d.修改/etc/profile中增加export JETTY_HOME="/opt/jetty8"　　
+	e.source /etc/profile
+	f.启动jetty: ./jetty.sh start ;访问http://localhost:8080/　　修改端口是在etc/jetty.xml文件下，默认是8080
+	g.关闭jetty:./jetty.sh stop
+	h.部署war web项目，直接放在webapps目录下即可，重启jetty
+2.部署Solr-4.10.3(JDK需要1.7以上版本)
+	a.下载
+	b.解压文件：tar -xvf solr-4.10.3.tar.gz -d /opt/
+	c.cd /opt/solr-4.10.3/example  
+	d.java -jar start.jar  访问：http://localhost:8983/solr
+
+3.添加记录
+	a. cd exampledocs/
+	b. java -Durl=http://localhost:8983/solr/update -jar post.jar *.xml
+	c. http://localhost:8983/solr/select?q=video
+
+3.加入中文分词
+http://www.blogjava.net/conans/articles/379547.html
+把solr4.8/webapps下的solr.war解压  然后把解压后的目录solr拷贝到  jetty8/webapps目录下 此目录下的.war文件可以都删除
+http://code.google.com/p/mmseg4j/
+https://github.com/chenlb/mmseg4j-solr
+http://www.importnew.com/12860.html
+
+
+/opt/solr-4.10.3/example/solr/collection1/conf/schema.xml
+http://www.varchar.cn/art/12.html
+http://www.tuicool.com/articles/FNjQBrR
+http://www.devnote.cn/article/86.html
+
+http://blog.csdn.net/yuwenruli/article/details/8442815
+http://www.devnote.cn/article/32.html
+http://www.luoshengsha.com/118.html
+http://www.luoshengsha.com/178.html
+http://www.luoshengsha.com/139.html
+http://www.luoshengsha.com/213.html
+
+http://code.google.com/p/sql-to-nosql-importer/
+http://wiki.apache.org/solr/SolrJetty
+http://wiki.apache.org/solr/DataImportHandler
+solr分词：http://code.google.com/p/mmseg4j/
+
+http://www.blogjava.net/RongHao/archive/2007/11/06/158621.html
+http://code.google.com/p/mmseg4j/
+http://www.solr.cc/blog/
+http://code.google.com/p/ik-analyzer/downloads/list
+http://www.solr.cc/blog/?p=260
+
+http://wiki.apache.org/solr/DIHQuickStart
+

@@ -1,0 +1,15 @@
+1.添加亲子助手(妈妈)
+http://182.92.162.223/api/helper/add.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&actTime=06:23&repeats=1,2,3&tags=小鸟叫&url=yuequ/杜鹃圆舞曲.mp3
+
+2.修改亲子助手(妈妈)
+http://182.92.162.223/api/helper/update.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&actTime=06:23&repeats=1,2,3&tags=小鸟叫&url=yuequ/杜鹃圆舞曲.mp3
+
+3. 删除亲子助手(妈妈)
+http://182.92.162.223/api/helper/delete.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&id=3
+
+4. 获取亲子助手(妈妈)
+http://182.92.162.223/api/helper/delete.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&toyUserId=48&type=0
+
+5. 获取亲子助手(Toy)
+http://182.92.162.223/api/helper/delete.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&toyUserId=48&type=1
+

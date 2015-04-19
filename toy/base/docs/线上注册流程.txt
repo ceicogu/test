@@ -1,0 +1,99 @@
+1.Toy自動註冊
+http://182.92.162.223/api/account/register.json?type=1&loginName=mac001&pwd=mac001&comeFrom=0&comeSN=123456789&miRegId=Wi3fQCBrI6JHU6gnsqfKdOx%2BW1TRcoiRb5UpgtDIafLHWY%2FQ4%2BUtmkNsciCeBTaO5OyLfy4GBdLUx0GzVCfvYBGfPegQAKAam1zrrSJ7Cu8%3D
+
+{"data":{"authToken":"yqErBpNG2wWTQo7eCN9bZX/5utYq/FxJQJ7CZbnTa7A=","uid":17},"success":true}
+
+2.发送手机验证码(妈妈手机)
+http://182.92.162.223/api/account/createVerifyCode.json?mobile=18600361168
+3.手机注册(扫码注册)--进入toy家庭群
+妈妈注册
+http://182.92.162.223/api/account/register.json?loginName=18600361168&pwd=123456&nickName=18600361168&mobile=18600361168&code=262794&comeFrom=0&comeSN=123456789&miRegId=Wi3fQCBrI6JHU6gnsqfKdDc3SHkr01XnH3%2FafTPglWJmdbU3mQ6GzM%2FjX5lpa0ypMvhM1y0Db1XVu1Ra1JAlJtB4gaOaGziVLjUyOHBzO8o%3D
+
+4.发送手机验证码(爸爸手机)
+http://182.92.162.223/api/account/createVerifyCode.json?mobile=1391083629
+
+{"data":{"authToken":"7Jq4UGh42KMBwBVNQtcfTkvQ7VWoA3OQ6zuUZ0uKjGg=","nickName":"18600361168","uid":18},"success":true}
+5.手机注册(扫码注册--爸爸)
+http://182.92.162.223/api/account/register.json?loginName=13910836292&pwd=123456&nickName=13910836292&mobile=13910836292&code=434311&comeFrom=0&comeSN=123456789
+
+{"data":{"authToken":"J3mLs0Pgc0M/Dpt6vBCs5v0ZHlO6Xg8KLBSWZJELT2w=","nickName":"13910836292","uid":19},"success":true}
+
+6.注册邀请码验证(妈妈邀请宝贝叔叔加入)
+http://182.92.162.223/api/account/inviteFriend.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&mobile=13693135536
+
+7.发送手机验证码(宝贝叔叔手机)
+http://182.92.162.223/api/account/createVerifyCode.json?mobile=13693135536
+
+8.手机注册(邀请注册)--进入邀请者好友列表--叔叔成为妈妈的朋友
+http://182.92.162.223/api/account/register.json?loginName=13693135536&pwd=123456&nickName=13693135536&mobile=13693135536&code=241155&comeFrom=1&comeSN=334956
+
+{"data":{"authToken":"4tbNG368C78Lx9G4dL+PSf6dFD2Yj5SJO+I7rivrrdA=","nickName":"13693135536","uid":20},"success":true}
+
+9.绑定玩具(妈妈)
+http://182.92.162.223/api/account/renameToy.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&toySN=123456789&toyName=阿1呆&kidName=宝宝&kidGender=1&kidAge=4
+
+10.发送文字消息(妈妈-->Toy)
+http://182.92.162.223/api/account/sendLetter.json?authToken=RHvFnexM9LK9mPx6e2XeFaXi73X0YPfn6FRygV92Y8o%3D&accptorType=0&acceptorId=17&content=宝贝该吃饭了&type=0
+
+11.发送文字消息(toy-->妈妈)
+http://182.92.162.223/api/account/sendLetter.json?authToken=yqErBpNG2wWTQo7eCN9bZX%2F5utYq%2FFxJQJ7CZbnTa7A%3D&accptorType=0&acceptorId=18&content=妈妈知道啦&type=0
+
+12.获取站内信详情(Toy)
+http://182.92.162.223/api/account/getLetter.json?authToken=yqErBpNG2wWTQo7eCN9bZX%2F5utYq%2FFxJQJ7CZbnTa7A%3D&letterId=28
+
+13.发送语音消息(toy->妈妈)
+http://182.92.162.223/api/account/sendLetter.json?authToken=yqErBpNG2wWTQo7eCN9bZX%2F5utYq%2FFxJQJ7CZbnTa7A%3D&accptorType=0&acceptorId=18&url=upload/annex_572806869731688258.mp3&type=1
+
+14.主动更新当前帐号的miRegId
+http://182.92.162.223/api/account/modifyProfile.json?authToken=4tbNG368C78Lx9G4dL%2BPSf6dFD2Yj5SJO%2BI7rivrrdA%3D&miRegId=1111111111
+
+-----------------------------------------
+
+
+
+
+
+1.登录
+http://182.92.162.223/api/account/login.json?loginName=18600361168&pwd=123456
+
+{"data":{"authToken":"EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1+ia6+6WFSe4=","nickName":"18600361168"},"success":true}
+
+2.获取用户基本信息(userId&nickName)
+http://182.92.162.223/api/account/getUserInfo.json?authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D
+
+3.文件上传
+curl -F "myFile=@aa.mp3" -H "Expect: " -F "authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1+ia6+6WFSe4=" "http://182.92.162.223/api/resource/upload.json"
+
+curl -F "myFile=@aa.mp3" -H "Expect: " -F "authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D" "http://182.92.162.223/api/resource/upload.json"
+
+
+curl -F "myFile=@酒狂.mp3" -F "authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1+ia6+6WFSe4=" "http://182.92.162.223/api/resource/upload.json"
+
+curl -F "myFile=@aa.mp3" -F "authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D" "http://182.92.162.223/api/resource/upload.json"
+
+curl -d "myFile=@aa.mp3" -d "authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D" "http://182.92.162.223/api/resource/upload.json"
+
+
+{"data":"upload/annex_572806869731688258.mp3","message":"文件上传成功!","success":true}
+
+4.文件下载
+http://182.92.162.223/api/resource/download.json?authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D&fileName=upload/annex_572806869731688258.mp3
+
+5.发送消息
+http://182.92.162.223/api/account/sendLetter.json?authToken=EdhhV9qfarJvhHeYMGjRygOUUh2ygjn1%2Bia6%2B6WFSe4%3D&accptorType=0&acceptorId=15&content=吃饭了&type=0
+
+6.接收消息
+http://182.92.162.223/api/account/login.json?loginName=toy_000001&pwd=000001
+{"data":{"authToken":"7iZZCPWVgbhMT79VN2pNVSXFW8U0lIIsCwyPAHE9UW0=","nickName":"000001"},"success":true}
+http://182.92.162.223/api/account/getLetter.json?authToken=7iZZCPWVgbhMT79VN2pNVSXFW8U0lIIsCwyPAHE9UW0%3D&letterId=xxxxxx
+
+Wi3fQCBrI6JHU6gnsqfKdDc3SHkr01XnH3/afTPglWJmdbU3mQ6GzM/jX5lpa0ypMvhM1y0Db1XVu1Ra1JAlJtB4gaOaGziVLjUyOHBzO8o=
+
+{
+  acceptorId  = 10
+  accptorType = 0
+  authToken   = thdbn2dXLGp8hE8yfSFtPfJRw7WnR8cBLLeJO2G5pA0=
+  type        = 1
+  url         = upload/annex_2330998980349760260.mp3
+}
+org.springframework.beans.SimpleTypeConverter@17475e3

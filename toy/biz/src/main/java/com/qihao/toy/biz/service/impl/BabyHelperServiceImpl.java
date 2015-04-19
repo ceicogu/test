@@ -5,13 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.BabyHelperService;
 import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.BabyHelperDO;
 import com.qihao.toy.dal.domain.MiPushCommandMessage;
-import com.qihao.toy.dal.enums.MediaTypeEnum;
-import com.qihao.toy.dal.enums.MiCommandTypeEnum;
+import com.qihao.toy.dal.domain.UserDO;
+import com.qihao.toy.dal.enums.CommandTypeEnum;
 import com.qihao.toy.dal.enums.MiContentTypeEnum;
+import com.qihao.toy.dal.enums.OperateTypeEnum;
 import com.qihao.toy.dal.persistent.BabyHelperMapper;
 import com.xiaomi.xmpush.server.Message;
 
@@ -19,35 +22,27 @@ import com.xiaomi.xmpush.server.Message;
 public class BabyHelperServiceImpl implements BabyHelperService {
 	@Autowired
 	private BabyHelperMapper babyHelperMapper;
+	@Autowired
+	private AccountService accountService;
 
 	public Long insert(BabyHelperDO helper) {
 		babyHelperMapper.insert(helper);
-		//通知Toy更新
-		MiPushCommandMessage miPushCmdMessage = new MiPushCommandMessage();
-		miPushCmdMessage.setSenderId(helper.getOperatorId());
-		miPushCmdMessage.setType(MiCommandTypeEnum.DOWNLOAD);
-		miPushCmdMessage.setMediaType(MediaTypeEnum.SOUND);
-		miPushCmdMessage.setMsgId(helper.getId());
-		miPushCmdMessage.setMsgContent(helper.getTags());
-		miPushCmdMessage.setMsgUrl(helper.getUrl());
-		try {
-			Message message = MiPushUtils.buildMessage( 
-					MiCommandTypeEnum.DOWNLOAD.name(),
-					MiContentTypeEnum.HELPER.name(),
-					helper);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+		sendMessageToToy(OperateTypeEnum.ADD,helper);
 		return helper.getId();
 	}
 
 	public Boolean update(Long id, BabyHelperDO helper) {
 		helper.setId(id);
-		return babyHelperMapper.update(helper);
+		boolean bOK =  babyHelperMapper.update(helper);
+		sendMessageToToy(OperateTypeEnum.UPDATE,helper);
+		return bOK;
 	}
 
 	public Boolean deleteById(Long id) {
-		return babyHelperMapper.deleteById(id);
+		BabyHelperDO helper = this.getById(id);
+		boolean bOK =  babyHelperMapper.deleteById(id);
+		sendMessageToToy(OperateTypeEnum.DELETE,helper);
+		return bOK;
 	}
 
 	public BabyHelperDO getById(Long id) {
@@ -57,5 +52,30 @@ public class BabyHelperServiceImpl implements BabyHelperService {
 	public List<BabyHelperDO> getAll(BabyHelperDO helper) {
 		return babyHelperMapper.getAll(helper);
 	}
+	private String sendMessageToToy(OperateTypeEnum optType,BabyHelperDO helper ){
+		//通知Toy更新
+		MiPushCommandMessage miPushCmdMessage = new MiPushCommandMessage();
+		miPushCmdMessage.setSenderId(helper.getOperatorId());
+		miPushCmdMessage.setCmdType(CommandTypeEnum.HELPER_CONTORL);
+		miPushCmdMessage.setOptType(optType);
+		miPushCmdMessage.setCmdId(helper.getId());
+		miPushCmdMessage.setCmdContent(JSON.toJSONString(helper));
+		try {
+			Message message = MiPushUtils.buildMessage( 
+					CommandTypeEnum.HELPER_CONTORL.name(),
+					MiContentTypeEnum.HELPER.name(),
+					helper);
+			UserDO user = accountService.getUser(helper.getToyUserId());
+			String miMessageId = MiPushUtils.sendMessage(message, user.getMiRegId());
+			if(null != miMessageId) {
 
+			}else {
+
+			}
+			return miMessageId;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return null;
+	}
 }

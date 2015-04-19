@@ -50,6 +50,8 @@
 				<when>
 					<!-- 创建JSON，无模板，无layout。 -->
 					<pl-conditions:target-extension-condition extension="json" />
+					<!-- 签名检查-->
+					<pl-valves:valve class="com.qihao.toy.web.valve.SignatureCheckValve" />
 					<pl-valves:performScreen />
 					<pl-valves:renderResultAsJson />
 				</when>

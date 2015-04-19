@@ -19,7 +19,7 @@ import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.SubscribeMessageDO;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.dal.enums.MiCommandTypeEnum;
+import com.qihao.toy.dal.enums.CommandTypeEnum;
 import com.qihao.toy.dal.enums.MiContentTypeEnum;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
 import com.qihao.toy.dal.persistent.SubscribeMessageMapper;
@@ -66,7 +66,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 		Map<Long, String> handleMap = Maps.newLinkedHashMap();
 		try {
 			Message message = MiPushUtils.buildMessage(
-					MiCommandTypeEnum.VIEW.name(), 
+					CommandTypeEnum.CONTENT_VIEW.name(), 
 					MiContentTypeEnum.LETTER.name(),
 					letter);				
 			if(acceptorType.equals(0)){//直接发送给好友
