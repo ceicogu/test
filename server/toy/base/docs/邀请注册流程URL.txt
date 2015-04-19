@@ -1,0 +1,10 @@
+1.好友邀请
+http://localhost:8081/api/account/inviteFriend.json?authToken=7HKLfhsV4CM9lYXIFSN8sxhvsPSt2pT5CyDOGH0K5qw%3D&mobile=受邀请手机号
+
+2.发送手机注册验证码
+http://localhost:8081/api/account/createVerifyCode.json?mobile=注册手机号
+
+3.邀请注册
+http://localhost:8081/api/account/register.json?loginName=登录名&pwd=登录密码&nickName=昵称&mobile=注册手机号&code=验证码&comeFrom=1&comeSN=邀请码
+
+

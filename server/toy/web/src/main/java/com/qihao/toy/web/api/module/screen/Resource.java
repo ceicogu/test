@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import com.alibaba.citrus.service.requestcontext.buffered.BufferedRequestContext;
 import com.alibaba.citrus.turbine.Navigator;
 import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.fastjson.JSON;
@@ -50,7 +51,8 @@ public class Resource  extends BaseApiScreenAction{
     private ResourceService resourceService;
     @Autowired
     private DefaultSolrOperator solrOperator;
-    
+    @Autowired
+    private BufferedRequestContext buffered;
     /**
      * 单文件上传
      * @param requestParams
@@ -77,6 +79,7 @@ public class Resource  extends BaseApiScreenAction{
     
     public void doDownload(@Param("authToken") String authToken, @Param("fileName") String fileName, Navigator nav) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!"); 	    	
+    	buffered.setBuffering(false);
         try {
             OutputStream out = response.getOutputStream();
             File downloadFile = AnnexUtils.getAnnexFile(fileName);

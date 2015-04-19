@@ -41,7 +41,7 @@ public class AuthorizationValve extends AbstractValve {
     	targetWhiteList.add("account_register");
     	targetWhiteList.add("account_validateQrCode");
     	targetWhiteList.add("account_createVerifyCode");
-    	targetWhiteList.add("account_checkInvitionCode");    	
+    	targetWhiteList.add("account_checkInvitionCode");
     }
     
 	public void invoke(PipelineContext pipelineContext) throws Exception {
