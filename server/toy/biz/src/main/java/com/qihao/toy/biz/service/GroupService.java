@@ -53,6 +53,7 @@ public interface GroupService {
      * @return
      */
     MyGroupDO getItemById(long groupId);
+    List<MyGroupDO> getItemByIds(List<Long> groupIds);
     /**
      * 判断是否是该群成员
      * @param groupId
@@ -79,7 +80,8 @@ public interface GroupService {
      * @param myId
      * @return
      */
-    List<MyGroupDO> getMyJoinedGroups(long myId);
+    List<Long> getMyJoinedGroups(long myId);
+    List<Long> getMyJoinedGroups(long myId,Integer groupType);
     
     /**
      * 获取指定群的所有成员

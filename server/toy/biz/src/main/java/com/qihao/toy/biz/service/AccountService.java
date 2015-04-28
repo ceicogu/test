@@ -94,5 +94,10 @@ public interface AccountService {
      * @return
      */
     Boolean isMyFriend(long myId, long friendId);
-    
+    /**
+     * 获取自己所在家庭群ID
+     * @param myId
+     * @return
+     */
+    List<Long> getMyFamilyGroupId(long myId);
 }

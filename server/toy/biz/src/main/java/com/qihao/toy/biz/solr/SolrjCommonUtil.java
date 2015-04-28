@@ -24,7 +24,13 @@ public class SolrjCommonUtil {
                 if (value != null) {  
                     resultMap.put(name, value);  
                 }  
-            }  
+            } else if(type.equals("class java.lang.Long")){
+                Method m = model.getClass().getMethod("get" + UpperCaseField(name));  
+                Long value = (Long) m.invoke(model); // 调用getter方法获取属性值  
+                if (value != null) {  
+                    resultMap.put(name, String.valueOf(value));  
+                }              	
+            }
         }  
         return resultMap;  
     }  

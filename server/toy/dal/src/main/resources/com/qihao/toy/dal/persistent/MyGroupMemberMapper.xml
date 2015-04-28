@@ -31,13 +31,15 @@
     <select id="getAll" resultType="com.qihao.toy.dal.domain.MyGroupMemberDO"
         parameterType="com.qihao.toy.dal.domain.MyGroupMemberDO">
         SELECT
-        <include refid="All_Fields" />
-        FROM my_group_member
+        a.id,a.group_id,b.group_type,a.member_id,a.member_name,a.is_deleted
+        FROM my_group_member as a
+        LEFT JOIN my_group as b ON a.group_id=b.id
         <where>
-        	<if test="id != null"> AND id=#{id}</if>
-        	<if test="groupId != null"> AND group_id=#{groupId}</if>
-	        <if test="memberId != null"> AND member_id=#{memberId}</if>
-	        <if test="memberName != null"> AND member_name=#{memberName}</if>
+        	<if test="id != null"> AND a.id=#{id}</if>
+        	<if test="groupId != null"> AND a.group_id=#{groupId}</if>
+	        <if test="memberId != null"> AND a.member_id=#{memberId}</if>
+	        <if test="memberName != null"> AND a.member_name=#{memberName}</if>
+	        <if test="groupType != null"> AND b.group_type=#{groupType}</if>
         </where>
         limit #{offset},#{limit}
     </select>    

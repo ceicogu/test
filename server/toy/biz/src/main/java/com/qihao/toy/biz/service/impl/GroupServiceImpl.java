@@ -74,20 +74,30 @@ public class GroupServiceImpl implements GroupService {
 		return myGroupMapper.getAll(myGroup);
 	}
 
-	public List<MyGroupDO> getMyJoinedGroups(long myId) {
-		MyGroupDO myGroup = new MyGroupDO();
+	public List<Long> getMyJoinedGroups(long myId) {
+		return this.getMyJoinedGroups(myId,null);
+	}
+	public List<Long> getMyJoinedGroups(long myId,Integer groupType) {
 		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
 		myGroupMember.setMemberId(myId);
+		myGroupMember.setGroupType(groupType);
 		List<MyGroupMemberDO> resp = myGroupMemberMapper.getAll(myGroupMember);
 		if(CollectionUtils.isEmpty(resp)){
 			return null;
 		}
 		List<Long> groupIds = Lists.newArrayList();
 		for(MyGroupMemberDO member : resp) {
-			groupIds.add(member.getGroupId());
+			if(null == groupType) {
+				groupIds.add(member.getGroupId());
+			}
+			else{
+				if(groupType.equals(member.getGroupType())){
+					groupIds.add(member.getGroupId());
+				}
+			}
+			
 		}
-		myGroup.setGroupIds(groupIds);
-		return myGroupMapper.getAll(myGroup);
+		return groupIds;
 	}
 
 	public List<MyGroupMemberDO> getGroupMembersByGroupId(long groupId) {
@@ -105,5 +115,11 @@ public class GroupServiceImpl implements GroupService {
 			userIds.add(member.getMemberId());
 		}
 		return userIds;
+	}
+
+	public List<MyGroupDO> getItemByIds(List<Long> groupIds) {
+		MyGroupDO myGroup = new MyGroupDO();
+		myGroup.setGroupIds(groupIds);
+		return myGroupMapper.getAll(myGroup);	
 	}
 }

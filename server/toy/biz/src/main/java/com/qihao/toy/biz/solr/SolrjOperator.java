@@ -5,6 +5,13 @@ import java.util.List;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 
 public interface SolrjOperator {
+	/**
+	 * 获得语句分词结果
+	 * @param sentence
+	 * @return
+	 * @throws Exception
+	 */
+    public List<String> anlysisSolrResult(String coreName, String sentence)  throws Exception;  
 	 
     /** 
      * 获得搜索结果 

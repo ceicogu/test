@@ -114,13 +114,14 @@ public class Resource  extends BaseApiScreenAction{
     	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
     	ResourceSolrDO resourceSolrDO =  new ResourceSolrDO();
     	resourceSolrDO.setTitle(query);
-    	resourceSolrDO.setContent(query);
+    	//resourceSolrDO.setContent(query);
     	ResourceSolrDO compositorDO = new ResourceSolrDO();
     	compositorDO.setId(SolrQuery.ORDER.desc.toString());
     	
  //   	 Long count = solrOperator.querySolrResultCount(resourceSolrDO,null);
     	List<String>  fields = Lists.newArrayList();
     	fields.add("id");
+    	fields.add("url");
     	List<Object> resp = solrOperator.querySolrResult("resource",(Object)resourceSolrDO, compositorDO, fields,null, null);
      	result.setSuccess(true);
      	result.setMessage("搜索成功!");

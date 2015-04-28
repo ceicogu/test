@@ -50,6 +50,10 @@ public class DefaultSolrOperator implements SolrjOperator {
         SolrjQuery solrjQuery = SolrjQueryFactory.getServer(coreName);
         SolrDocumentList solrDocument = solrjQuery.query(propertyMap, compositorMap,  null, null, null);  
         return solrDocument.getNumFound();  
-    }  
+    }
+	public List<String> anlysisSolrResult(String coreName,String sentence) throws Exception {
+        SolrjQuery solrjQuery = SolrjQueryFactory.getServer(coreName);
+        return solrjQuery.analysis(sentence);  
+	}  
 
 }

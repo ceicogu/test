@@ -57,11 +57,11 @@
 	        <if test="singer != null"> AND singer=#{singer}</if>
 	        <if test="urlType!= null"> AND url_type=#{urlType}</if>
 	        <if test="url != null"> AND url=#{url}</if>
-	        <if test="urlRlc != null"> ,url_rlc=#{urlRlc}</if>
+	        <if test="urlRlc != null"> AND url_rlc=#{urlRlc}</if>
 	        <if test="summary != null"> AND summary=#{summary}</if>
 	        <if test="photo != null"> AND photo=#{photo}</if>
 	        <if test="creatorId != null"> AND creatorId=#{creatorId}</if>
-	        <if test="bizFlag != null"> ,biz_flag=#{bizFlag}</if>
+	        <if test="bizFlag != null"> AND biz_flag=#{bizFlag}</if>
         	<if test="ids != null"> AND id IN 
         	  <foreach collection="ids"  item="resourceId" open="("    separator="," close=")">
    						#{resourceId}

@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.dataresolver.Param;
@@ -50,6 +51,7 @@ import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.enums.GroupTypeEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.web.base.BaseApiScreenAction;
 
@@ -260,8 +262,12 @@ public class Account extends BaseApiScreenAction{
     		Map<String,String> item = Maps.newTreeMap();
     		item.put("toyName", toy.getToyName());
     		item.put("kidName", toy.getKidName());
+    		if(null != toy.getKidGender()){
     		item.put("kidGender", toy.getKidGender().toString());
+    		}
+    		if(null != toy.getKidAge()){
     		item.put("kidAge", toy.getKidAge().toString());
+    		}
     		item.put("ownerId", toy.getOwnerId().toString());
     		data.add(item);
     	}
@@ -498,8 +504,14 @@ public class Account extends BaseApiScreenAction{
     public void doSearch(@Param("q") String query) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
+    	//1.确认自己所在家庭群
+    	List<Long> groupIds = groupService.getMyJoinedGroups(currentUser.getId(), GroupTypeEnum.Family.numberValue());
+    	//2.在自己所在家庭群找人
     	AccountSolrDO accountSolrDO =  new AccountSolrDO();
     	accountSolrDO.setMemberName(query);    	
+    	if(!CollectionUtils.isEmpty(groupIds)){
+    		accountSolrDO.setGroupId(groupIds.get(0));
+    	}
 //    	AccountSolrDO compositorDO = new AccountSolrDO();
 //    	compositorDO.setGroupId(SolrQuery.ORDER.desc);
     	
@@ -507,12 +519,28 @@ public class Account extends BaseApiScreenAction{
     	List<String>  fields = Lists.newArrayList();
     	fields.add("groupId");
     	fields.add("memberId");
+    	fields.add("memberName");
+    	fields.add("memberMobile");
     	List<Object> resp = solrOperator.querySolrResult("account",(Object)accountSolrDO, null, fields,null, null);
+    	if(!CollectionUtils.isEmpty(resp)){
+    		Object obj = resp.get(0);
+    		
+    	}
      	result.setSuccess(true);
      	result.setMessage("搜索成功!");
      	result.setData(resp);
          response.getWriter().println(JSON.toJSONString(result));
          return;   
+    }
+    public void doAnalysis(@Param("q") String query) throws Exception {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<String>> result  = new DataResult<List<String>>();
+    	List<String> resp = solrOperator.anlysisSolrResult("account",query);
+     	result.setSuccess(true);
+     	result.setMessage("分词成功!");
+     	result.setData(resp);
+         response.getWriter().println(JSON.toJSONString(result));
+         return;    	
     }
 }
 

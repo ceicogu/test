@@ -42,8 +42,8 @@ public class ResourceDO  extends PageDO {
     private String	summary;		//摘要
     private String	content;			//内容
     private String	photo;				//封面
-    private Long		creatorId;		//创建者ID
-    private Integer bizFlag;				//业务标识：0-公开／1-只对好友公开/2-不公开
+    private Long	creatorId;		//创建者ID
+    private Integer bizFlag;		//业务标识：0-公开／1-只对好友公开/2-不公开
     
     //查询专用
     private List<Long>  ids;
