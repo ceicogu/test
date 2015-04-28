@@ -54,6 +54,7 @@ public class AccountServiceImpl implements AccountService{
 	private MyFriendMapper myFriendMapper;
 	@Autowired
 	private GroupService groupService;
+
 	@Autowired
 	private VerifyCodeMapper  verifyCodeMapper;
 	@Autowired
@@ -273,5 +274,9 @@ public class AccountServiceImpl implements AccountService{
 		myFriend.setFriendId(friendId);
 		List<MyFriendDO> resp = myFriendMapper.getAll(myFriend);
 		return !CollectionUtils.isEmpty(resp);
+	}
+
+	public List<Long> getMyFamilyGroupId(long myId) {
+		return groupService.getMyJoinedGroups(myId, GroupTypeEnum.Family.numberValue());
 	}
 }

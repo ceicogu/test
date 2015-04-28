@@ -28,8 +28,7 @@
 		<!-- 检查页面的授权，如果当前用户无权访问该页面，则跳转到petstoreLogin页面 -->
 		<pl-valves:pageAuthorization callbackClass="com.alibaba.sample.petstore.web.common.PetstoreUserAuth" />
 
-		<!-- AuthToken检查 -->
-		<pl-valves:valve class="com.qihao.toy.web.valve.AuthorizationValve" />
+
 
 
 		<pl-valves:loop>
@@ -50,6 +49,8 @@
 				<when>
 					<!-- 创建JSON，无模板，无layout。 -->
 					<pl-conditions:target-extension-condition extension="json" />
+					<!-- AuthToken检查 -->
+					<pl-valves:valve class="com.qihao.toy.web.valve.AuthorizationValve" />
 					<!-- 签名检查-->
 					<pl-valves:valve class="com.qihao.toy.web.valve.SignatureCheckValve" />
 					<pl-valves:performScreen />

@@ -2,21 +2,30 @@ package com.qihao.toy.biz.solr;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.FieldAnalysisRequest;
+import org.apache.solr.client.solrj.response.AnalysisResponseBase.AnalysisPhase;
+import org.apache.solr.client.solrj.response.AnalysisResponseBase.TokenInfo;
+import org.apache.solr.client.solrj.response.FieldAnalysisResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.util.CollectionUtils;
 
+import com.alibaba.common.lang.StringUtil;
 import com.google.common.base.Joiner;
+@Slf4j
 @Setter @Getter
 public class SolrjQuery {
 	    private String url;  
@@ -38,6 +47,37 @@ public class SolrjQuery {
 	        solrServer.setAllowCompression(true);  
 	        solrServer.setMaxRetries(maxRetries);  
 	    }  
+	    /**
+	     * 获取语句分词结果
+	     * @param sentence
+	     * @return
+	     */
+	    public List<String> analysis(String sentence) {
+	        FieldAnalysisRequest request = new FieldAnalysisRequest("/analysis/field");
+	        request.addFieldName("title");// 字段名，随便指定一个支持中文分词的字段
+	        request.setFieldValue("");// 字段值，可以为空字符串，但是需要显式指定此参数
+	        request.setQuery(sentence);
+	       
+	        FieldAnalysisResponse response = null;
+	        try {
+	            response = request.process(solrServer);
+	        } catch (Exception e) {
+	            log.error("获取查询语句的分词时遇到错误", e);
+	        }
+
+	        List<String> results = new ArrayList<String>();
+	        Iterator<AnalysisPhase> it = response.getFieldNameAnalysis("title")
+	                .getQueryPhases().iterator();
+	        while(it.hasNext()) {
+	          AnalysisPhase pharse = (AnalysisPhase)it.next();
+	          List<TokenInfo> list = pharse.getTokens();
+	          for (TokenInfo info : list) {
+	              results.add(info.getText());
+	          }
+	        }
+	        
+	        return results;
+	    }
 	    public void write(Map<String,String>propertyMap){
             SolrInputDocument doc1 = new SolrInputDocument();
             for(String key : propertyMap.keySet()) {
@@ -76,13 +116,17 @@ public class SolrjQuery {
 	        if (null == propertyMap) {  
 	            throw new Exception("搜索字段不可为空!");  
 	        } else {  
-	            for (Object o : propertyMap.keySet()) {  
-	                StringBuffer sb = new StringBuffer();  
-	                sb.append(o.toString()).append(":");  
-	                sb.append(propertyMap.get(o));  
-	                String queryString = addBlank2Expression(sb.toString());  
-	                query.setQuery(queryString);  
-	            }  
+	        	StringBuffer sb = new StringBuffer();  
+	            for (Object o : propertyMap.keySet()) {
+	                if(!StringUtil.isBlank(sb.toString())) {
+	                	sb.append(" AND ");
+	                }
+	                sb.append(o.toString()).append(":").append(propertyMap.get(o));
+	            }
+		           
+                
+                String queryString = addBlank2Expression(sb.toString());  
+                query.setQuery(queryString);  
 	        }  
 	        // 设置排序条件  
 	        if (!CollectionUtils.isEmpty(compositorMap)) {  
