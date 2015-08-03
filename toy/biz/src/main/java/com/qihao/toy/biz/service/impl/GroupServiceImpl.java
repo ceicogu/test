@@ -70,7 +70,9 @@ public class GroupServiceImpl implements GroupService {
 	public List<MyGroupDO> getMyCreatedGroups(long myId, GroupTypeEnum groupType) {
 		MyGroupDO myGroup = new MyGroupDO();
 		myGroup.setMyId(myId);
-		myGroup.setGroupType(groupType.numberValue());
+		if(null != groupType) {
+			myGroup.setGroupType(groupType.numberValue());
+		}
 		return myGroupMapper.getAll(myGroup);
 	}
 

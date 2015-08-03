@@ -27,4 +27,5 @@ public class MyToyDO  extends PageDO {
 
     private Long		myId;			//玩具归属用户
     private String	toySN;			//玩具唯一编码
+    private Long	toyUserId;		//玩具注册账号ID
 }

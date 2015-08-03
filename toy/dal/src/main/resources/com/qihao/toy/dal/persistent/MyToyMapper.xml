@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.MyToyMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,my_id,toy_sn,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,my_id,toy_sn,toy_user_id,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.MyToyDO"
         parameterType="java.lang.Long">
@@ -20,10 +20,10 @@
     </select>        
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyToyDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO my_toy (
-         my_id,toy_sn,gmt_created,gmt_modified
+         my_id,toy_sn,toy_user_id,gmt_created,gmt_modified
         )
         VALUES (
-        #{myId},#{toySN},now(),now()
+        #{myId},#{toySN},#{toyUserId},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.MyToyDO">
@@ -33,6 +33,7 @@
          <if test="isDeleted != null"> , is_deleted=#{isDeleted}</if>
          <if test="myId != null"> , my_id=#{myId}</if>
          <if test="toySN != null"> , toy_sn=#{toySN}</if>
+         <if test="toyUserId != null"> , toy_user_id=#{toyUserId}</if>
         WHERE id=#{id}
     </update>
     <select id="getAll" resultType="com.qihao.toy.dal.domain.MyToyDO"
@@ -44,8 +45,15 @@
         	<if test="id != null"> AND id=#{id}</if>
         	<if test="myId != null"> AND my_id=#{myId}</if>
         	<if test="toySN != null"> AND toy_sn=#{toySN}</if>
+        	<if test="toyUserId != null"> AND toy_user_id=#{toyUserId}</if>
         </where>
         limit #{offset},#{limit}
+    </select>    
+    <select id="getMyToyUserIds" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT
+        toy_user_id
+        FROM my_toy
+        WHERE my_id=#{myId}
     </select>    
 </mapper>
         

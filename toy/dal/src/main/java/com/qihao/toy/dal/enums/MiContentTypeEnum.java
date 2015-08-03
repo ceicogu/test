@@ -7,6 +7,9 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
+
 
 public enum MiContentTypeEnum implements DescedEnum{
 	LETTER(0,"消息类型"),

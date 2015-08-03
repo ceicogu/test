@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sound.sampled.AudioFormat.Encoding;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +42,8 @@ public class BaseApiScreenAction {
     public void beforeExecution() {
     	request.setAttribute(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
         currentUser = (UserDO) request.getAttribute("currentUser");
     }
 

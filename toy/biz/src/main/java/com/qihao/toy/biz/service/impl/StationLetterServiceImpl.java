@@ -76,7 +76,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 					msg.setMessageId(letter.getId());
 					msg.setUserId(user.getId());
 					msg.setSenderId(letter.getSenderId());
-					String miMessageId = MiPushUtils.sendMessage(message, user.getMiRegId());
+					String miMessageId = MiPushUtils.sendMessageToAlias(message, user.getMiRegId());
 					if(null != miMessageId) {
 						handleMap.put(user.getId(), miMessageId);
 						msg.setStatus(1);
@@ -104,7 +104,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 							continue;
 						}
 
-						String miMessageId = 	MiPushUtils.sendMessage(message, user.getMiRegId());
+						String miMessageId = 	MiPushUtils.sendMessageToAlias(message, user.getMiRegId());
 						if(null != miMessageId) {
 							handleMap.put(user.getId(), miMessageId);
 							msg.setStatus(1);			

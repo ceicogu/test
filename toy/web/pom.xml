@@ -48,6 +48,10 @@
             <groupId>com.alibaba.citrus</groupId>
             <artifactId>citrus-test-all</artifactId>
         </dependency>
+        <dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>     
     </dependencies>
     <build>
         <finalName>petstore</finalName>

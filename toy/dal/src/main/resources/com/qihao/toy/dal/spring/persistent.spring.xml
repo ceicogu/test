@@ -7,7 +7,7 @@
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url"
-			value="jdbc:mysql://localhost:3306/qihao_toy?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8" />
+			value="jdbc:mysql://182.92.162.223:3306/qihao_toy?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8" />
 		<property name="username" value="mysql" />
 		<property name="password" value="123456" />
 	</bean>

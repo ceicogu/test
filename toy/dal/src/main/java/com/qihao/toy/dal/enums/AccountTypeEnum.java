@@ -7,6 +7,9 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
+
 
 public enum AccountTypeEnum implements DescedEnum{
 	MOBILE_REG(0,"手机注册"),

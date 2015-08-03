@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -39,7 +38,6 @@ import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.ResourceService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
-import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.biz.utils.AnnexUtils;
 import com.qihao.toy.dal.domain.ResourceDO;
 import com.qihao.toy.web.base.BaseApiScreenAction;
@@ -109,26 +107,7 @@ public class Resource  extends BaseApiScreenAction{
 
         }
     }
-    public void doSearch(@Param("q") String query, Navigator nav) throws Exception {
-    	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
-    	ResourceSolrDO resourceSolrDO =  new ResourceSolrDO();
-    	resourceSolrDO.setTitle(query);
-    	//resourceSolrDO.setContent(query);
-    	ResourceSolrDO compositorDO = new ResourceSolrDO();
-    	compositorDO.setId(SolrQuery.ORDER.desc.toString());
-    	
- //   	 Long count = solrOperator.querySolrResultCount(resourceSolrDO,null);
-    	List<String>  fields = Lists.newArrayList();
-    	fields.add("id");
-    	fields.add("url");
-    	List<Object> resp = solrOperator.querySolrResult("resource",(Object)resourceSolrDO, compositorDO, fields,null, null);
-     	result.setSuccess(true);
-     	result.setMessage("搜索成功!");
-     	result.setData(resp);
-         response.getWriter().println(JSON.toJSONString(result));
-         return;    
-    }
+
     public void doGetResourceItems(@Param("ids") String ids, Navigator nav) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");    	
     	DataResult<List<ResourceDO>> result  = new DataResult<List<ResourceDO>>();

@@ -2,6 +2,8 @@ package com.qihao.toy.biz.solr;
 
 import java.util.List;
 
+import org.apache.solr.common.SolrDocumentList;
+
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 
 public interface SolrjOperator {
@@ -24,7 +26,7 @@ public interface SolrjOperator {
      * @return 
      * @throws Exception 
      */  
-    public List<Object> querySolrResult(String coreName, Object propertyDO,  Object compositorDO, List<String> filterFields, Integer startIndex, Integer pageSize)  throws Exception;  
+    public SolrDocumentList querySolrResult(String coreName, Object propertyDO,  Object compositorDO, List<String> filterFields, Integer startIndex, Integer pageSize)  throws Exception;  
   
     /** 
      * 获得搜索结果条数 

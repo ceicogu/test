@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 public enum VerifyCodeTypeEnum implements DescedEnum{
 	Reg_VerifyCode(0,"注册验证码"),
 	Reg_InviteCode(1,"注册邀请码");
