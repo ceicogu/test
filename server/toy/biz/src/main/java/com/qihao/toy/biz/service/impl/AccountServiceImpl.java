@@ -98,6 +98,8 @@ public class AccountServiceImpl implements AccountService{
 		} catch (Exception e) {
 			throw new IllegalArgumentException("系统配置参数错误！");
 		}		
+		//TODO 若是手机扫码注册，需要检查toy是否已激活，否则不能注册
+		
 		//4.注册（创建用户）
 		userMapper.insert(user);//注册
 		//5.根据注册帐号类型，进行设定
@@ -107,7 +109,7 @@ public class AccountServiceImpl implements AccountService{
 	    	toyService.toAcitvateToy( user.getId(), user.getComeSN(), user.getLoginName());
 			//创建一个家庭群
 			Long groupId = groupService.createGroup(user.getId(),"我的家庭群", GroupTypeEnum.Family);
-			groupService.insertGroupMember(groupId, user.getId(),  "宝贝");
+			groupService.insertGroupMember(groupId, user.getId(),  user.getNickName());
 			return user.getId();
 		}		
 		//5-2若是手机注册，就要进一步检查是否扫码注册，是就要看该码对应的Toy是否已激活，若无就激活
@@ -125,7 +127,7 @@ public class AccountServiceImpl implements AccountService{
 			//加入Toy家庭群
 			List<MyGroupDO> resp4 = groupService.getMyCreatedGroups(toy.getActivatorId(), GroupTypeEnum.Family);
 			if(!CollectionUtils.isEmpty(resp4)){
-				groupService.insertGroupMember(resp4.get(0).getId(), user.getId(), "妈妈");
+				groupService.insertGroupMember(resp4.get(0).getId(), user.getId(), user.getNickName());
 			}			
 			//验证码
 			//与Toy互为好友
@@ -180,9 +182,13 @@ public class AccountServiceImpl implements AccountService{
 	 * @param myFriendId
 	 */
 	private void focusA2B(long userAId, long userBId){
+		UserDO userA =this.getUser(userAId);
+		UserDO userB =this.getUser(userBId);
+		
 		MyFriendDO myFriend = new MyFriendDO();
-		myFriend.setMyId(userAId);
-		myFriend.setFriendId(userBId);
+		myFriend.setMyId(userBId);
+		myFriend.setFriendId(userAId);
+		myFriend.setRelation(userA.getNickName());
 		List<MyFriendDO> resp = myFriendMapper.getAll(myFriend);
 		boolean needPushMessage = false;
 		if(CollectionUtils.isEmpty(resp)){
@@ -200,10 +206,10 @@ public class AccountServiceImpl implements AccountService{
 				needPushMessage = true;
 			}
 		}
+		//TODO 若B有管理的Toy帐号，就同时将A变成Toy的好友
+		
 		if(needPushMessage) {//推送消息给userBId
 			//调用miPush接口推送消息给userBId			
-			UserDO userA =this.getUser(userAId);
-			UserDO userB =this.getUser(userBId);
 			if(null != userB && !StringUtils.isBlank(userB.getMiRegId())) {			
 				StationLetterDO letter = new StationLetterDO();
 				letter.setAcceptorId(userB.getId());

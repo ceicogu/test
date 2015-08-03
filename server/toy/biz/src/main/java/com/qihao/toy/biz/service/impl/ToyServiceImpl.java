@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.qihao.toy.biz.service.ToyService;
+import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.enums.ToyStatusEnum;
+import com.qihao.toy.dal.persistent.MyToyMapper;
 import com.qihao.toy.dal.persistent.ToyMapper;
 
 @Slf4j
@@ -21,6 +23,8 @@ import com.qihao.toy.dal.persistent.ToyMapper;
 public class ToyServiceImpl implements ToyService {
 	@Autowired
 	private ToyMapper toyMapper;
+	@Autowired
+	private MyToyMapper myToyMapper;
 	
 	public Long insert(ToyDO toy) {
 		toyMapper.insert(toy);
@@ -71,7 +75,14 @@ public class ToyServiceImpl implements ToyService {
 		toy.setOwnerId(ownerId);
 		toy.setStatus(ToyStatusEnum.Claimed.numberValue());
 		toy.setGmtOwned(new Date());
-		return toyMapper.update(toy)? toy : null;	
+		toyMapper.update(toy);
+		//加入我管理的故事机队列
+		MyToyDO myToyDO = new MyToyDO();
+		myToyDO.setMyId(ownerId);
+		myToyDO.setToySN(toySN);
+		myToyDO.setToyUserId(toy.getActivatorId());
+		myToyMapper.insert(myToyDO);
+		return toy;
 	}
 	public ToyDO toNameToy(long ownerId, String toySN, String toyName, String kidName, Integer kidGender, Integer kidAge, Date kidBirth){
 		ToyDO toy =  toyMapper.getItemByToySN(toySN);
@@ -119,4 +130,18 @@ public class ToyServiceImpl implements ToyService {
 	public List<ToyDO> getAll(ToyDO toy) {
 		return toyMapper.getAll(toy);
 	}
+	public List<Long> getMyToyUserIds(long myId) {
+		return myToyMapper.getMyToyUserIds(myId);
+	}
+	public List<ToyDO> getMyClaimToys(long ownerId) {
+		ToyDO toyDO = new ToyDO();
+		toyDO.setOwnerId(ownerId);
+		
+		return toyMapper.getAll(toyDO);
+	}
+
+	public List<ToyDO> getMyManageToys(long myId) {
+		return toyMapper.getMyManageToys(myId);
+	}
+	
 }

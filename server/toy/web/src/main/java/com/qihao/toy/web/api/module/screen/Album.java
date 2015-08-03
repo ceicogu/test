@@ -23,6 +23,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -163,14 +164,14 @@ public class Album extends BaseApiScreenAction{
      */
     public void doSearch(@Param("q") String query) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
+    	DataResult<SolrDocumentList> result  = new DataResult<SolrDocumentList>(); 
     	AlbumSolrDO albumSolrDO =  new AlbumSolrDO();
     	albumSolrDO.setTitle(query);    	
     	albumSolrDO.setSummary(query);
 
     	List<String>  fields = Lists.newArrayList();
     	fields.add("id");
-    	List<Object> resp = solrOperator.querySolrResult("album",(Object)albumSolrDO, null, fields,null, null);
+    	SolrDocumentList resp = solrOperator.querySolrResult("album",(Object)albumSolrDO, null, fields,null, null);
      	result.setSuccess(true);
      	result.setMessage("搜索成功!");
      	result.setData(resp);

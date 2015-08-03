@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.dataresolver.Param;
@@ -44,14 +43,13 @@ import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
-import com.qihao.toy.biz.solr.domain.AccountSolrDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
+import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
-import com.qihao.toy.dal.enums.GroupTypeEnum;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.web.base.BaseApiScreenAction;
 
@@ -269,6 +267,9 @@ public class Account extends BaseApiScreenAction{
     		item.put("kidAge", toy.getKidAge().toString());
     		}
     		item.put("ownerId", toy.getOwnerId().toString());
+    		if(null != toy.getActivatorId()) {
+    			item.put("activatorId", toy.getActivatorId().toString());
+    		}
     		data.add(item);
     	}
     	result.setSuccess(true);
@@ -297,6 +298,46 @@ public class Account extends BaseApiScreenAction{
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
+    }
+    /**
+     * 获得我管理toy的好友列表
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doGetMyToyFriends(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
+    	Long toyUserId= requestParams.getLong("user_id");
+    	if(null == toyUserId){
+            result.setSuccess(false);
+            result.setErrorCode(1000);
+            result.setMessage("请指定所管理toy的ID！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    		    		
+    	}
+    	//检查该userID是否是本人管理的故事机
+    	List<Long> toyUserIds = toyService.getMyToyUserIds(currentUser.getId());  
+    	if(null == toyUserIds || !toyUserIds.contains(toyUserId)){
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请所管理toy的ID无效！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    		
+    	}
+    	//获取该toy的所有好友列表
+    	List<UserDO>  resp = accountService.getMyFriends(toyUserId);
+    	List<Map<String,String>> data = Lists.newArrayList();    	
+    	for(UserDO user : resp) {
+    		Map<String,String> item = Maps.newTreeMap();
+    		item.put("nickName", user.getNickName());
+    		item.put("userId",user.getId().toString());
+    		item.put("status",user.getStatus().toString());
+    		item.put("type", user.getType().toString());
+    		data.add(item);
+    	}
+    	result.setSuccess(true);
+    	result.setData(data);
+    	response.getWriter().println(JSON.toJSONString(result));      	
     }
     /**
      * 获取我创建/参与的所有群
@@ -496,42 +537,7 @@ public class Account extends BaseApiScreenAction{
     	result.setSuccess(true);
     	response.getWriter().println(JSON.toJSONString(result));    	
     }    
-    /**
-     * 帐号搜索
-     * @param requestParams
-     * @throws IOException
-     */
-    public void doSearch(@Param("q") String query) throws Exception {
-    	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Object>> result  = new DataResult<List<Object>>(); 
-    	//1.确认自己所在家庭群
-    	List<Long> groupIds = groupService.getMyJoinedGroups(currentUser.getId(), GroupTypeEnum.Family.numberValue());
-    	//2.在自己所在家庭群找人
-    	AccountSolrDO accountSolrDO =  new AccountSolrDO();
-    	accountSolrDO.setMemberName(query);    	
-    	if(!CollectionUtils.isEmpty(groupIds)){
-    		accountSolrDO.setGroupId(groupIds.get(0));
-    	}
-//    	AccountSolrDO compositorDO = new AccountSolrDO();
-//    	compositorDO.setGroupId(SolrQuery.ORDER.desc);
-    	
-//    	 Long count = solrOperator.querySolrResultCount(accountSolrDO,null);
-    	List<String>  fields = Lists.newArrayList();
-    	fields.add("groupId");
-    	fields.add("memberId");
-    	fields.add("memberName");
-    	fields.add("memberMobile");
-    	List<Object> resp = solrOperator.querySolrResult("account",(Object)accountSolrDO, null, fields,null, null);
-    	if(!CollectionUtils.isEmpty(resp)){
-    		Object obj = resp.get(0);
-    		
-    	}
-     	result.setSuccess(true);
-     	result.setMessage("搜索成功!");
-     	result.setData(resp);
-         response.getWriter().println(JSON.toJSONString(result));
-         return;   
-    }
+
     public void doAnalysis(@Param("q") String query) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<String>> result  = new DataResult<List<String>>();

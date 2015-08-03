@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 /**
  * 站内信消息类型
  */

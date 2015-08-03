@@ -58,6 +58,13 @@
         	<if test="ownerId != null"> AND owner_id=#{ownerId}</if>
         </where>
         limit #{offset},#{limit}
-    </select>    
+    </select> 
+    <select id="getMyManageToys" resultType="com.qihao.toy.dal.domain.ToyDO"
+        parameterType="long">
+        SELECT
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_age,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        FROM toy left join my_toy on toy.toySN=my_toy.toySN
+        WHERE my_toy.my_id = #{myId} and toy.is_deleted !=1
+    </select>           
 </mapper>
         

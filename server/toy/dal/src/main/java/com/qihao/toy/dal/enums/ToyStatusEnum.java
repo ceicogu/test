@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 /**
  * 类AuditStatus.java的实现描述：TODO 类实现描述
  * 

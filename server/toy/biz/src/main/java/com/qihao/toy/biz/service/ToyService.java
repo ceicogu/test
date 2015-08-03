@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.ToyDO;
 
 /**
@@ -33,11 +34,50 @@ public interface ToyService {
 	List<ToyDO> getAll(ToyDO toy);
 	
 	Boolean update(String toySN, ToyDO toy);
-	
+	/**
+	 * 激活故事机
+	 * @param activatorId
+	 * @param toySN
+	 * @param toyMac
+	 * @return
+	 */
 	Boolean toAcitvateToy( long activatorId,String toySN, String toyMac);
-	
+	/**
+	 * 认领故事机
+	 * @param ownerId
+	 * @param toySN
+	 * @return
+	 */
 	ToyDO toClaimToy(long ownerId, String toySN);
-	
+	/**
+	 * 获取我认领的故事机列表
+	 * @param ownerId
+	 * @return
+	 */
+	List<ToyDO> getMyClaimToys(long ownerId);
+	/**
+	 * 获取我的故事机注册ID列表
+	 * @param myId
+	 * @return
+	 */
+	List<Long> getMyToyUserIds(long myId);
+	/**
+	 * 获取我管理的故事机列表
+	 * @param myId
+	 * @return
+	 */
+	List<ToyDO> getMyManageToys(long myId);
+	/**
+	 * 给我管理的故事机进行命名
+	 * @param ownerId
+	 * @param toySN
+	 * @param toyName
+	 * @param kidName
+	 * @param kidGender
+	 * @param kidAge
+	 * @param kidBirth
+	 * @return
+	 */
 	ToyDO toNameToy(long ownerId, String toySN, String toyName, String kidName, Integer kidGender, Integer kidAge, Date kidBirth);
 	ToyDO toNameToy(long ownerId, String toySN, String toyName, Map<String, String> kidParams);
 }

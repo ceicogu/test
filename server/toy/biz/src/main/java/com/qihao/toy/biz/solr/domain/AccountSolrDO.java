@@ -5,9 +5,11 @@ import lombok.Setter;
 
 @Setter @Getter
 public class AccountSolrDO {
-	private Long groupId;
-	private String groupName;
-	private Integer groupType;
-	private Long memberId;
-	private String memberName;
+	private Long myId;
+	private Long friendId;
+	private Integer status;
+	private String relation;
+	private String loginName;
+	private String nickName;
+	private String friendMobile;
 }

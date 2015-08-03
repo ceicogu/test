@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 
 public enum CommandTypeEnum implements DescedEnum{
 	CONTENT_VIEW(0,"显示指令"),

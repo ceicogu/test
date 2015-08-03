@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 
 public enum GroupTypeEnum implements DescedEnum{
 	Family(1,"我的家庭群"),

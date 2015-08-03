@@ -7,6 +7,8 @@
  */
 package com.qihao.toy.dal.enums;
 
+import com.qihao.shared.base.DescedEnum;
+
 public enum VerifyCodeStatusEnum implements DescedEnum{
 	Initial(0,"待验证"),
 	Verified(1,"已验证"),
