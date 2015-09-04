@@ -1,0 +1,18 @@
+<form enctype="multipart/form-data" action="ashx/login.ashx" method="post">
+    <table>
+        <tr>
+            <td><label for="txtname">账号：</label></td>
+            <td><input type="text" id="txtname" name="login_username" /></td>
+        </tr>
+        <tr>
+            <td><label for="txtpswd">密码：</label></td>
+            <td><input type="password" id="txtpswd" name="login_pswd" /></td>
+        </tr>
+        <tr>
+            <td colspan=2>
+                <input type="reset" />
+                <input type="submit" />
+            </td>
+        </tr>
+    </table>
+</form>
