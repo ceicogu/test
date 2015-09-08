@@ -17,7 +17,7 @@
         <include refid="All_Fields" />
         FROM my_toy
         WHERE toy_sn=#{toySN}
-    </select>        
+    </select>       
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyToyDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO my_toy (
          my_id,toy_sn,toy_user_id,gmt_created,gmt_modified

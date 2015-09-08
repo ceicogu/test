@@ -22,11 +22,44 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.qihao.shared.base.IntEnum;
+
 @Setter @Getter
 public class UserDO  extends PageDO {
 
 	private static final long serialVersionUID = -7395134204375628403L;
 
+	public static enum AccountType implements IntEnum{
+		Mobile(0),//手机注册
+		Toy(1);//故事机注册
+	    
+	    private int    intValue;
+
+	    private AccountType(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
+	public static enum AccoutChannel implements IntEnum{
+		Scan(0),//扫码注册
+		Self(1),//自主注册
+		Invite(9);//邀请注册
+	    
+	    private int    intValue;
+
+	    private AccoutChannel(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
 	private String   loginName;	//登录帐号
     private String   password;	//登录密码
     private Integer type;				//帐号类型  0-手机注册/1-Toy注册
@@ -40,7 +73,7 @@ public class UserDO  extends PageDO {
     private Long		invitorId;		//邀请人ID
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常
     private String	miRegId;		//miPushRegId
-    
+    private String	voipToken;
     //查询专用
     private List<Long>  userIds;
 }

@@ -63,8 +63,14 @@
         parameterType="long">
         SELECT
         toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_age,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
-        FROM toy left join my_toy on toy.toySN=my_toy.toySN
+        FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
         WHERE my_toy.my_id = #{myId} and toy.is_deleted !=1
-    </select>           
+    </select>  
+    <select id="getMyManageToy" resultType="com.qihao.toy.dal.domain.ToyDO">
+        SELECT
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_age,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
+        WHERE my_toy.my_id = #{myId} and my_toy.toy_user_id=#{toyUserId} and toy.is_deleted !=1
+    </select>          
 </mapper>
         
