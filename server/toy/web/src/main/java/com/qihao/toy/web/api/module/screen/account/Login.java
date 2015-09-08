@@ -17,22 +17,20 @@
 
 package com.qihao.toy.web.api.module.screen.account;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Context;
-
 import com.alibaba.fastjson.JSON;
-
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.web.base.BaseApiScreenAction;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class Login extends BaseApiScreenAction {
@@ -46,7 +44,7 @@ public class Login extends BaseApiScreenAction {
 	 */
 	public void execute(ParameterParser requestParams, Context context)
 			throws Exception {
-	   	DataResult<Map<String,String>> result =new DataResult<Map<String,String>>();
+	   	DataResult<Map<String,Object>> result =new DataResult<Map<String,Object>>();
 			String loginName	=	requestParams.getString("loginName");
 			String pwd				=	requestParams.getString("pwd");
 			if(StringUtils.isBlank(loginName) || StringUtils.isBlank(pwd)) {
@@ -58,13 +56,13 @@ public class Login extends BaseApiScreenAction {
 			}
 	    	try{
 	    		UserDO userDO = accountService.login(loginName, pwd);
+		    	
+		    	Map<String,Object>  data = super.userDO2Map(userDO);
 	    		//生成认证token
 		    	String authToken =  accountService.createAuthToken(userDO);
-		    	Map<String,String>  resp = new HashMap<String,String>();
-		    	resp.put("authToken", authToken);
-		    	resp.put("nickName", userDO.getNickName());
+		    	data.put("authToken", authToken);
 		    	result.setSuccess(true);
-		    	result.setData(resp);
+		    	result.setData(data);
 	    	} catch(Exception e){
 	    		log.error("exception={}",e);
 	    		result.setSuccess(false);

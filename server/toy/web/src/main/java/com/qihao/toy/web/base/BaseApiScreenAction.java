@@ -1,12 +1,12 @@
 package com.qihao.toy.web.base;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sound.sampled.AudioFormat.Encoding;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,5 +95,13 @@ public class BaseApiScreenAction {
     
     protected boolean isAuthed() throws IOException {
     	return  null != currentUser;
+    }
+    protected Map<String,Object> userDO2Map(UserDO user){
+    	Map<String,Object> data = new HashMap<String,Object>();
+    	data.put("userId", user.getId());
+    	data.put("nickName", user.getNickName());
+    	data.put("photo", user.getPhoto());
+    	data.put("voipToken", user.getVoipToken());
+    	return data;
     }
 }
