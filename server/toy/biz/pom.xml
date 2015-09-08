@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>petstore-biz</artifactId>
-    <name>Pet Store Biz Logic</name>
+    <name>Qihao box Biz Logic</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -46,7 +46,12 @@
 		    <groupId>com.chenlb.mmseg4j</groupId>
 		    <artifactId>mmseg4j-solr</artifactId>
 		    <version>2.0.0</version>
-		</dependency>			
+		</dependency>	
+		<dependency>  
+		    <groupId>com.thoughtworks.xstream</groupId>  
+		    <artifactId>xstream</artifactId>  
+		    <version>1.4.8</version>  
+		</dependency>  		
 		<dependency> 
 		        <artifactId>solr-solrj</artifactId> 
 		        <groupId>org.apache.solr</groupId> 
@@ -54,6 +59,11 @@
 		        <type>jar</type>
 		        <scope>compile</scope> 
 		</dependency>
+		<dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
 	 	<!-- 
 		<dependency>
 		  <groupId>edu.cmu.sphinx</groupId>
@@ -88,11 +98,19 @@
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>MiPush_SDK_Server</artifactId>
 		    <version>2.2.14</version>
+		    	<!-- 
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/MiPush_SDK_Server-2.2.14.jar</systemPath>
+			 -->
 		</dependency>
 		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>json-simple</artifactId>
 		    <version>1.1.1</version>
+		    <!-- 
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/libs/json-simple-1.1.1.jar</systemPath>
+			 -->
 		</dependency>	
     </dependencies>
     <repositories>

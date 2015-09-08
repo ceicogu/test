@@ -18,7 +18,9 @@
 package com.qihao.toy.biz.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.UserDO;
 
 /**
@@ -86,7 +88,20 @@ public interface AccountService {
      * @param userId
      * @return
      */
-    List<UserDO> getMyFriends(long myId);
+    List<MyFriendDO> getMyFriends(long myId);
+    /**
+     * 获取我管理的toy列表
+     * @param myId
+     * @return
+     */
+    List<UserDO> getMyToys(long myId);
+    /**
+     * 判断某个toy是我管理的吗
+     * @param myId
+     * @param toyUserId
+     * @return
+     */
+    Boolean isMyToy(long myId, long toyUserId);
     /**
      * 判断是否是我的好友
      * @param myId
@@ -95,9 +110,26 @@ public interface AccountService {
      */
     Boolean isMyFriend(long myId, long friendId);
     /**
+     * 判断是否是我管理toy的好友
+     * @param myId
+     * @param toyUserId
+     * @param firendId
+     * @return
+     */
+    Boolean isMyToyFriend(long myId, long toyUserId, long friendId);
+    /**
      * 获取自己所在家庭群ID
      * @param myId
      * @return
      */
     List<Long> getMyFamilyGroupId(long myId);
+    /**
+     * 修改我的好友名称
+     * @param myId
+     * @param friendId
+     * @param relation
+     * @return
+     */
+    Boolean toRenameMyFriend(long myId, long friendId, String relation);
+    
 }
