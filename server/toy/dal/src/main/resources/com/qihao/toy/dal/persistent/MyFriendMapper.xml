@@ -25,9 +25,16 @@
         SET
         gmt_modified=now()
         <if test="status != null"> ,status=#{status}</if>
+        <if test="relation != null"> ,relation=#{relation}</if>
         <if test="gmtInvited != null"> ,gmt_invited=#{gmtInvited}</if>
         <if test="gmtConfirmed != null"> ,gmt_confirmed=#{gmtConfirmed}</if>
         WHERE id=#{id}
+    </update>
+    <update id="modifyRelation">
+        UPDATE my_friend
+        SET
+        gmt_modified=now(),relation=#{relation}
+        WHERE my_id=#{myId} AND friend_id=#{friendId}
     </update>
     <select id="getAll" resultType="com.qihao.toy.dal.domain.MyFriendDO"
         parameterType="com.qihao.toy.dal.domain.MyFriendDO">

@@ -13,6 +13,7 @@ import com.alibaba.sample.petstore.dal.constants.PageConstants;
 @Getter
 @Setter
 public abstract class PageDO extends BaseDO {
+	
 	private static final long serialVersionUID = -8211167542197595896L;
 	/**
 	 * 偏移量

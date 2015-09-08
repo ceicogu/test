@@ -28,7 +28,7 @@ import lombok.Setter;
  */
 @Setter @Getter
 public class ResourceDO  extends PageDO {
-
+	
 	private static final long serialVersionUID = 1L;
 	private Long		id;
 	private String	title;					//主标题
