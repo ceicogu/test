@@ -18,17 +18,15 @@
 package com.qihao.toy.web.api.module.screen.message;
 
 import lombok.extern.slf4j.Slf4j;
+
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Context;
-
 import com.alibaba.fastjson.JSON;
-
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.dal.domain.StationLetterDO;
-
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

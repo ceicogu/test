@@ -30,7 +30,7 @@ import com.alibaba.fastjson.JSON;
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 @Slf4j
 public class Login extends BaseApiScreenAction {

@@ -40,7 +40,7 @@ import com.qihao.toy.biz.service.ResourceService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.utils.AnnexUtils;
 import com.qihao.toy.dal.domain.ResourceDO;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 public class Resource  extends BaseApiScreenAction{
     @Autowired

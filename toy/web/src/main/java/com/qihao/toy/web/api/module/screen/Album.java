@@ -37,7 +37,7 @@ import com.qihao.toy.biz.service.AlbumService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.solr.domain.AlbumSolrDO;
 import com.qihao.toy.dal.domain.AlbumDO;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 @Slf4j
 public class Album extends BaseApiScreenAction{
