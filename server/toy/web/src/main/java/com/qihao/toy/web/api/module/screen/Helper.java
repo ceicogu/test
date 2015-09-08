@@ -37,7 +37,7 @@ import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.dal.domain.BabyHelperDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 @Slf4j
 public class Helper extends BaseApiScreenAction{

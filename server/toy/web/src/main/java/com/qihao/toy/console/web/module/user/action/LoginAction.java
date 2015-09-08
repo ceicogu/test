@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.sample.petstore.web.user.module.action;
+package com.qihao.toy.console.web.module.user.action;
 
 import static com.alibaba.sample.petstore.web.common.PetstoreConstant.*;
 

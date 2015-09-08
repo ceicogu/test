@@ -1,4 +1,4 @@
-package com.qihao.toy.web.base;
+package com.qihao.toy.web.api.base;
 
 import java.io.IOException;
 import java.util.HashMap;

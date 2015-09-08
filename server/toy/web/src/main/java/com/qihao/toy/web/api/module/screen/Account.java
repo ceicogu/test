@@ -51,7 +51,7 @@ import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 /**
  * 这个例子演示了用一个screen类处理多个事件的方法。

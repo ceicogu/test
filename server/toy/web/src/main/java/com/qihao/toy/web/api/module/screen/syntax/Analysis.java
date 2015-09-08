@@ -52,7 +52,7 @@ import com.qihao.toy.biz.solr.domain.AnswerSolrDO;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.dal.domain.ResourceDO;
 import com.qihao.toy.dal.enums.VoiceCmdTypeEnum;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 /**
  * 这个例子演示了用一个screen类处理多个事件的方法。

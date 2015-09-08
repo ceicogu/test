@@ -36,7 +36,7 @@ import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
-import com.qihao.toy.web.base.BaseApiScreenAction;
+import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 @Slf4j
 public class Register extends BaseApiScreenAction {
