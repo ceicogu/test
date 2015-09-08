@@ -109,7 +109,7 @@ public class ToyServiceImpl implements ToyService {
 		if(null ==toy) {
 			throw new RuntimeException("故事机不存在!");
 		}
-		if(!toy.getStatus().equals(ToyStatusEnum.Claimed.numberValue())) {
+		if(toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
 			throw new RuntimeException("故事机已被认领!");
 		}
 		if(!toy.getOwnerId().equals(ownerId)){
@@ -143,5 +143,7 @@ public class ToyServiceImpl implements ToyService {
 	public List<ToyDO> getMyManageToys(long myId) {
 		return toyMapper.getMyManageToys(myId);
 	}
-	
+	public ToyDO getMyManageToy(long myId, long toyUserId) {
+		return toyMapper.getMyManageToy(myId,toyUserId);
+	}	
 }

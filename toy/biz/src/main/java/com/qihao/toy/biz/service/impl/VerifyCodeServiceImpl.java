@@ -1,12 +1,14 @@
 package com.qihao.toy.biz.service.impl;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.qihao.shared.base.utils.RandomStringHelper;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.VerifyCodeService;
@@ -43,19 +45,19 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 		 verifyCodeMapper.insert(verifyCode) ;
 		if(null != verifyCode.getId()) {
 			//发送验证码给用户
-			String contentTpl = messageChannelManager.getMessageTemplate(VerifyCodeTypeEnum.Reg_VerifyCode);
-			String content = String.format(contentTpl, code);
-			messageChannelManager.sendMessage(verifyCode.getMobile(), content);
+			Map<String,Object> context = Maps.newConcurrentMap();
+			context.put("code", code);
+			messageChannelManager.sendMessage(codeType,verifyCode.getMobile(), context);
 		}
 		return true;
 	}
 
 	public boolean checkVerifyCode(VerifyCodeTypeEnum codeType, String mobile, String code) {
-		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(VerifyCodeTypeEnum.Reg_VerifyCode.numberValue(), mobile, code);
-		Preconditions.checkArgument(null != verifyCodeDO,"验证码错误！");
+		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType.numberValue(), mobile, code);
+		Preconditions.checkArgument(null != verifyCodeDO,codeType.desc()+" 错误！");
  	
     	if(!verifyCodeDO.getStatus().equals(VerifyCodeStatusEnum.Initial.numberValue())) {
-    		throw new IllegalArgumentException("验证码已失效！");
+    		throw new IllegalArgumentException(codeType.desc()+" 已失效！");
     	}
     	if(verifyCodeDO.getDuration() ==null || verifyCodeDO.getDuration().equals(-1)) {
     		return true;
@@ -63,15 +65,15 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     	long diff =   (new Date()).getTime() - verifyCodeDO.getGmtCreated().getTime();
     	if(diff > verifyCodeDO.getDuration()) {
     		verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeStatusEnum.Invalid.numberValue());
-    		throw new IllegalArgumentException("验证码已过期失效！");
+    		throw new IllegalArgumentException(codeType.desc()+ " 已过期失效！");
     	}
     	return true;
 	}
 
 	public boolean comfirmVerifyCode(VerifyCodeTypeEnum codeType, String mobile, String code) {
-		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(VerifyCodeTypeEnum.Reg_VerifyCode.numberValue(), mobile, code);
+		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType.numberValue(), mobile, code);
     	if(null == verifyCodeDO){
-    		throw new IllegalArgumentException("验证码错误！");
+    		throw new IllegalArgumentException(codeType.desc()+" 错误！");
     	}    	
     	return verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeStatusEnum.Verified.numberValue()) > 0;
 	}

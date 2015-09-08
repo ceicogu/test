@@ -67,6 +67,7 @@ public interface ToyService {
 	 * @return
 	 */
 	List<ToyDO> getMyManageToys(long myId);
+    ToyDO getMyManageToy(long myId, long toyUserId);
 	/**
 	 * 给我管理的故事机进行命名
 	 * @param ownerId
