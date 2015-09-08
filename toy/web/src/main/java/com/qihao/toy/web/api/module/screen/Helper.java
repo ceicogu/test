@@ -36,7 +36,7 @@ import com.qihao.toy.biz.service.BabyHelperService;
 import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.dal.domain.BabyHelperDO;
 import com.qihao.toy.dal.domain.ToyDO;
-import com.qihao.toy.dal.enums.AccountTypeEnum;
+import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.web.base.BaseApiScreenAction;
 
 @Slf4j
@@ -176,7 +176,7 @@ public class Helper extends BaseApiScreenAction{
     	DataResult<List<BabyHelperDO>> result = new DataResult<List<BabyHelperDO>>();
     	BabyHelperDO bean = new BabyHelperDO();
     	bean.setToyUserId(toyUserId);
-    	if(type==AccountTypeEnum.TOY_REG.numberValue()) {
+    	if(type==UserDO.AccountType.Toy.intValue()) {
     		if(toyUserId!=currentUser.getId()){
     			log.debug("无匹配计划");
     			result.setSuccess(false);

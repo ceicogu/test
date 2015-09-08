@@ -43,9 +43,9 @@ import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
+import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
-import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
@@ -119,12 +119,8 @@ public class Account extends BaseApiScreenAction{
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Map<String,Object>> result = new DataResult<Map<String, Object>>();
 
-        Map<String,Object> data = Maps.newTreeMap();
-        data.put("userId", currentUser.getId());
-        data.put("nickName", currentUser.getNickName());
-        data.put("photo", currentUser.getPhoto());
         result.setSuccess(true);
-        result.setData(data);
+        result.setData(super.userDO2Map(currentUser));
         response.getWriter().println(JSON.toJSONString(result));
         return;    
     }
@@ -155,14 +151,25 @@ public class Account extends BaseApiScreenAction{
     		return;    		
     	}
     	
-    	String toySN= requestParams.getString("toySN");
-    	if(StringUtil.isBlank(toySN)){
+    	Long toyUserId= requestParams.getLong("toyUserId",-1);
+    	if(-1 == toyUserId){
     		result.setSuccess(false);
     		result.setErrorCode(1002);
     		result.setMessage("玩具唯一码或邀请码不能为空！");
     		response.getWriter().println(JSON.toJSONString(result));
     		return;    		    		
     	}
+
+    	//获取故事机SN
+    	ToyDO toy = toyService.getMyManageToy(currentUser.getId(), toyUserId);
+    	if(null == toy){
+    		result.setSuccess(false);
+    		result.setErrorCode(1002);
+    		result.setMessage("您无权对该故事机进行命名！");
+    		response.getWriter().println(JSON.toJSONString(result));
+    		return;   		
+    	}
+    	String toySN = toy.getToySN();
     	//1.首先认领Toy
     	//给玩具和宝宝设置基本信息
     	String toyName	=	requestParams.getString("toyName");
@@ -173,6 +180,12 @@ public class Account extends BaseApiScreenAction{
     	kidParams.put("kidBirth", requestParams.getString("kidBirth", null));
     	try{
 	    	toyService.toNameToy(currentUser.getId(), toySN, toyName, kidParams);
+	    	if(null==kidParams.get("kidName")){
+		    	UserDO user = new UserDO();
+		    	user.setId(toy.getActivatorId());
+		    	user.setNickName(kidParams.get("kidName"));
+		    	accountService.update(user);
+	    	}
 			result.setSuccess(true);
 			result.setMessage("给故事机取名成功!");
 			response.getWriter().println(JSON.toJSONString(result));
@@ -251,24 +264,24 @@ public class Account extends BaseApiScreenAction{
      */
     public void doGetMyToys(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
+    	DataResult<List<Map<String,Object>>> result = new DataResult<List<Map<String,Object>>>();
     	ToyDO findToy = new ToyDO();
     	findToy.setOwnerId(currentUser.getId());
     	List<ToyDO> resp = toyService.getAll(findToy);    	
-    	List<Map<String,String>> data = Lists.newArrayList();    	
+    	List<Map<String,Object>> data = Lists.newArrayList();    	
     	for(ToyDO toy : resp) {
-    		Map<String,String> item = Maps.newTreeMap();
+    		Map<String,Object> item = Maps.newTreeMap();
     		item.put("toyName", toy.getToyName());
     		item.put("kidName", toy.getKidName());
     		if(null != toy.getKidGender()){
-    		item.put("kidGender", toy.getKidGender().toString());
+    			item.put("kidGender", toy.getKidGender());
     		}
     		if(null != toy.getKidAge()){
-    		item.put("kidAge", toy.getKidAge().toString());
+    			item.put("kidAge", toy.getKidAge());
     		}
-    		item.put("ownerId", toy.getOwnerId().toString());
+    		item.put("ownerId", toy.getOwnerId());
     		if(null != toy.getActivatorId()) {
-    			item.put("activatorId", toy.getActivatorId().toString());
+    			item.put("activatorId", toy.getActivatorId());
     		}
     		data.add(item);
     	}
@@ -283,16 +296,14 @@ public class Account extends BaseApiScreenAction{
      */
     public void doGetMyFriends(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
+    	DataResult<List<Map<String,Object>>> result = new DataResult<List<Map<String,Object>>>();
 
-    	List<UserDO>  resp = accountService.getMyFriends(currentUser.getId());
-    	List<Map<String,String>> data = Lists.newArrayList();    	
-    	for(UserDO user : resp) {
-    		Map<String,String> item = Maps.newTreeMap();
-    		item.put("nickName", user.getNickName());
-    		item.put("userId",user.getId().toString());
-    		item.put("status",user.getStatus().toString());
-    		item.put("type", user.getType().toString());
+    	List<MyFriendDO>  resp = accountService.getMyFriends(currentUser.getId());
+    	List<Map<String,Object>> data = Lists.newArrayList();    	
+    	for(MyFriendDO myFriend : resp) {
+    		Map<String,Object> item = Maps.newTreeMap();
+    		item.put("friendId",myFriend.getFriendId());
+    		item.put("relation",myFriend.getRelation());
     		data.add(item);
     	}
     	result.setSuccess(true);
@@ -306,8 +317,8 @@ public class Account extends BaseApiScreenAction{
      */
     public void doGetMyToyFriends(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<Map<String,String>>> result = new DataResult<List<Map<String,String>>>();
-    	Long toyUserId= requestParams.getLong("user_id");
+    	DataResult<List<Map<String,Object>>> result = new DataResult<List<Map<String,Object>>>();
+    	Long toyUserId= requestParams.getLong("toy_user_id");
     	if(null == toyUserId){
             result.setSuccess(false);
             result.setErrorCode(1000);
@@ -315,24 +326,21 @@ public class Account extends BaseApiScreenAction{
             response.getWriter().println(JSON.toJSONString(result));
             return;    		    		
     	}
-    	//检查该userID是否是本人管理的故事机
-    	List<Long> toyUserIds = toyService.getMyToyUserIds(currentUser.getId());  
-    	if(null == toyUserIds || !toyUserIds.contains(toyUserId)){
-            result.setSuccess(false);
+    	//是我管理的Toy吗？
+    	if(!accountService.isMyToy(currentUser.getId(), toyUserId)){
+             result.setSuccess(false);
             result.setErrorCode(2000);
             result.setMessage("请所管理toy的ID无效！");
             response.getWriter().println(JSON.toJSONString(result));
             return;    		
     	}
     	//获取该toy的所有好友列表
-    	List<UserDO>  resp = accountService.getMyFriends(toyUserId);
-    	List<Map<String,String>> data = Lists.newArrayList();    	
-    	for(UserDO user : resp) {
-    		Map<String,String> item = Maps.newTreeMap();
-    		item.put("nickName", user.getNickName());
-    		item.put("userId",user.getId().toString());
-    		item.put("status",user.getStatus().toString());
-    		item.put("type", user.getType().toString());
+    	List<MyFriendDO>  resp = accountService.getMyFriends(toyUserId);
+    	List<Map<String,Object>> data = Lists.newArrayList();    	
+    	for(MyFriendDO myFriend : resp) {
+    		Map<String,Object> item = Maps.newTreeMap();
+    		item.put("friendId",myFriend.getFriendId());
+    		item.put("relation",myFriend.getRelation());
     		data.add(item);
     	}
     	result.setSuccess(true);

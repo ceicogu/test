@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>petstore-web</artifactId>
-    <name>Pet Store Web Application</name>
+    <name>Qihao Box Web Application</name>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
