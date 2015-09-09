@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>petstore-parent</artifactId>
-    <name>Parent Project of Pet Store Web Application</name>
+    <name>Parent Project of Qihao Toy Web Application</name>
     <packaging>pom</packaging>
     <version>1.0</version>
     <properties>
