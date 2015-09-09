@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans   http://localhost:8080/schema/www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://localhost:8080/schema/www.springframework.org/schema/context/spring-context.xsd
+       "
+	default-autowire="byName">
+	<context:annotation-config />
+	<context:component-scan base-package="com.qihao.toy.biz.service" />
+	
+	<!-- 配置信息 -->
+	<bean id="globalConfig" class="com.qihao.toy.biz.config.GlobalConfig">
+		<property name="md5Key" value="1f8b638841b06b291d41" />
+		<property name="aesKey" value="FZG4XCMSTTXU9NBS" />
+		<property name="aesIv" value="D1EW3JSQLCH2DWKV" />
+
+		<property name="messageChannelURL" value="http://sdkhttp.eucp.b2m.cn" />
+		<property name="messageChannelAccount" value="0SDK-EBB-0130-JIULT" />
+		<property name="messageChannelPassword" value="111111" />
+	</bean>
+	<!-- Solrj -->
+	<bean name="solrOperator" class="com.qihao.toy.biz.solr.DefaultSolrOperator"/>
+	
+	<!-- 
+	<bean name="solrjQueryFactory" class="com.qihao.toy.biz.solr.SolrjQueryFactory">
+		<property name="baseUrl" value="http://localhost:18080/solr" />
+	</bean>
+	 -->
+</beans>

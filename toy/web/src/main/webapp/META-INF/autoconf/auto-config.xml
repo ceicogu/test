@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config>
-    <group>
-        <property name="petstore.work" description="应用程序的工作目录" />
-        <property name="petstore.loggingRoot" defaultValue="${petstore.work}/logs"
-                  description="日志文件目录" />
-        <property name="petstore.upload" defaultValue="${petstore.work}/upload"
-                  description="上传文件的目录" />
-        <property name="petstore.loggingLevel" defaultValue="warn" description="日志文件级别">
-            <validator name="choice" choice="trace, debug, info, warn, error" />
-        </property>
+<config description="自动配置">
+
+    <group name="qihao-logging">
+		<property name="logging.output" description="idc data center日志目录" /> 
+		<property name="logging.level"  description="idc data center日志级别" />
     </group>
-    <script>
-        <generate template="WEB-INF/web.xml" />
-        <generate template="WEB-INF/common/resources.xml" />
-    </script>
+    <group name="qihao-biz-config">
+ 		<property name="qihao.biz.md5key" defaultValue="1f8b638841b06b291d41" description="" />
+		<property name="qihao.biz.md5key" defaultValue="FZG4XCMSTTXU9NBS"		description="" />
+		<property name="qihao.biz.aeskey" defaultValue="FZG4XCMSTTXU9NBS"		description="" />
+		<property name="qihao.biz.aesIv" defaultValue="D1EW3JSQLCH2DWKV"		description="" />
+
+ 		<property name="message.channel.url" defaultValue="http://sdkhttp.eucp.b2m.cn" description="" />
+		<property name="message.channel.account" defaultValue="0SDK-EBB-0130-JIULT"		description="" />
+		<property name="message.channel.password" defaultValue="111111"		description="" />
+
+ 		<property name="mipush.package" defaultValue="box.qihao.com.qihaohao" description="" />
+		<property name="mipush.appid" defaultValue="2882303761517295776"		description="" />
+		<property name="mipush.appkey" defaultValue="5631729575776"		description="" />
+		<property name="mipush.appsecret" defaultValue="eGZnHPky5HHDXGwN1+ON9Q=="		description="" />
+	</group>
+    <group name="qihao-dal-config">
+ 		<property name="database.userName" defaultValue="root" description="" />
+		<property name="database.password" defaultValue="123456"		description="" />
+		<property name="database.url" defaultValue="jdbc:mysql://182.92.162.223:3306/qihao_toy?zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=utf-8" description="" />
+	</group>
+
+	<script>
+		<generate template="qihao-dal-config.properties.vm" destfile="WEB-INF/classes/config/qihao-dal-config.properties"
+			charset="UTF-8" />
+		<generate template="qihao-biz-config.properties.vm" destfile="WEB-INF/classes/config/qihao-biz-config.properties"
+			charset="UTF-8" />
+		<generate template="log4j.xml.vm" destfile="WEB-INF/classes/log4j.xml" charset="UTF-8"/>
+	</script>
 </config>

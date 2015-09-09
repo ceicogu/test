@@ -65,6 +65,7 @@ public class GetMessage extends BaseApiScreenAction {
         	Long		   acceptorId	  = letter.getAcceptorId();    		
     		if(acceptorType.equals(0)) {
     			if(!acceptorId.equals(currentUser.getId())) {
+    				log.debug("ggg");
     	            result.setSuccess(false);
     	            result.setErrorCode(2001);
     	            result.setMessage("无权查看该消息！");

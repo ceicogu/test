@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE log4j:configuration SYSTEM "http://toolkit.alibaba-inc.com/dtd/log4j/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="ALL" class="org.apache.log4j.AdvancedDailyRollingFileAppender">
+		<param name="File" value="${logging_output}/debug.log" />
+		<param name="encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<param name="maxBackupIndex" value="7" />
+		<param name="BufferSize" value="8192" />
+		<param name="ImmediateFlush" value="false" />
+		<param name="BufferedIO" value="true" />			
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%t] %c{2} %d{ISO8601} -- %p -- %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="ERROR-APPENDER"
+		class="org.apache.log4j.AdvancedDailyRollingFileAppender">
+		<param name="file" value="${logging.output}/error.log" />
+		<param name="encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<param name="threshold" value="error" />
+		<param name="maxBackupIndex" value="7" />
+		<param name="BufferSize" value="8192" />
+		<param name="ImmediateFlush" value="false" />
+		<param name="BufferedIO" value="true" />				
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%t] %c{2} %d{ISO8601} -- %p -- %m%n" />
+		</layout>
+	</appender>
+
+
+	<appender name="Console" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+
+	<logger name="java.sql.PreparedStatement" additivity="true">
+		<level value="${logging_level}" />
+	</logger>
+
+	<logger name="java.sql.ResultSet" additivity="true">
+		<level value="${logging_level}" />
+	</logger>
+
+	<root>
+		<priority value="${logging_level}" />
+		<appender-ref ref="Console" />
+		<appender-ref ref="ALL" />
+		<appender-ref ref="ERROR-APPENDER" /> 
+	</root>
+</log4j:configuration>   

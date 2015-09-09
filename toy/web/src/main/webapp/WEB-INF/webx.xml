@@ -38,8 +38,7 @@
 
 
 	<!-- Dal/biz配置。 -->
-    <beans:import resource="classpath:com/qihao/toy/biz/spring/qihao_biz_spring.xml" />
- 	<beans:import resource="classpath:com/qihao/toy/dal/spring/persistent.spring.xml" />
+  	<beans:import resource="classpath:spring/qihao-spring.xml" /> 
  
 	<!-- 综合设置。 -->
 	<services:webx-configuration>
