@@ -3,8 +3,6 @@ package com.qihao.toy.dal.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.alibaba.sample.petstore.dal.constants.PageConstants;
-
 
 
 /**
@@ -15,6 +13,9 @@ import com.alibaba.sample.petstore.dal.constants.PageConstants;
 public abstract class PageDO extends BaseDO {
 	
 	private static final long serialVersionUID = -8211167542197595896L;
+	
+	private static final int DEFULT_PAGE_SIZE = 20;
+	private static final int MAX_PAGE_SIZE =100;
 	/**
 	 * 偏移量
 	 */
@@ -22,7 +23,7 @@ public abstract class PageDO extends BaseDO {
 	/**
 	 * 分页大小
 	 */
-	private int limit = PageConstants.DEFULT_PAGE_SIZE;
+	private int limit = DEFULT_PAGE_SIZE;
 	/**
 	 * 页数
 	 */
@@ -52,7 +53,7 @@ public abstract class PageDO extends BaseDO {
 	 */
 	public void setLimit(int limit) {
 		limit = limit < 1 ? 1 : limit;
-		limit = limit > PageConstants.MAX_PAGE_SIZE ? PageConstants.MAX_PAGE_SIZE
+		limit = limit > MAX_PAGE_SIZE ? MAX_PAGE_SIZE
 				: limit;
 		this.limit = limit;
 	}

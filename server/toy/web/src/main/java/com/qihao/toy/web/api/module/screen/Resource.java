@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import com.alibaba.citrus.service.requestcontext.buffered.BufferedRequestContext;
+import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Navigator;
 import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.fastjson.JSON;
@@ -56,7 +57,7 @@ public class Resource  extends BaseApiScreenAction{
      * @param requestParams
      * @throws IOException
      */
-    public void doUpload(@Param("authToken") String authToken, @Param("myFile") FileItem myFile) throws IOException {
+    public void doUpload(ParameterParser requestParams,@Param("authToken") String authToken, @Param("myFile") FileItem myFile) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<String> result =  new DataResult<String>();
 

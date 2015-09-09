@@ -36,15 +36,11 @@
 	<!-- URI生成。 -->
 	<beans:import resource="common/uris.xml" />
 
-	<!-- 模板所需要的数据。 -->
-	<beans:import resource="common/template-data.xml" />
 
 	<!-- Dal/biz配置。 -->
-
-	<beans:import resource="classpath:petstore/dal/data-source.xml" />
-	<beans:import resource="classpath:petstore/dal/dao.xml" />
-	<beans:import resource="classpath:petstore/biz/manager.xml" />
-
+    <beans:import resource="classpath:com/qihao/toy/biz/spring/qihao_biz_spring.xml" />
+ 	<beans:import resource="classpath:com/qihao/toy/dal/spring/persistent.spring.xml" />
+ 
 	<!-- 综合设置。 -->
 	<services:webx-configuration>
 		<!-- 默认将productionMode设为true，建议在jetty插件中设置-DproductionMode=false。 -->

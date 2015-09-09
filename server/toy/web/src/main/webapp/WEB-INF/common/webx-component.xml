@@ -26,17 +26,6 @@
         <pull-factories:control-tool />
         <pull-factories:uris-tool />
 
-        <!-- Petstore tools。 -->
-        <pull-factories:context-exposer>
-            <tool id="selectCountries" />
-            <tool id="selectCreditCardType" />
-            <tool id="selectMonth" />
-            <tool id="selectYear" />
-        </pull-factories:context-exposer>
-
-        <pull-factories:factory id="petstoreUser"
-                                class="com.alibaba.sample.petstore.web.common.util.PetstoreUserTool" />
-
     </services:pull>
 
 </beans:beans>
