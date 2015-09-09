@@ -1,0 +1,15 @@
+### md5key ###
+qihao.biz.md5key 	= 	${qihao_biz_md5key}
+qihao.biz.aeskey	=	${qihao_biz_aeskey}
+qihao.biz.aesIv		=	${qihao_biz_aesIv}
+
+### messageChannel ###
+message.channel.url			=	${message_channel_url}
+message.channel.account		=	${message_channel_account}
+message.channel.password	=	${message_channel_password}
+
+### miPush ###
+mipush.package		=	${mipush_package}
+mipush.appid		=	${mipush_appid}
+mipush.appkey		=	${mipush_appkey}
+mipush.appsecret	=	${mipush_appsecret}

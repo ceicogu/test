@@ -160,21 +160,19 @@ public class Analysis extends BaseApiScreenAction{
     	accountSolrDO.setRelation(query);    	
 
     	List<String>  fields = Lists.newArrayList();
-    	fields.add("myId");
     	fields.add("friendId");
     	fields.add("relation");
-    	fields.add("status");
     	fields.add("friendMobile");
-    	fields.add("loginName");
     	SolrDocumentList resp = solrOperator.querySolrResult("account",(Object)accountSolrDO, null, fields,null, null);
     	//增加同义词识别逻辑，前期简单些
-    	Map<String,String> relationMap = Maps.newLinkedHashMap();
-    	relationMap.put("外婆", "姥姥");
-    	relationMap.put("外公", "姥爷");
-    	relationMap.put("姥姥", "外婆");
-    	relationMap.put("姥爷", "外公");
-    	String value = null;
+
     	if(CollectionUtils.isEmpty(resp)) {
+        	Map<String,String> relationMap = Maps.newLinkedHashMap();
+        	relationMap.put("外婆", "姥姥");
+        	relationMap.put("外公", "姥爷");
+        	relationMap.put("姥姥", "外婆");
+        	relationMap.put("姥爷", "外公");
+        	String value = null;
 	    	Set<String> a1 = relationMap.keySet();
 	    	for(String key : a1) {
 	    		if(query.contains(key)) {

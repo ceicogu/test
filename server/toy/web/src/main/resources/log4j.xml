@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE log4j:configuration SYSTEM "http://toolkit.alibaba-inc.com/dtd/log4j/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="ALL" class="org.apache.log4j.AdvancedDailyRollingFileAppender">
+		<param name="File" value="${log4j.dir}/idc_portal/idc-portal.log" />
+		<param name="encoding" value="UTF-8" />		
+		<param name="Append" value="true" />
+		<param name="maxBackupIndex" value="7" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%t] %c{2} %d{ISO8601} -- %p -- %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="Console" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="EXCEPTION_LOG" class="com.alibaba.dragoon.patrol.log4j.PatrolLog4jAppender">
+		<param name="Threshold" value="ERROR" />
+	</appender>
+
+    <!-- 根logger的设置-->
+	<root>
+		<priority value="${log4j.level}" />
+		<appender-ref ref="Console" />
+		<appender-ref ref="ALL" />
+		<appender-ref ref="EXCEPTION_LOG" />
+	</root>
+</log4j:configuration>   

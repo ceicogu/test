@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 
 @Slf4j
-@Service
 public class DefaultSolrOperator implements SolrjOperator {
 
 	public void writeSolrDO(Object propertyDO){

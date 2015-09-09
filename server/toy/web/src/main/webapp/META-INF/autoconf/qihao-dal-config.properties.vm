@@ -1,0 +1,8 @@
+### database config ###
+database.username	=	${database_username}
+database.password	=	${database_password}
+database.url		=	${database_url}
+
+
+logging.output	=	${logging_output}
+logging.level	=	${logging_level}
