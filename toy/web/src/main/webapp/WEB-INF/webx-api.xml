@@ -22,7 +22,7 @@
 	<beans:import resource="common/pipeline.xml" />
 
 	<!-- 表单验证。 -->
-	<beans:import resource="user/form.xml" />
+ 	<beans:import resource="api/form.xml" /> 
 
 	<!-- 装载模块。 -->
 	<services:module-loader>
