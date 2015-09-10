@@ -9,7 +9,6 @@ import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 
-import com.qihao.shared.base.DescedEnum;
 import com.qihao.shared.base.IntEnum;
 import com.qihao.shared.base.utils.IntEnumUtils;
 
@@ -18,7 +17,7 @@ import com.qihao.shared.base.utils.IntEnumUtils;
  *
  * @author 
  */
-@MappedTypes({ DescedEnum.class })
+@MappedTypes({ IntEnum.class })
 public class IntEnumTypeHandler<E extends Enum<E> & IntEnum> extends
 		BaseTypeHandler<E> {
 	private Class<E> type;
