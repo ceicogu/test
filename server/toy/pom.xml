@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qihao.toy</groupId>
-    <artifactId>petstore-parent</artifactId>
+    <artifactId>qihao-toy-parent</artifactId>
     <name>Parent Project of Qihao Box Web Application</name>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
@@ -62,22 +62,22 @@
             <!-- ======================================== -->
             <dependency>
                 <groupId>com.qihao.toy</groupId>
-                <artifactId>petstore-base</artifactId>
+                <artifactId>qihao-toy-base</artifactId>
                 <version>${project.version}</version>
             </dependency>            
             <dependency>
                 <groupId>com.qihao.toy</groupId>
-                <artifactId>petstore-dal</artifactId>
+                <artifactId>qihao-toy-dal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.qihao.toy</groupId>
-                <artifactId>petstore-biz</artifactId>
+                <artifactId>qihao-toy-biz</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.qihao.toy</groupId>
-                <artifactId>petstore-web</artifactId>
+                <artifactId>qihao-toy-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- ======================================== -->

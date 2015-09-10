@@ -32,9 +32,9 @@
 	<!-- 
 		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
-		<property name="typeAliasesPackage" value="com.alibaba.sample.petstore.dal.domain" />
-		<property name="typeHandlersPackage" value="com.alibaba.sample.petstore.dal.domain.typehandlers" />
-		<property name="configLocation" value="classpath:petstore/dal/mybatis-config.xml"></property>
+		<property name="typeAliasesPackage" value="com.qihao.toy.dal.domain" />
+		<property name="typeHandlersPackage" value="com.qihao.toy.dal.domain.typehandlers" />
+		<property name="configLocation" value="classpath:com/qihao/toy/dal/mybatis-config.xml"></property>
 		</bean>
 	-->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
@@ -42,9 +42,9 @@
 	</bean>
 
 	<!-- 
-		<bean id="typeHandlerService" class="com.alibaba.sample.petstore.dal.services.impl.TypeHandlerServiceImpl"
+		<bean id="typeHandlerService" class="com.qihao.toy.dal.services.impl.TypeHandlerServiceImpl"
 		init-method="init">
-		<property name="scanPackage" value="com.alibaba.sample.petstore.dal.domain.enums" />
+		<property name="scanPackage" value="com.qihao.toy.dal.domain.enums" />
 		</bean>
 	-->
 </beans>
