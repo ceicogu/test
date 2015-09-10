@@ -10,7 +10,7 @@
 
     <services:resource-loading>
 
-        <resource-alias pattern="/petstore/dal" name="/classpath/petstore/dal" />
+        <resource-alias pattern="/com/qihao/toy/dal" name="/classpath//com/qihao/toy/dal" />
 
     </services:resource-loading>
 

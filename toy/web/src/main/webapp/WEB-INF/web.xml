@@ -7,11 +7,11 @@
 
     <context-param>
         <param-name>loggingRoot</param-name>
-        <param-value>${petstore.loggingRoot}</param-value>
+        <param-value>${qihao.loggingRoot}</param-value>
     </context-param>
     <context-param>
         <param-name>loggingLevel</param-name>
-        <param-value>${petstore.loggingLevel}</param-value>
+        <param-value>${qihao.loggingLevel}</param-value>
     </context-param>
     <context-param>
         <param-name>loggingCharset</param-name>
@@ -38,10 +38,10 @@
         <init-param>
             <!--
              - 需要被“排除”的URL路径，以逗号分隔，如/static, *.jpg。适合于映射静态页面、图片。
-             - 此处将所有静态html、图片文件交给servlet引擎直接处理；但/petstore/images下的图片仍由pipeline来处理。
+             - 此处将所有静态html、图片文件交给servlet引擎直接处理；但/qihao/images下的图片仍由pipeline来处理。
             -->
             <param-name>excludes</param-name>
-            <param-value>*.html, *.jpg, *.gif, *.png, *.mp3, *.pcm,!/petstore/images</param-value>
+            <param-value>*.html, *.jpg, *.gif, *.png, *.mp3, *.pcm,!/qihao/images</param-value>
         </init-param>
         <init-param>
             <!--
@@ -66,7 +66,7 @@
 
 <!--     <servlet>
         <servlet-name>getLoginUser</servlet-name>
-        <servlet-class>com.alibaba.sample.petstore.web.servlet.GetLoginUser</servlet-class>
+        <servlet-class>com.qihao.toy.console.web.servlet.GetLoginUser</servlet-class>
     </servlet>
 
     <servlet-mapping>

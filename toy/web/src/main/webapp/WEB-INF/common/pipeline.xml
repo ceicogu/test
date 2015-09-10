@@ -52,8 +52,8 @@
 				</when>
 				<when>
 					<!-- 读取资源文件。 -->
-					<pl-conditions:path-condition name="/petstore/images/(.+)" />
-					<pl-valves:getResource name="/petstore/images/$1" />
+					<pl-conditions:path-condition name="/qihao/images/(.+)" />
+					<pl-valves:getResource name="/qihao/images/$1" />
 				</when>
 				<otherwise>
 					<!-- 将控制交还给servlet engine。 -->

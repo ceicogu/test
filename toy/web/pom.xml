@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
 	    <groupId>com.qihao.toy</groupId>
-	    <artifactId>petstore-parent</artifactId>
+	    <artifactId>qihao-toy-parent</artifactId>
 	    <version>1.0.0-SNAPSHOT</version>
 	</parent>
-    <artifactId>petstore-web</artifactId>
+    <artifactId>qihao-toy-web</artifactId>
     <name>Qihao Box Web Application</name>
     <packaging>war</packaging>
     <dependencies>
@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>com.qihao.toy</groupId>
-            <artifactId>petstore-biz</artifactId>
+            <artifactId>qihao-toy-biz</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
