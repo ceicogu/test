@@ -5,13 +5,13 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
-        <dependent-module archiveName="petstore-biz-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-biz/petstore-biz">
+        <dependent-module archiveName="petstore-biz-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-biz/petstore-biz">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="petstore-base-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-base/petstore-base">
+        <dependent-module archiveName="petstore-base-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-base/petstore-base">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="petstore-dal-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-dal/petstore-dal">
+        <dependent-module archiveName="petstore-dal-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/petstore-dal/petstore-dal">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="petstore"/>

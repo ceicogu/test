@@ -2,17 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>com.alibaba.citrus.sample</groupId>
-        <artifactId>citrus-sample-parent</artifactId>
-        <version>1.2</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <groupId>com.qihao.toy</groupId>
     <artifactId>petstore-parent</artifactId>
-    <name>Parent Project of Qihao Toy Web Application</name>
+    <name>Parent Project of Qihao Box Web Application</name>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <properties>
         <java.version>1.5</java.version>
         <java.encoding>UTF-8</java.encoding>
@@ -66,22 +61,22 @@
             <!-- 子项目依赖 -->
             <!-- ======================================== -->
             <dependency>
-                <groupId>com.alibaba.citrus.sample</groupId>
+                <groupId>com.qihao.toy</groupId>
                 <artifactId>petstore-base</artifactId>
                 <version>${project.version}</version>
             </dependency>            
             <dependency>
-                <groupId>com.alibaba.citrus.sample</groupId>
+                <groupId>com.qihao.toy</groupId>
                 <artifactId>petstore-dal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.alibaba.citrus.sample</groupId>
+                <groupId>com.qihao.toy</groupId>
                 <artifactId>petstore-biz</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.alibaba.citrus.sample</groupId>
+                <groupId>com.qihao.toy</groupId>
                 <artifactId>petstore-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
