@@ -17,7 +17,7 @@
 
 package com.qihao.toy.biz.service;
 
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
+import com.qihao.toy.dal.domain.VerifyCodeDO;
 
 /**
  * 手机短信各类验证码管理
@@ -30,8 +30,8 @@ public interface VerifyCodeService {
 	 * @param verifyCode				验证码对象
 	 * @return
 	 */
-	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile);
-	public boolean createVerifyCode(Long invitorId, VerifyCodeTypeEnum codeType, String mobile, Integer codeLength);
+	public boolean createVerifyCode( Long invitorId,VerifyCodeDO.VerifyCodeType codeType, String mobile);
+	public boolean createVerifyCode(Long invitorId, VerifyCodeDO.VerifyCodeType codeType, String mobile, Integer codeLength);
 	/**
 	 * 创建注册验证码或邀请码
 	 * @param codeType      注册验证码／注册邀请码
@@ -40,19 +40,19 @@ public interface VerifyCodeService {
 	 * @param duration       失效时长（秒，缺失永久)
 	 * @return
 	 */
-	public boolean createVerifyCode(Long invitorId, VerifyCodeTypeEnum codeType, String mobile, Integer codeLength, Integer duration);
+	public boolean createVerifyCode(Long invitorId, VerifyCodeDO.VerifyCodeType codeType, String mobile, Integer codeLength, Integer duration);
     /**
      * 校验手机验证码是否有效
      * @param mobile
      * @param code
      * @return
      */
-    boolean checkVerifyCode(VerifyCodeTypeEnum codeType,String mobile, String code);
+    boolean checkVerifyCode(VerifyCodeDO.VerifyCodeType codeType,String mobile, String code);
     /**
      * 确认验证码已验证
      * @param userId
      * @param code
      * @return
      */
-    boolean comfirmVerifyCode(VerifyCodeTypeEnum codeType,String mobile, String code);
+    boolean comfirmVerifyCode(VerifyCodeDO.VerifyCodeType codeType,String mobile, String code);
 }

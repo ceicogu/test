@@ -50,7 +50,6 @@ import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 /**
@@ -129,7 +128,7 @@ public class Account extends BaseApiScreenAction{
     	SimpleResult result = new SimpleResult();
     	//1.创建验证码，并发送
     	try{
-    		verifyCodeService.createVerifyCode(null, VerifyCodeTypeEnum.Reg_VerifyCode, mobile);
+    		verifyCodeService.createVerifyCode(null, VerifyCodeDO.VerifyCodeType.Reg_VerifyCode, mobile);
     		result.setSuccess(true);
     	}catch(Exception e) {
     		result.setSuccess(false);
@@ -217,7 +216,7 @@ public class Account extends BaseApiScreenAction{
     	}
     	//1.好友邀请
     	try{
-    		verifyCodeService.createVerifyCode(currentUser.getId(), VerifyCodeTypeEnum.Reg_InviteCode, mobile);
+    		verifyCodeService.createVerifyCode(currentUser.getId(), VerifyCodeDO.VerifyCodeType.Reg_InviteCode, mobile);
     		result.setSuccess(true);
     	}catch(Exception e) {
     		result.setSuccess(false);
@@ -244,12 +243,12 @@ public class Account extends BaseApiScreenAction{
     	}
     	//2.信息入库
     	VerifyCodeDO verifyCodeDO = new VerifyCodeDO();
-    	verifyCodeDO.setType(1);
+    	verifyCodeDO.setType(VerifyCodeDO.VerifyCodeType.Reg_InviteCode);
     	verifyCodeDO.setMobile(mobile);
     	verifyCodeDO.setCode(code);
-    	verifyCodeDO.setStatus(0);
+    	verifyCodeDO.setStatus(VerifyCodeDO.VerifyCodeStatus.Initial);
     	try{
-    		verifyCodeService.checkVerifyCode(VerifyCodeTypeEnum.Reg_InviteCode, mobile, code);
+    		verifyCodeService.checkVerifyCode(VerifyCodeDO.VerifyCodeType.Reg_InviteCode, mobile, code);
     		result.setSuccess(true);
     	}catch(Exception e) {
     		result.setSuccess(false);
@@ -399,12 +398,13 @@ public class Account extends BaseApiScreenAction{
             return;    
     	}
     	
-    	Integer	type			=	requestParams.getInt("type",0);
+    	String	type			=	requestParams.getString("type",StationLetterDO.MediaType.TEXT.name());    	
+    	StationLetterDO.MediaType mediaType = Enum.valueOf(StationLetterDO.MediaType.class, type);
     	int     acceptorType = requestParams.getInt("acceptorType",0);
     	long acceptorId		=	requestParams.getLong("acceptorId");
     	String content			= requestParams.getString("content");
     	String url						= requestParams.getString("url");
-    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, type,content, url);
+    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, mediaType,content, url);
     	
         response.getWriter().println(JSON.toJSONString(result));
         return;        			

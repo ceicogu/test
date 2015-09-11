@@ -2,7 +2,7 @@ package com.qihao.toy.biz.service;
 
 import java.util.Map;
 
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
+import com.qihao.toy.dal.domain.VerifyCodeDO;
 
 /**
  * 短信消息管理
@@ -16,5 +16,5 @@ public interface MessageChannelService {
 	 * @param content
 	 * @return
 	 */
-	boolean sendMessage(VerifyCodeTypeEnum vmTpl, String mobile,Map<String,Object> parameter);
+	boolean sendMessage(VerifyCodeDO.VerifyCodeType vmTpl, String mobile,Map<String,Object> parameter);
 }

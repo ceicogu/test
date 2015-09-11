@@ -19,16 +19,17 @@ package com.qihao.toy.web.api.module.screen.message;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Context;
 import com.alibaba.fastjson.JSON;
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.StationLetterService;
+import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 @Slf4j
 public class SendMessage extends BaseApiScreenAction {
@@ -54,12 +55,13 @@ public class SendMessage extends BaseApiScreenAction {
             return;    
     	}
     	
-    	int		type					=	requestParams.getInt("type",0);
+    	String	type			=	requestParams.getString("type",StationLetterDO.MediaType.TEXT.name());    	
+    	StationLetterDO.MediaType mediaType = Enum.valueOf(StationLetterDO.MediaType.class, type);
     	int     acceptorType 	= requestParams.getInt("acceptorType",0);
     	long acceptorId		=	requestParams.getLong("acceptorId");
     	String content			= requestParams.getString("content");
     	String url						= requestParams.getString("url");
-    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, type,content, url);
+    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, mediaType,content, url);
     	
         response.getWriter().println(JSON.toJSONString(result));
         return;        	

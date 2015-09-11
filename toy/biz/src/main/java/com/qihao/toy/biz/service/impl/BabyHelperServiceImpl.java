@@ -12,9 +12,9 @@ import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.BabyHelperDO;
 import com.qihao.toy.dal.domain.MiPushCommandMessage;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.dal.enums.CommandTypeEnum;
-import com.qihao.toy.dal.enums.MiContentTypeEnum;
-import com.qihao.toy.dal.enums.OperateTypeEnum;
+import com.qihao.toy.dal.domain.enums.CommandTypeEnum;
+import com.qihao.toy.dal.domain.enums.MiContentTypeEnum;
+import com.qihao.toy.dal.domain.enums.OperateTypeEnum;
 import com.qihao.toy.dal.persistent.BabyHelperMapper;
 import com.xiaomi.xmpush.server.Message;
 

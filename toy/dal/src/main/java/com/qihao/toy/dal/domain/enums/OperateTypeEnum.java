@@ -5,7 +5,7 @@
  * use it only in accordance with the terms of the license agreement you entered
  * into with Aliyun.com .
  */
-package com.qihao.toy.dal.enums;
+package com.qihao.toy.dal.domain.enums;
 
 /**
  * 指令操作类型

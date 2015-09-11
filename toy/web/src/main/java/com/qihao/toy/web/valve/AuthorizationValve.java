@@ -18,7 +18,6 @@ import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.qihao.shared.base.DataResult;
 import com.qihao.shared.base.SimpleResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;

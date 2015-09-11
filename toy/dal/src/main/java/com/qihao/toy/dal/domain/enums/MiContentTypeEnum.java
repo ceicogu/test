@@ -5,18 +5,20 @@
  * use it only in accordance with the terms of the license agreement you entered
  * into with Aliyun.com .
  */
-package com.qihao.toy.dal.enums;
+package com.qihao.toy.dal.domain.enums;
 
 import com.qihao.shared.base.DescedEnum;
 
-public enum VerifyCodeTypeEnum implements DescedEnum{
-	Reg_VerifyCode(0,"注册验证码"),
-	Reg_InviteCode(1,"注册邀请码");
-    
+
+
+public enum MiContentTypeEnum implements DescedEnum{
+	LETTER(0,"消息类型"),
+	HELPER(1,"亲子助手");
+	
     private int    num;
     private String desc;
     
-    private VerifyCodeTypeEnum(int num, String desc){
+    private MiContentTypeEnum(int num, String desc){
         this.num = num;
         this.desc = desc;
     }

@@ -19,6 +19,8 @@ package com.qihao.toy.dal.domain;
 
 import java.util.Date;
 
+import com.qihao.shared.base.IntEnum;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,11 +28,40 @@ import lombok.Setter;
 public class VerifyCodeDO  extends PageDO {
 
 	private static final long serialVersionUID =1L;
+	public static enum VerifyCodeType implements IntEnum{
+		Reg_VerifyCode(0),//注册验证码
+		Reg_InviteCode(1);//注册邀请码
 
+
+	    private int    intValue;
+
+	    private VerifyCodeType(int intValue){
+	        this.intValue = intValue;
+	    }
+
+		public int intValue() {
+			return intValue;
+		}
+	}
+	public static enum VerifyCodeStatus implements IntEnum{
+		Initial(0),//待验证
+		Verified(1),//已验证
+		Invalid(2);//已失效
+		
+	    private int    intValue;
+
+	    private VerifyCodeStatus(int intValue){
+	        this.intValue = intValue;
+	    }
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private String	mobile;			//手机号
     private String	code;				//验证码
-    private Integer type;				//验证码类型：0-注册验证码/1-注册邀请码
-    private Integer status;			//帐号状态：0-待验证/1-已验证/2-已失效
+    private VerifyCodeType type;				//验证码类型：0-注册验证码/1-注册邀请码
+    private VerifyCodeStatus status;			//帐号状态：0-待验证/1-已验证/2-已失效
     private Long		invitorId;				//注册邀请人
     private Date gmtInvited;				//邀请时间
     private Integer duration;			//失效时长

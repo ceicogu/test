@@ -5,6 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
 
 public interface VerifyCodeMapper extends CRUDMapper<VerifyCodeDO> {
-	VerifyCodeDO getValidItem(@Param("type") Integer type, @Param("mobile") String mobile,@Param("code") String code);
-	int updateStatusById(@Param("id") Long id,@Param("status") Integer status);
+	VerifyCodeDO getValidItem(@Param("type") VerifyCodeDO.VerifyCodeType type, @Param("mobile") String mobile,@Param("code") String code);
+	int updateStatusById(@Param("id") Long id,@Param("status") VerifyCodeDO.VerifyCodeStatus status);
 }

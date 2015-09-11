@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
-import com.qihao.toy.dal.enums.GroupTypeEnum;
 import com.qihao.toy.dal.persistent.MyGroupMapper;
 import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 
@@ -28,12 +27,12 @@ public class GroupServiceImpl implements GroupService {
 	@Autowired
 	private MyGroupMemberMapper myGroupMemberMapper;
 	
-	public Long createGroup(long userId,String groupName, GroupTypeEnum groupType) {
+	public Long createGroup(long userId,String groupName, MyGroupDO.GroupType groupType) {
 		Preconditions.checkArgument(StringUtils.isNotBlank(groupName),"群名称不能为空");
 		MyGroupDO group = new MyGroupDO();
 		group.setMyId(userId);
 		group.setGroupName(groupName);
-		group.setGroupType(groupType.numberValue());
+		group.setGroupType(groupType);
 		return myGroupMapper.insert(group) > 0? group.getId() : null;
 	}
 
@@ -67,11 +66,11 @@ public class GroupServiceImpl implements GroupService {
 		myGroupMember.setMemberName(memberName);
 		return myGroupMemberMapper.insert(myGroupMember)>0? myGroupMember.getId() : null;
 	}
-	public List<MyGroupDO> getMyCreatedGroups(long myId, GroupTypeEnum groupType) {
+	public List<MyGroupDO> getMyCreatedGroups(long myId, MyGroupDO.GroupType groupType) {
 		MyGroupDO myGroup = new MyGroupDO();
 		myGroup.setMyId(myId);
 		if(null != groupType) {
-			myGroup.setGroupType(groupType.numberValue());
+			myGroup.setGroupType(groupType);
 		}
 		return myGroupMapper.getAll(myGroup);
 	}
@@ -79,7 +78,7 @@ public class GroupServiceImpl implements GroupService {
 	public List<Long> getMyJoinedGroups(long myId) {
 		return this.getMyJoinedGroups(myId,null);
 	}
-	public List<Long> getMyJoinedGroups(long myId,Integer groupType) {
+	public List<Long> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType) {
 		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
 		myGroupMember.setMemberId(myId);
 		myGroupMember.setGroupType(groupType);

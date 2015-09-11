@@ -22,15 +22,32 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.qihao.shared.base.IntEnum;
+
 @Setter @Getter
 public class ToyDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
+	public static enum ToyStatus implements IntEnum{
+		Initial(0),//初始状态
+		Activated(1),//已激活
+		Claimed(2);//已认领
 
+	    private int    intValue;
+
+	    private ToyStatus(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private String	toySN;			//玩具唯一编码
     private String	toyName;	//玩具名称
     private String	toyMac;		//玩具MAC地址
-    private Integer	 status;			//状态0-初始状态/1-已激活/2-已綁定
+    private ToyStatus	 status;			//状态0-初始状态/1-已激活/2-已綁定
     private Long		activatorId;  //激活者ID(toy自己的帐号ID)
     private Long		ownerId;		//绑定者
     private String	kidName;		//宝宝的名字

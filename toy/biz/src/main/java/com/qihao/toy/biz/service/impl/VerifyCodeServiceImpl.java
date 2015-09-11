@@ -13,8 +13,6 @@ import com.qihao.shared.base.utils.RandomStringHelper;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
-import com.qihao.toy.dal.enums.VerifyCodeStatusEnum;
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
 
 @Service
@@ -23,17 +21,17 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 	private VerifyCodeMapper verifyCodeMapper;
 	@Autowired
 	private MessageChannelService messageChannelManager;
-	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile) {
+	public boolean createVerifyCode( Long invitorId,VerifyCodeDO.VerifyCodeType codeType, String mobile) {
 		return this.createVerifyCode(invitorId,codeType, mobile, null, null);
 	}
-	public boolean createVerifyCode( Long invitorId,VerifyCodeTypeEnum codeType, String mobile, Integer codeLength) {
+	public boolean createVerifyCode( Long invitorId,VerifyCodeDO.VerifyCodeType codeType, String mobile, Integer codeLength) {
 		return this.createVerifyCode(invitorId, codeType, mobile, codeLength, null);
 	}
-	public boolean createVerifyCode( Long invitorId, VerifyCodeTypeEnum codeType, String mobile,  Integer codeLength,Integer duration) {
+	public boolean createVerifyCode( Long invitorId, VerifyCodeDO.VerifyCodeType codeType, String mobile,  Integer codeLength,Integer duration) {
 		Preconditions.checkArgument(StringUtils.isNotBlank(mobile),"请指定手机号码！");
 
 		VerifyCodeDO verifyCode = new VerifyCodeDO();
-		verifyCode.setType(codeType.numberValue());
+		verifyCode.setType(codeType);
 		verifyCode.setMobile(mobile);
 		verifyCode.setDuration(null==duration?-1:duration);		
 		verifyCode.setGmtInvited(new Date());
@@ -41,7 +39,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 		//生成验证码
 		String code = RandomStringHelper.getRandomNum(null==codeLength? 6: codeLength);
 		verifyCode.setCode(code);
-		verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
+		verifyCode.setStatus(VerifyCodeDO.VerifyCodeStatus.Initial);
 		 verifyCodeMapper.insert(verifyCode) ;
 		if(null != verifyCode.getId()) {
 			//发送验证码给用户
@@ -52,30 +50,30 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 		return true;
 	}
 
-	public boolean checkVerifyCode(VerifyCodeTypeEnum codeType, String mobile, String code) {
-		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType.numberValue(), mobile, code);
-		Preconditions.checkArgument(null != verifyCodeDO,codeType.desc()+" 错误！");
+	public boolean checkVerifyCode(VerifyCodeDO.VerifyCodeType codeType, String mobile, String code) {
+		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType, mobile, code);
+		Preconditions.checkArgument(null != verifyCodeDO,codeType.name()+" 错误！");
  	
-    	if(!verifyCodeDO.getStatus().equals(VerifyCodeStatusEnum.Initial.numberValue())) {
-    		throw new IllegalArgumentException(codeType.desc()+" 已失效！");
+    	if(!verifyCodeDO.getStatus().equals(VerifyCodeDO.VerifyCodeStatus.Initial)) {
+    		throw new IllegalArgumentException(" 已失效！");
     	}
     	if(verifyCodeDO.getDuration() ==null || verifyCodeDO.getDuration().equals(-1)) {
     		return true;
     	}    	
     	long diff =   (new Date()).getTime() - verifyCodeDO.getGmtCreated().getTime();
     	if(diff > verifyCodeDO.getDuration()) {
-    		verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeStatusEnum.Invalid.numberValue());
-    		throw new IllegalArgumentException(codeType.desc()+ " 已过期失效！");
+    		verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeDO.VerifyCodeStatus.Invalid);
+    		throw new IllegalArgumentException( " 已过期失效！");
     	}
     	return true;
 	}
 
-	public boolean comfirmVerifyCode(VerifyCodeTypeEnum codeType, String mobile, String code) {
-		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType.numberValue(), mobile, code);
+	public boolean comfirmVerifyCode(VerifyCodeDO.VerifyCodeType codeType, String mobile, String code) {
+		VerifyCodeDO verifyCodeDO = verifyCodeMapper.getValidItem(codeType, mobile, code);
     	if(null == verifyCodeDO){
-    		throw new IllegalArgumentException(codeType.desc()+" 错误！");
+    		throw new IllegalArgumentException(codeType.name()+" 错误！");
     	}    	
-    	return verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeStatusEnum.Verified.numberValue()) > 0;
+    	return verifyCodeMapper.updateStatusById(verifyCodeDO.getId(),VerifyCodeDO.VerifyCodeStatus.Verified) > 0;
 	}
 
 }

@@ -28,6 +28,7 @@ import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Context;
 import com.alibaba.fastjson.JSON;
 import com.qihao.shared.base.DataResult;
+import com.qihao.shared.base.utils.IntEnumUtils;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.MessageChannelService;
@@ -35,7 +36,7 @@ import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
+import com.qihao.toy.dal.domain.VerifyCodeDO;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 @Slf4j
@@ -60,14 +61,17 @@ public class Register extends BaseApiScreenAction {
 		// }
 		// 参数校验
 		DataResult<Map<String, Object>> result = new DataResult<Map<String, Object>>();
+		int type = requestParams.getInt("type", UserDO.AccountType.Mobile.intValue());
+		int comeFrom = requestParams.getInt("comeFrom",UserDO.AccoutChannel.Self.intValue());
+		
 		UserDO userDO = new UserDO();
 		userDO.setLoginName(requestParams.getString("loginName"));
 		userDO.setPassword(requestParams.getString("pwd"));// 在biz层进行md5
 		userDO.setMobile(requestParams.getString("mobile"));
 		userDO.setNickName(requestParams.getString("nickName"));
-		userDO.setComeFrom(requestParams.getInt("comeFrom",UserDO.AccoutChannel.Self.intValue()));
+		userDO.setComeFrom(IntEnumUtils.valueOf(UserDO.AccoutChannel.class, comeFrom));
 		userDO.setComeSN(requestParams.getString("comeSN"));
-		userDO.setType(requestParams.getInt("type",UserDO.AccountType.Mobile.intValue()));
+		userDO.setType(IntEnumUtils.valueOf(UserDO.AccountType.class, type));
 		userDO.setMiRegId(requestParams.getString("miRegId"));
 		if (StringUtils.isNumeric(requestParams.getString("invitorId"))) {
 			userDO.setInvitorId(requestParams.getLong("invitorId"));
@@ -75,7 +79,7 @@ public class Register extends BaseApiScreenAction {
 		
 		// 1.参数校验(0-手機註冊/1-Toy註冊
 		String code = requestParams.getString("code");
-		if(userDO.getType() == UserDO.AccountType.Mobile.intValue()){
+		if(userDO.getType() == UserDO.AccountType.Mobile){
 			if(!StringUtils.isNumeric(code)) {
 				result.setSuccess(false);
 				result.setErrorCode(2001);
@@ -92,7 +96,7 @@ public class Register extends BaseApiScreenAction {
 			}
 			try {
 				verifyCodeService.checkVerifyCode(
-						VerifyCodeTypeEnum.Reg_VerifyCode, userDO.getMobile(), code);
+						VerifyCodeDO.VerifyCodeType.Reg_VerifyCode, userDO.getMobile(), code);
 			} catch (Exception e) {
 				result.setSuccess(false);
 				result.setErrorCode(2001);
@@ -106,10 +110,10 @@ public class Register extends BaseApiScreenAction {
 			// 3.注册
 			accountService.register(userDO);
 			
-			if(userDO.getType() == UserDO.AccountType.Mobile.intValue()){
+			if(userDO.getType() == UserDO.AccountType.Mobile){
 				try {
 					verifyCodeService.comfirmVerifyCode(
-							VerifyCodeTypeEnum.Reg_VerifyCode, userDO.getMobile(), code);// 将验证码修改为已使用
+							VerifyCodeDO.VerifyCodeType.Reg_VerifyCode, userDO.getMobile(), code);// 将验证码修改为已使用
 				} catch (Exception e) {
 					log.error("验证码错误");
 				}

@@ -60,15 +60,31 @@ public class UserDO  extends PageDO {
 			return intValue;
 		}
 	}
+	public static enum AccoutStatus implements IntEnum{
+		Normal(0),//正常
+		Frozen(1);//冻结
+	    
+	    private int    intValue;
+
+	    private AccoutStatus(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
+
 	private String   loginName;	//登录帐号
     private String   password;	//登录密码
-    private Integer type;				//帐号类型  0-手机注册/1-Toy注册
-    private Integer status;			//帐号状态：0-正常/1-冻结
+    private AccountType type;				//帐号类型  0-手机注册/1-Toy注册
+    private AccoutStatus status;			//帐号状态：0-正常/1-冻结
     private String 	nickName;	//昵称
     private String	mobile;			//手机号
     private String	email;			//邮箱
     private String	photo;			//头像
-    private Integer comeFrom;	//来源:0-扫码注册/1-邀请注册
+    private AccoutChannel comeFrom;	//来源:0-扫码注册/1-邀请注册
     private String	comeSN;		//ToySN或注册邀请码
     private Long		invitorId;		//邀请人ID
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常

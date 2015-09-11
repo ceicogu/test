@@ -69,7 +69,6 @@ public class Login extends BaseApiScreenAction {
 	    		result.setErrorCode(1000);
 	    		result.setMessage("帐号或密码错误！");
 	    	}
-
 	        response.getWriter().println(JSON.toJSONString(result));
 	}
 }

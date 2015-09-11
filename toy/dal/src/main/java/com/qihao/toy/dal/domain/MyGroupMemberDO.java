@@ -30,7 +30,7 @@ public class MyGroupMemberDO  extends PageDO {
 	private static final long serialVersionUID = 1L;
 
     private Long			groupId;		//群ID	
-    private Integer			groupType;		//群类型
+    private MyGroupDO.GroupType			groupType;		//群类型
     private Long			memberId;		//群成员用户ID
     private String			memberName;		//群成员群中昵称
 }

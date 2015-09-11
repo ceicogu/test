@@ -12,7 +12,7 @@ public interface StationLetterService {
 	 * @return
 	 */
 	DataResult<Long> createLetter(StationLetterDO letter);
-	DataResult<Long> createLetter(long senderId, int acceptorType, long acceptorId,	int type, String content, String url);
+	DataResult<Long> createLetter(long senderId, int acceptorType, long acceptorId,	StationLetterDO.MediaType type, String content, String url);
 	/**
 	 * 按接收者获取站内消息
 	 * @param acceptorType

@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import lombok.Data;
 
-import com.qihao.toy.dal.enums.CommandTypeEnum;
-import com.qihao.toy.dal.enums.OperateTypeEnum;
+import com.qihao.toy.dal.domain.enums.CommandTypeEnum;
+import com.qihao.toy.dal.domain.enums.OperateTypeEnum;
 @Data
 public class MiPushCommandMessage implements Serializable {
 	private static final long serialVersionUID = 7846379801688580643L;

@@ -51,7 +51,7 @@ import com.qihao.toy.biz.solr.domain.AccountSolrDO;
 import com.qihao.toy.biz.solr.domain.AnswerSolrDO;
 import com.qihao.toy.biz.solr.domain.ResourceSolrDO;
 import com.qihao.toy.dal.domain.ResourceDO;
-import com.qihao.toy.dal.enums.VoiceCmdTypeEnum;
+import com.qihao.toy.dal.domain.enums.VoiceCmdTypeEnum;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 /**
