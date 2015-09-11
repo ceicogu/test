@@ -19,8 +19,8 @@ import com.qihao.toy.biz.utils.MiPushUtils;
 import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.SubscribeMessageDO;
 import com.qihao.toy.dal.domain.UserDO;
-import com.qihao.toy.dal.enums.CommandTypeEnum;
-import com.qihao.toy.dal.enums.MiContentTypeEnum;
+import com.qihao.toy.dal.domain.enums.CommandTypeEnum;
+import com.qihao.toy.dal.domain.enums.MiContentTypeEnum;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
 import com.qihao.toy.dal.persistent.SubscribeMessageMapper;
 import com.xiaomi.xmpush.server.Message;
@@ -131,7 +131,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 		result.setData(letter.getId());
 		return result;
 	}
-	public DataResult<Long> createLetter(long senderId, int acceptorType, long acceptorId,	int type, String content, String url) {
+	public DataResult<Long> createLetter(long senderId, int acceptorType, long acceptorId,	StationLetterDO.MediaType type, String content, String url) {
 		DataResult<Long> result = new DataResult<Long>();
 		if(StringUtils.isBlank(content) && StringUtils.isBlank(url)) {
 			log.warn("消息内容为空!");

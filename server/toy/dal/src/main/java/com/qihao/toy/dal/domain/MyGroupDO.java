@@ -19,6 +19,8 @@ package com.qihao.toy.dal.domain;
 
 import java.util.List;
 
+import com.qihao.shared.base.IntEnum;
+
 import lombok.Getter;
 import lombok.Setter;
 /**
@@ -30,10 +32,24 @@ import lombok.Setter;
 public class MyGroupDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
+	public static enum GroupType implements IntEnum{
+		Family(0),//我的家庭群
+		General(9);//普通用户群
 
+	    private int    intValue;
+
+	    private GroupType(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private Long		myId;			
     private String		groupName;	//群名称
-    private Integer		groupType;		//群类型：1-家庭群／9-普通用户群
+    private GroupType		groupType;		//群类型：1-家庭群／9-普通用户群
     
     //查询用
     private List<Long>  groupIds;

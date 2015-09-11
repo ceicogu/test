@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.dal.domain.MyToyDO;
 import com.qihao.toy.dal.domain.ToyDO;
-import com.qihao.toy.dal.enums.ToyStatusEnum;
 import com.qihao.toy.dal.persistent.MyToyMapper;
 import com.qihao.toy.dal.persistent.ToyMapper;
 
@@ -45,17 +44,17 @@ public class ToyServiceImpl implements ToyService {
 		if(null ==toy) {
 			throw new RuntimeException("故事机不存在!");
 		}
-		if(toy.getStatus().equals(ToyStatusEnum.Activated.numberValue())){
+		if(toy.getStatus().equals(ToyDO.ToyStatus.Activated)){
 			return true;
 		}
-		if(!toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
+		if(!toy.getStatus().equals(ToyDO.ToyStatus.Initial)) {
 			log.error("故事机已被激活!");
 			throw new RuntimeException("故事机已被激活!");
 		}
 		toy.setToySN(toySN);
 		toy.setToyMac(toyMac);
 		toy.setActivatorId(activatorId);
-		toy.setStatus(ToyStatusEnum.Activated.numberValue());
+		toy.setStatus(ToyDO.ToyStatus.Activated);
 		return toyMapper.update(toy);
 	}
 	public ToyDO toClaimToy(long ownerId, String toySN) {		
@@ -63,17 +62,17 @@ public class ToyServiceImpl implements ToyService {
 		if(null ==toy) {
 			throw new RuntimeException("故事机不存在!");
 		}
-		if(toy.getStatus().equals(ToyStatusEnum.Claimed.numberValue())) {
+		if(toy.getStatus().equals(ToyDO.ToyStatus.Claimed)) {
 			if(toy.getOwnerId().equals(ownerId)) {
 				return toy;
 			}
 		}
-		if(!toy.getStatus().equals(ToyStatusEnum.Activated.numberValue())) {
+		if(!toy.getStatus().equals(ToyDO.ToyStatus.Activated)) {
 			throw new RuntimeException("故事机已被认领!");
 		}
 		toy.setToySN(toySN);
 		toy.setOwnerId(ownerId);
-		toy.setStatus(ToyStatusEnum.Claimed.numberValue());
+		toy.setStatus(ToyDO.ToyStatus.Claimed);
 		toy.setGmtOwned(new Date());
 		toyMapper.update(toy);
 		//加入我管理的故事机队列
@@ -89,7 +88,7 @@ public class ToyServiceImpl implements ToyService {
 		if(null ==toy) {
 			throw new RuntimeException("故事机不存在!");
 		}
-		if(!toy.getStatus().equals(ToyStatusEnum.Claimed.numberValue())) {
+		if(!toy.getStatus().equals(ToyDO.ToyStatus.Claimed)) {
 			throw new RuntimeException("故事机已被认领!");
 		}
 		if(!toy.getOwnerId().equals(ownerId)){
@@ -109,7 +108,7 @@ public class ToyServiceImpl implements ToyService {
 		if(null ==toy) {
 			throw new RuntimeException("故事机不存在!");
 		}
-		if(toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
+		if(toy.getStatus().equals(ToyDO.ToyStatus.Initial)) {
 			throw new RuntimeException("故事机已被认领!");
 		}
 		if(!toy.getOwnerId().equals(ownerId)){

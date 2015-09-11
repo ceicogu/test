@@ -15,10 +15,7 @@ import org.springframework.util.CollectionUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.qihao.shared.base.utils.CryptoCoder;
-import com.qihao.shared.base.utils.IntEnumUtils;
 import com.qihao.shared.base.utils.MD5Algorithm;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.AccountService;
@@ -31,13 +28,6 @@ import com.qihao.toy.dal.domain.StationLetterDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
-import com.qihao.toy.dal.enums.FriendStatusEnum;
-import com.qihao.toy.dal.enums.GroupTypeEnum;
-import com.qihao.toy.dal.enums.MediaTypeEnum;
-import com.qihao.toy.dal.enums.RegStatusEnum;
-import com.qihao.toy.dal.enums.ToyStatusEnum;
-import com.qihao.toy.dal.enums.VerifyCodeStatusEnum;
-import com.qihao.toy.dal.enums.VerifyCodeTypeEnum;
 import com.qihao.toy.dal.persistent.MyFriendMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
@@ -79,17 +69,18 @@ public class AccountServiceImpl implements AccountService{
 		Preconditions.checkArgument(null != user.getType(),"帐号类型未指定");
 		Preconditions.checkArgument(null != user.getComeFrom(),"注册途径未指定");
 		
-		UserDO.AccoutChannel accountChannel = IntEnumUtils.valueOf(UserDO.AccoutChannel.class, user.getComeFrom());
+		UserDO.AccoutChannel accountChannel = user.getComeFrom();
 		if(null == accountChannel) {
 			if(null == accountChannel) {
 				throw new  IllegalArgumentException("注册途径错误！");
 			}		
 		}
-		UserDO.AccountType accountType = IntEnumUtils.valueOf(UserDO.AccountType.class, user.getType());
+		//UserDO.AccountType accountType = IntEnumUtils.valueOf(UserDO.AccountType.class, user.getType());
+		UserDO.AccountType accountType = user.getType();
 		if(accountType.equals(UserDO.AccountType.Toy)) {//故事机器注册
 			Preconditions.checkArgument(StringUtils.isNotBlank(user.getComeSN()),"SN不能为空");//ToySN
 			Preconditions.checkArgument(null != user.getInvitorId(),"非法注册（无邀请者 ）");
-			user.setComeFrom(UserDO.AccoutChannel.Self.intValue());//toy都是自我注册
+			user.setComeFrom(UserDO.AccoutChannel.Self);//toy都是自我注册
 			//检查邀请者是否存在
 			UserDO invitor = userMapper.getById(user.getInvitorId());
 			if(null == invitor) {
@@ -102,10 +93,10 @@ public class AccountServiceImpl implements AccountService{
 				Preconditions.checkArgument(null != user.getComeSN(),"请填写邀请码");
 				//检查邀请码是否有效
 				VerifyCodeDO verifyCode = new VerifyCodeDO();
-				verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
+				verifyCode.setType(VerifyCodeDO.VerifyCodeType.Reg_InviteCode);
 				verifyCode.setCode(user.getComeSN());
 				verifyCode.setMobile(user.getMobile());
-				verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
+				verifyCode.setStatus(VerifyCodeDO.VerifyCodeStatus.Initial);
 				List<VerifyCodeDO> resp2 = verifyCodeMapper.getAll(verifyCode);
 				if(CollectionUtils.isEmpty(resp2)){
 					throw new IllegalArgumentException("邀请码无效");
@@ -132,7 +123,7 @@ public class AccountServiceImpl implements AccountService{
 			throw new IllegalArgumentException("请指定注册类型");
 		}
 		//设定账号状态初始值
-		user.setStatus(RegStatusEnum.Normal.numberValue());
+		user.setStatus(UserDO.AccoutStatus.Normal);
 		//2.检查是否已注册
 		UserDO existUser = new UserDO();
 		existUser.setLoginName(user.getLoginName());
@@ -160,7 +151,7 @@ public class AccountServiceImpl implements AccountService{
 			//激活者认领toy
 	    	toyService.toClaimToy(user.getInvitorId(), user.getComeSN());
 	    	//创建一个家庭群
-			Long groupId = groupService.createGroup(user.getId(),"我的家庭群", GroupTypeEnum.Family);
+			Long groupId = groupService.createGroup(user.getId(),"我的家庭群", MyGroupDO.GroupType.Family);
 			groupService.insertGroupMember(groupId, user.getId(),  user.getNickName());
 			groupService.insertGroupMember(groupId, user.getInvitorId(), null);
 			//与Toy互为好友
@@ -173,15 +164,15 @@ public class AccountServiceImpl implements AccountService{
 			//获取Ｔｏｙ帐号
 			String toySN = user.getComeSN();
 			ToyDO toy = toyService.getItemByToySN(toySN);
-			if(null == toy || toy.getStatus().equals(ToyStatusEnum.Initial.numberValue())) {
+			if(null == toy || toy.getStatus().equals(ToyDO.ToyStatus.Initial)) {
 				return user.getId();
 			}
-			if(toy.getStatus().equals(ToyStatusEnum.Activated.numberValue())) {
+			if(toy.getStatus().equals(ToyDO.ToyStatus.Activated)) {
 				//认领Toy				
 				toyService.toClaimToy(user.getId(), toy.getToySN());	
 			}
 			//加入Toy家庭群
-			List<MyGroupDO> resp4 = groupService.getMyCreatedGroups(toy.getActivatorId(), GroupTypeEnum.Family);
+			List<MyGroupDO> resp4 = groupService.getMyCreatedGroups(toy.getActivatorId(), MyGroupDO.GroupType.Family);
 			if(!CollectionUtils.isEmpty(resp4)){
 				groupService.insertGroupMember(resp4.get(0).getId(), user.getId(), user.getNickName());
 			}			
@@ -193,16 +184,16 @@ public class AccountServiceImpl implements AccountService{
 		} else if(accountChannel.equals(UserDO.AccoutChannel.Invite)){//邀请注册用户,注册成功后邀请者和被邀请者互为好友 
 			Long invitorId= null;
 			VerifyCodeDO verifyCode = new VerifyCodeDO();
-			verifyCode.setType(VerifyCodeTypeEnum.Reg_InviteCode.numberValue());
+			verifyCode.setType(VerifyCodeDO.VerifyCodeType.Reg_InviteCode);
 			verifyCode.setCode(user.getComeSN());
 			verifyCode.setMobile(user.getMobile());
-			verifyCode.setStatus(VerifyCodeStatusEnum.Initial.numberValue());
+			verifyCode.setStatus(VerifyCodeDO.VerifyCodeStatus.Initial);
 			List<VerifyCodeDO> resp2 = verifyCodeMapper.getAll(verifyCode);
 			if(CollectionUtils.isEmpty(resp2)){
 				return user.getId();
 			}
 			verifyCode = resp2.get(0);
-			verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeStatusEnum.Verified.numberValue());//标记为已验证，不得再次使用
+			verifyCodeMapper.updateStatusById(verifyCode.getId(), VerifyCodeDO.VerifyCodeStatus.Verified);//标记为已验证，不得再次使用
 			invitorId= verifyCode.getInvitorId();
 
 			if(null != invitorId) {	//互相添加为好友
@@ -260,13 +251,13 @@ public class AccountServiceImpl implements AccountService{
 		if(CollectionUtils.isEmpty(resp)){
 			myFriend.setGmtInvited(new Date());
 			myFriend.setGmtConfirmed(new Date());
-			myFriend.setStatus(FriendStatusEnum.IsFriend.numberValue());
+			myFriend.setStatus(MyFriendDO.FriendStatus.IsFriend);
 			myFriendMapper.insert(myFriend);
 			needPushMessage = true;
 		}else {
 			MyFriendDO dbMyFriend = resp.get(0);
-			if(!dbMyFriend.getStatus().equals(FriendStatusEnum.IsFriend.numberValue())){
-				myFriend.setStatus(FriendStatusEnum.IsFriend.numberValue());
+			if(!dbMyFriend.getStatus().equals(MyFriendDO.FriendStatus.IsFriend)){
+				myFriend.setStatus(MyFriendDO.FriendStatus.IsFriend);
 				myFriend.setGmtConfirmed(new Date());
 				myFriendMapper.update(myFriend);
 				needPushMessage = true;
@@ -282,7 +273,7 @@ public class AccountServiceImpl implements AccountService{
 				letter.setAcceptorType(0);
 				letter.setContent(userA.getNickName()+"成为您的好友!");
 				letter.setSenderId(userA.getId());
-				letter.setType(MediaTypeEnum.TEXT.numberValue());
+				letter.setType(StationLetterDO.MediaType.TEXT);
 				stationLetterService.createLetter(letter);
 			}
 		}
@@ -349,7 +340,7 @@ public class AccountServiceImpl implements AccountService{
 		return !CollectionUtils.isEmpty(resp);
 	}
 	public List<Long> getMyFamilyGroupId(long myId) {
-		return groupService.getMyJoinedGroups(myId, GroupTypeEnum.Family.numberValue());
+		return groupService.getMyJoinedGroups(myId, MyGroupDO.GroupType.Family);
 	}
 
 	public List<UserDO> getMyToys(long myId) {

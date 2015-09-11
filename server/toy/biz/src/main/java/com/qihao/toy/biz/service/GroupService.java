@@ -21,7 +21,6 @@ import java.util.List;
 
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
-import com.qihao.toy.dal.enums.GroupTypeEnum;
 
 /**
  * 有关用户的操作。
@@ -34,7 +33,7 @@ public interface GroupService {
 	 * @param groupType
 	 * @return
 	 */
-	Long createGroup(long userId, String groupName, GroupTypeEnum groupType);
+	Long createGroup(long userId, String groupName, MyGroupDO.GroupType groupType);
 	/**
 	 * 更新
 	 * @param group
@@ -74,14 +73,14 @@ public interface GroupService {
      * @param myId
      * @return
      */
-    List<MyGroupDO> getMyCreatedGroups(long myId, GroupTypeEnum groupType);
+    List<MyGroupDO> getMyCreatedGroups(long myId, MyGroupDO.GroupType groupType);
     /**
      * 获取我加入的群
      * @param myId
      * @return
      */
     List<Long> getMyJoinedGroups(long myId);
-    List<Long> getMyJoinedGroups(long myId,Integer groupType);
+    List<Long> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType);
     
     /**
      * 获取指定群的所有成员

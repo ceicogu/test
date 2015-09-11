@@ -17,6 +17,8 @@
 
 package com.qihao.toy.dal.domain;
 
+import com.qihao.shared.base.IntEnum;
+
 import lombok.Getter;
 import lombok.Setter;
 /**
@@ -28,11 +30,25 @@ import lombok.Setter;
 public class StationLetterDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
+	public static enum MediaType implements IntEnum{
+		TEXT(0),//文字
+		SOUND(1);//语音
 
+	    private int    intValue;
+
+	    private MediaType(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private Long			senderId;					//消息发送者		
     private Integer		acceptorType;		//消息接收者类型:0-单个用户/1-我的好友/2-我的交流群
     private Long			acceptorId;				//好友ID/我的交流群ID(当type=1是记得是userId)
-    private Integer		type;							//类型0-文字/1-语音
+    private MediaType		type;							//类型0-文字/1-语音
     private String		content;					//消息内容
     private String		url;								//资源存储URL
 }

@@ -19,6 +19,8 @@ package com.qihao.toy.dal.domain;
 
 import java.util.Date;
 
+import com.qihao.shared.base.IntEnum;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,11 +28,26 @@ import lombok.Setter;
 public class MyFriendDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
+	public static enum FriendStatus implements IntEnum{
+		Inviting(0),//邀请中
+		IsFriend(1),//已关注
+		Cancel(2);//取消关注
+    
+	    private int    intValue;
 
+	    private FriendStatus(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private Long		myId;			
     private Long		friendId;		//好友ID
     private String	relation;		//自己对好友的关系称谓
-    private Integer status;			//好友状态:0-邀请中/1-已关注/1-取消关注
+    private FriendStatus status;			//好友状态:0-邀请中/1-已关注/1-取消关注
     private Date		gmtInvited;//邀请时间
     private Date		gmtConfirmed;//关注时间
 }
