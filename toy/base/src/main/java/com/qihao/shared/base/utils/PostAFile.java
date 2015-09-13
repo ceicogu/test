@@ -2,9 +2,14 @@ package com.qihao.shared.base.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.MultipartPostMethod;
+
+import com.qihao.shared.base.api.FileItem;
+import com.qihao.shared.base.api.internal.util.WebUtils;
 /**
  * http://www.theserverside.com/news/1365153/HttpClient-and-FileUpload
  * @author luqiao
@@ -33,8 +38,28 @@ public class PostAFile {
     	        mPost.addParameter(f3.getName(), f3);
 
     	        int statusCode1 = client.executeMethod(mPost);
-
+    	        
+    	 
     	        System.out.println("statusLine>>>" + mPost.getStatusLine());
     	        mPost.releaseConnection();
+    	    }
+    	    
+    	    private void test1(String url){
+    	    	Map<String, String> params = new TreeMap<String,String>();
+    	        File f1 = new File("/Users/luqiao/tmp/4.jpg");
+    	        File f2 = new File("/Users/luqiao/tmp/5.jpg");
+    	        File f3 = new File("/Users/luqiao/tmp/6.jpg");
+    	    	Map<String, FileItem> fileParams = new TreeMap<String, FileItem>();
+    	    	fileParams.put("f1",new FileItem(f1));
+    	    	fileParams.put("f2",new FileItem(f2));
+    	    	fileParams.put("f3",new FileItem(f3));
+    	    	
+    	    	try {
+					String aaa  = WebUtils.doPost(url, params, fileParams, 4000, 500);
+					System.out.println(aaa);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     	    }
 }

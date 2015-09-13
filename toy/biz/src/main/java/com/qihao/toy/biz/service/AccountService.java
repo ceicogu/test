@@ -18,7 +18,6 @@
 package com.qihao.toy.biz.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.UserDO;

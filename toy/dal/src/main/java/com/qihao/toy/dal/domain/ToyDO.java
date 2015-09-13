@@ -44,6 +44,22 @@ public class ToyDO  extends PageDO {
 			return intValue;
 		}
 	}
+	public static enum Gender implements IntEnum{
+		M(0),//男
+		F(1);//女
+
+
+	    private int    intValue;
+
+	    private Gender(int intValue){
+	        this.intValue = intValue;
+	    }
+
+
+		public int intValue() {
+			return intValue;
+		}
+	}
     private String	toySN;			//玩具唯一编码
     private String	toyName;	//玩具名称
     private String	toyMac;		//玩具MAC地址
@@ -51,8 +67,7 @@ public class ToyDO  extends PageDO {
     private Long		activatorId;  //激活者ID(toy自己的帐号ID)
     private Long		ownerId;		//绑定者
     private String	kidName;		//宝宝的名字
-    private Integer	kidGender;	//宝宝性别-1待定／0-女/1-男
-    private Integer	kidAge;			//宝宝年龄
+    private Gender	kidGender;	//宝宝性别-1待定／0-女/1-男
     private Date		kidBirth;		//宝宝出生日期
     private Date		gmtOwned;	//绑定时间
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常

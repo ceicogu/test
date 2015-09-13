@@ -250,7 +250,7 @@
         </dependencies>
     </dependencyManagement>
     <build>
-        <plugins>
+        <plugins>      
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>

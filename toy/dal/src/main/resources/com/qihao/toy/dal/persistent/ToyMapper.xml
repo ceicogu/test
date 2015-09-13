@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.ToyMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,toy_sn,toy_name,toy_mac,activator_id,status,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,toy_sn,toy_name,toy_mac,activator_id,status,kid_name,kid_gender,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.ToyDO"
         parameterType="java.lang.Long">
@@ -20,10 +20,10 @@
     </select>        
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.ToyDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO toy (
-         toy_sn,toy_name,toy_mac,status,activator_id,kid_name,kid_gender,kid_age,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified
+         toy_sn,toy_name,toy_mac,status,activator_id,kid_name,kid_gender,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified
         )
         VALUES (
-        #{toySN},#{toyName},#{toyMac},#{status},#{activatorId},#{kidName},#{kidGender},#{kidAge},#{kidBirth},#{ownerId},#{gmtOwned},now(),now()
+        #{toySN},#{toyName},#{toyMac},#{status},#{activatorId},#{kidName},#{kidGender},#{kidBirth},#{ownerId},#{gmtOwned},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.ToyDO">
@@ -37,7 +37,6 @@
         <if test="toyMac != null"> , toy_mac=#{toyMac}</if>
         <if test="kidName != null"> , kid_name=#{kidName}</if>
         <if test="kidGender != null"> , kid_gender=#{kidGender}</if>
-        <if test="kidAge != null"> , kid_age=#{kidAge}</if>
         <if test="kidBirth != null"> , kid_birth=#{kidBirth}</if>
         <if test="ownerId != null"> , owner_id=#{ownerId}</if>
         <if test="gmtOwned != null"> , gmt_owned=#{gmtOwned}</if>
@@ -62,13 +61,13 @@
     <select id="getMyManageToys" resultType="com.qihao.toy.dal.domain.ToyDO"
         parameterType="long">
         SELECT
-        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_age,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
         FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
         WHERE my_toy.my_id = #{myId} and toy.is_deleted !=1
     </select>  
     <select id="getMyManageToy" resultType="com.qihao.toy.dal.domain.ToyDO">
         SELECT
-        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_age,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
         FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
         WHERE my_toy.my_id = #{myId} and my_toy.toy_user_id=#{toyUserId} and toy.is_deleted !=1
     </select>          

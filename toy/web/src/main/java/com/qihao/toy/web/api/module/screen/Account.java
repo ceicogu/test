@@ -18,6 +18,7 @@
 package com.qihao.toy.web.api.module.screen;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -98,11 +99,30 @@ public class Account extends BaseApiScreenAction{
     	Assert.notNull(currentUser, "用户未登录!");
     	SimpleResult result = new SimpleResult();
     	
-		String miRegId	=	requestParams.getString("miRegId");
-		
-		currentUser.setMiRegId(miRegId);
-    	try{
-    		 accountService.update(currentUser);
+		UserDO user = new UserDO();
+		user.setId(currentUser.getId());
+
+		if(StringUtils.isNotBlank(requestParams.getString("loginName"))){
+			user.setLoginName(requestParams.getString("loginName"));
+		}
+		if(StringUtils.isNotBlank(requestParams.getString("nickName"))){
+			user.setNickName(requestParams.getString("nickName"));
+		}
+		if(StringUtils.isNotBlank(requestParams.getString("email"))){
+			user.setEmail(requestParams.getString("email"));
+		}
+		if(StringUtils.isNotBlank(requestParams.getString("photo"))){
+			user.setPhoto(requestParams.getString("photo"));
+		}		
+		if(StringUtils.isNotBlank(requestParams.getString("voipToken"))){
+			user.setVoipToken(requestParams.getString("voipToken"));
+		}
+		if(StringUtils.isNotBlank(requestParams.getString("miRegId"))){
+			user.setMiRegId(requestParams.getString("miRegId"));
+		}
+
+		try{
+    		accountService.update(user);
 	    	result.setSuccess(true);
     	} catch(Exception e){
     		log.error("exception={}",e);
@@ -168,21 +188,41 @@ public class Account extends BaseApiScreenAction{
     		response.getWriter().println(JSON.toJSONString(result));
     		return;   		
     	}
-    	String toySN = toy.getToySN();
-    	//1.首先认领Toy
-    	//给玩具和宝宝设置基本信息
-    	String toyName	=	requestParams.getString("toyName");
-    	Map<String,String> kidParams = Maps.newLinkedHashMap();
-    	kidParams.put("kidName", requestParams.getString("kidName"));
-    	kidParams.put("kidGender", requestParams.getString("kidGender","-1"));
-    	kidParams.put("kidAge", requestParams.getString("kidAge","-1"));
-    	kidParams.put("kidBirth", requestParams.getString("kidBirth", null));
+
+		if(!toy.getStatus().equals(ToyDO.ToyStatus.Claimed)) {
+    		result.setSuccess(false);
+    		result.setErrorCode(1002);
+    		result.setMessage("故事机已被认领！");
+    		response.getWriter().println(JSON.toJSONString(result));
+    		return; 
+		}
+		if(!toy.getOwnerId().equals(currentUser.getId())){
+    		result.setSuccess(false);
+    		result.setErrorCode(1002);
+    		result.setMessage("您不是故事机主人!");
+    		response.getWriter().println(JSON.toJSONString(result));
+    		return; 
+		}
+    	if(StringUtils.isNotBlank(requestParams.getString("toyName"))){
+    		toy.setToyName(requestParams.getString("toyName"));
+    	}
+    	if(StringUtils.isNotBlank(requestParams.getString("kidGender"))){
+    		toy.setKidGender(Enum.valueOf(ToyDO.Gender.class, requestParams.getString("kidGender")));
+    	}
+    	if(StringUtils.isNotBlank(requestParams.getString("kidName"))){
+    		toy.setKidName(requestParams.getString("kidName"));
+    	}
+    	if(StringUtils.isNotBlank(requestParams.getString("kidBirdth"))){
+    		toy.setKidBirth(requestParams.getDate("kidBirth",new SimpleDateFormat("yyyy-MM-dd")));
+    	}
+
     	try{
-	    	toyService.toNameToy(currentUser.getId(), toySN, toyName, kidParams);
-	    	if(null==kidParams.get("kidName")){
+        	String toySN = toy.getToySN();
+	    	toyService.update(toySN, toy);
+	    	if(StringUtils.isNotBlank(requestParams.getString("kidName"))){
 		    	UserDO user = new UserDO();
 		    	user.setId(toy.getActivatorId());
-		    	user.setNickName(kidParams.get("kidName"));
+		    	user.setNickName(requestParams.getString("kidName"));
 		    	accountService.update(user);
 	    	}
 			result.setSuccess(true);
@@ -275,8 +315,8 @@ public class Account extends BaseApiScreenAction{
     		if(null != toy.getKidGender()){
     			item.put("kidGender", toy.getKidGender());
     		}
-    		if(null != toy.getKidAge()){
-    			item.put("kidAge", toy.getKidAge());
+    		if(null != toy.getKidBirth()){
+    			item.put("kidBirth", toy.getKidBirth());
     		}
     		item.put("ownerId", toy.getOwnerId());
     		if(null != toy.getActivatorId()) {
@@ -523,28 +563,7 @@ public class Account extends BaseApiScreenAction{
     	}
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
-    }
-    /**
-     * 更新当前帐号的miRegId
-     * @param requestParams
-     * @throws IOException
-     */
-    public void doSaveMiRegId(ParameterParser requestParams) throws IOException {
-    	Assert.notNull(currentUser, "用户未登录!");
-    	SimpleResult result = new SimpleResult(); 	
-    	String miRegId = requestParams.getString("miRegId");
-    	if(StringUtils.isBlank(miRegId)) {
-            result.setSuccess(false);
-            result.setErrorCode(2000);
-            result.setMessage("miRegId不能为空！");
-            response.getWriter().println(JSON.toJSONString(result));
-            return;    		    		
-    	}
-    	currentUser.setMiRegId(miRegId);
-    	accountService.update(currentUser);//保存miRegId
-    	result.setSuccess(true);
-    	response.getWriter().println(JSON.toJSONString(result));    	
-    }    
+    }   
 
     public void doAnalysis(@Param("q") String query) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");

@@ -28,7 +28,21 @@ import com.qihao.shared.base.IntEnum;
 public class UserDO  extends PageDO {
 
 	private static final long serialVersionUID = -7395134204375628403L;
+	//操作系统类型
+	public static enum OsType implements IntEnum{
+		Android(0),//故事机注册
+		Ios(1);//手机注册
+	    
+	    private int    intValue;
 
+	    private OsType(int intValue){
+	        this.intValue = intValue;
+	    }
+
+		public int intValue() {
+			return intValue;
+		}
+	}
 	public static enum AccountType implements IntEnum{
 		Mobile(0),//手机注册
 		Toy(1);//故事机注册
@@ -38,7 +52,6 @@ public class UserDO  extends PageDO {
 	    private AccountType(int intValue){
 	        this.intValue = intValue;
 	    }
-
 
 		public int intValue() {
 			return intValue;
@@ -54,7 +67,6 @@ public class UserDO  extends PageDO {
 	    private AccoutChannel(int intValue){
 	        this.intValue = intValue;
 	    }
-
 
 		public int intValue() {
 			return intValue;
@@ -90,6 +102,7 @@ public class UserDO  extends PageDO {
     private Integer isDeleted;	//逻辑删除标记1-逻辑删除/0--正常
     private String	miRegId;		//miPushRegId
     private String	voipToken;
+    private OsType osType;//登录用户设备类型
     //查询专用
     private List<Long>  userIds;
 }
