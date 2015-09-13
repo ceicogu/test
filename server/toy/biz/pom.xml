@@ -61,7 +61,6 @@
 		<dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
-            <version>1.7</version>
         </dependency>
 	 	<!-- 
 		<dependency>
@@ -92,25 +91,30 @@
 		  <artifactId>nlp-lang</artifactId>
 		  <version>0.3</version>
 		</dependency>	
-				
-		<dependency>
+   		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>MiPush_SDK_Server</artifactId>
-		    <version>2.2.14</version>
-		    	<!-- 
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/libs/MiPush_SDK_Server-2.2.14.jar</systemPath>
-			 -->
-		</dependency>
-		<dependency>
+		    <version>2.2.14</version> 		
+ 		</dependency>	
+ 		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>json-simple</artifactId>
 		    <version>1.1.1</version>
-		    <!-- 
+		</dependency>  	
+<!--   		<dependency>
+		    <groupId>com.xiaomi.xmpush.server</groupId>
+		    <artifactId>MiPush_SDK_Server</artifactId>
+		    <version>2.2.14</version>
+ 		    <scope>system</scope>
+		    <systemPath>${basedir}/lib/MiPush_SDK_Server-2.2.14.jar</systemPath>
+  		</dependency>
+		<dependency>
+		    <groupId>com.xiaomi.xmpush.server</groupId>
+		    <artifactId>json-simple</artifactId>
+		    <version>1.1.1</version> 		    
 		    <scope>system</scope>
-		    <systemPath>${project.basedir}/libs/json-simple-1.1.1.jar</systemPath>
-			 -->
-		</dependency>	
+		    <systemPath>${basedir}/lib/json-simple-1.1.1.jar</systemPath>
+		</dependency>	   -->
     </dependencies>
     <repositories>
         <repository>

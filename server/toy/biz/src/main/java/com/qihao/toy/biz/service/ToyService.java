@@ -68,17 +68,4 @@ public interface ToyService {
 	 */
 	List<ToyDO> getMyManageToys(long myId);
     ToyDO getMyManageToy(long myId, long toyUserId);
-	/**
-	 * 给我管理的故事机进行命名
-	 * @param ownerId
-	 * @param toySN
-	 * @param toyName
-	 * @param kidName
-	 * @param kidGender
-	 * @param kidAge
-	 * @param kidBirth
-	 * @return
-	 */
-	ToyDO toNameToy(long ownerId, String toySN, String toyName, String kidName, Integer kidGender, Integer kidAge, Date kidBirth);
-	ToyDO toNameToy(long ownerId, String toySN, String toyName, Map<String, String> kidParams);
 }

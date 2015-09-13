@@ -57,7 +57,7 @@ public class TypeHandlerRegistry {
 	            enumSet = resolverUtil.getClasses();
 	            //通过for循环依次将加载
 	            for (Class<?> type : enumSet) {
-	            	log.info("typeHandler: "+ type.toString());
+	            	log.info("enum="+clz.getName()+"; typeHandler: "+ type.toString());
 	                // Ignore inner classes and interfaces (including package-info.java) and abstract classes
 	            	//不处理内部类、接口、抽象类以及packgee_info类 
 	            	if (!type.isAnonymousClass() && !type.isInterface() && !Modifier.isAbstract(type.getModifiers())) {

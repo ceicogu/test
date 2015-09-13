@@ -1,13 +1,10 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.lucene.document.DateTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,48 +79,6 @@ public class ToyServiceImpl implements ToyService {
 		myToyDO.setToyUserId(toy.getActivatorId());
 		myToyMapper.insert(myToyDO);
 		return toy;
-	}
-	public ToyDO toNameToy(long ownerId, String toySN, String toyName, String kidName, Integer kidGender, Integer kidAge, Date kidBirth){
-		ToyDO toy =  toyMapper.getItemByToySN(toySN);
-		if(null ==toy) {
-			throw new RuntimeException("故事机不存在!");
-		}
-		if(!toy.getStatus().equals(ToyDO.ToyStatus.Claimed)) {
-			throw new RuntimeException("故事机已被认领!");
-		}
-		if(!toy.getOwnerId().equals(ownerId)){
-			throw new RuntimeException("您不是故事机主人!");
-		}
-		toy.setToySN(toySN);
-		toy.setToyName(toyName);
-		toy.setKidName(kidName);
-		toy.setKidGender(kidGender);
-		toy.setKidAge(kidAge);
-		toy.setKidBirth(kidBirth);
-
-		return toyMapper.update(toy)? toy : null;	
-	}
-	public ToyDO toNameToy(long ownerId, String toySN, String toyName, Map<String, String> kidParams) {		
-		ToyDO toy =  toyMapper.getItemByToySN(toySN);
-		if(null ==toy) {
-			throw new RuntimeException("故事机不存在!");
-		}
-		if(toy.getStatus().equals(ToyDO.ToyStatus.Initial)) {
-			throw new RuntimeException("故事机已被认领!");
-		}
-		if(!toy.getOwnerId().equals(ownerId)){
-			throw new RuntimeException("您不是故事机主人!");
-		}
-		toy.setToySN(toySN);
-		toy.setToyName(toyName);
-		toy.setKidName(kidParams.containsKey("kidName")? kidParams.get("kidName"):"");
-		toy.setKidGender(kidParams.containsKey("kidGender")? Integer.valueOf(kidParams.get("kidGender")):-1);
-		toy.setKidAge(kidParams.containsKey("kidAge")? Integer.valueOf(kidParams.get("kidAge")):-1);
-		try {
-			toy.setKidBirth(kidParams.containsKey("kidBirh")? DateTools.stringToDate(kidParams.get("kidBirth")):null);
-		} catch (ParseException e) {
-		}
-		return toyMapper.update(toy)? toy : null;	
 	}
 
 	public List<ToyDO> getAll(ToyDO toy) {

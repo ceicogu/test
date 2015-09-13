@@ -28,7 +28,7 @@
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="libs/MiPush_SDK_Server-2.2.14.jar"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/MiPush_SDK_Server-2.2.14.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

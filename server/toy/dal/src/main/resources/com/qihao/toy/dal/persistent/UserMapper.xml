@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.UserMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,login_name,status,nick_name,photo,mobile,email,type,come_from,come_sn,invitor_id,mi_reg_id,voip_token,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,login_name,status,nick_name,photo,mobile,email,type,come_from,come_sn,invitor_id,mi_reg_id,os_type,voip_token,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.UserDO"
         parameterType="java.lang.Long">
@@ -35,10 +35,10 @@
     <!-- 注册 -->    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.UserDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (
-         login_name,password,status,nick_name,mobile,photo,email,type,come_from,come_sn,invitor_id,mi_reg_id,voip_token,gmt_created,gmt_modified
+         login_name,password,status,nick_name,mobile,photo,email,type,come_from,come_sn,invitor_id,mi_reg_id,os_type,voip_token,gmt_created,gmt_modified
         )
         VALUES (
-        #{loginName},#{password},#{status},#{nickName},#{mobile},#{photo},#{email},#{type},#{comeFrom},#{comeSN},#{invitorId},#{miRegId},#{voipToken},now(),now()
+        #{loginName},#{password},#{status},#{nickName},#{mobile},#{photo},#{email},#{type},#{comeFrom},#{comeSN},#{invitorId},#{miRegId},#{osType},#{voipToken},now(),now()
         )
     </insert>
     <!-- 修改密码 -->
@@ -60,6 +60,7 @@
         	<if test="type != null"> ,type=#{type}</if>
         	<if test="status != null"> ,status=#{status}</if>
         	<if test="miRegId != null"> ,mi_reg_id=#{miRegId}</if>
+        	<if test="osType != null"> ,os_type=#{osType}</if>
         	<if test="voipToken != null"> ,voip_token=#{voipToken}</if>
         WHERE id=#{id}
     </update>
