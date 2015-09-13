@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.dataresolver.Param;
@@ -143,6 +144,43 @@ public class Account extends BaseApiScreenAction{
         response.getWriter().println(JSON.toJSONString(result));
         return;    
     }
+    /**
+     * 获取我管理故事机详情信息
+     * @param toySN
+     * @param toyUserId
+     * @throws IOException
+     */
+    public void doGetMyToyInfo(@Param("toySN") String toySN, @Param("toyUserId") Long toyUserId) throws IOException{
+    	DataResult<ToyDO> result = new DataResult<ToyDO>();
+    	if(StringUtils.isBlank(toySN)
+    			&& null==toyUserId) {
+    		result.setSuccess(false);
+    		result.setMessage("请指定故事机账号或SN号!");
+    		response.getWriter().println(JSON.toJSONString(result)); 
+    		return;
+    	}
+    	ToyDO toy = null;
+    	if(StringUtils.isBlank(toySN)){
+    		toy = toyService.getItemByToySN(toySN);
+    	}else {
+    		ToyDO searchToy = new ToyDO();
+    		searchToy.setActivatorId(toyUserId);
+    		List<ToyDO> resp = toyService.getAll(searchToy);
+    		if(!CollectionUtils.isEmpty(resp)){
+    			toy = resp.get(0);
+    		}   		
+    	}
+    	if(null == toy  
+    			|| !accountService.isMyToy(currentUser.getId(), toy.getActivatorId())){
+    		result.setSuccess(false);
+    		result.setMessage("指定故事机不存在!");
+    		response.getWriter().println(JSON.toJSONString(result)); 
+    		return;    		
+    	}
+    	result.setSuccess(true);
+    	result.setData(toy);
+    	response.getWriter().println(JSON.toJSONString(result));   	
+    }
     /** 获取邮寄验证码  */
     public void doCreateVerifyCode(@Param("mobile") String mobile) throws IOException {
     	SimpleResult result = new SimpleResult();
@@ -171,17 +209,26 @@ public class Account extends BaseApiScreenAction{
     	}
     	
     	Long toyUserId= requestParams.getLong("toyUserId",-1);
-    	if(-1 == toyUserId){
+    	if(-1 == toyUserId 
+    			||StringUtils.isBlank(requestParams.getString("toySN"))){
     		result.setSuccess(false);
     		result.setErrorCode(1002);
     		result.setMessage("玩具唯一码或邀请码不能为空！");
     		response.getWriter().println(JSON.toJSONString(result));
     		return;    		    		
     	}
-
+    	ToyDO toy = null;
+    	String toySN = null;
     	//获取故事机SN
-    	ToyDO toy = toyService.getMyManageToy(currentUser.getId(), toyUserId);
-    	if(null == toy){
+    	if(StringUtils.isNotBlank(requestParams.getString("toySN"))){
+    		toySN = requestParams.getString("toySN");
+    		toy = toyService.getItemByToySN(toySN);
+    	}
+    	if(null == toy && -1 != toyUserId) {
+    		toy = toyService.getMyManageToy(currentUser.getId(), toyUserId);
+    		toySN = toy.getToySN();
+    	}
+     	if(null == toy){
     		result.setSuccess(false);
     		result.setErrorCode(1002);
     		result.setMessage("您无权对该故事机进行命名！");
@@ -217,8 +264,7 @@ public class Account extends BaseApiScreenAction{
     	}
 
     	try{
-        	String toySN = toy.getToySN();
-	    	toyService.update(toySN, toy);
+ 	    	toyService.update(toySN, toy);
 	    	if(StringUtils.isNotBlank(requestParams.getString("kidName"))){
 		    	UserDO user = new UserDO();
 		    	user.setId(toy.getActivatorId());
@@ -310,6 +356,7 @@ public class Account extends BaseApiScreenAction{
     	List<Map<String,Object>> data = Lists.newArrayList();    	
     	for(ToyDO toy : resp) {
     		Map<String,Object> item = Maps.newTreeMap();
+    		item.put("toySN", toy.getToySN());
     		item.put("toyName", toy.getToyName());
     		item.put("kidName", toy.getKidName());
     		if(null != toy.getKidGender()){
