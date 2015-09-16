@@ -1,15 +1,14 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.common.base.Preconditions;
 import com.qihao.toy.biz.service.TagService;
 import com.qihao.toy.dal.domain.TagDO;
 import com.qihao.toy.dal.persistent.TagMapper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TagServiceImpl implements TagService {

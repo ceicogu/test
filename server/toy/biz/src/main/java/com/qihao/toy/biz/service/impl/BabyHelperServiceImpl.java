@@ -1,10 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSON;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.BabyHelperService;
@@ -17,6 +12,10 @@ import com.qihao.toy.dal.domain.enums.MiContentTypeEnum;
 import com.qihao.toy.dal.domain.enums.OperateTypeEnum;
 import com.qihao.toy.dal.persistent.BabyHelperMapper;
 import com.xiaomi.xmpush.server.Message;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BabyHelperServiceImpl implements BabyHelperService {
@@ -66,7 +65,7 @@ public class BabyHelperServiceImpl implements BabyHelperService {
 					MiContentTypeEnum.HELPER.name(),
 					helper);
 			UserDO user = accountService.getUser(helper.getToyUserId());
-			String miMessageId = MiPushUtils.sendMessage(message, user.getMiRegId());
+			String miMessageId = MiPushUtils.sendMessage(message, user.getDeviceToken());
 			if(null != miMessageId) {
 
 			}else {

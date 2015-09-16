@@ -1,12 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.qihao.toy.biz.service.ResourceService;
@@ -14,6 +7,12 @@ import com.qihao.toy.dal.domain.ResourceDO;
 import com.qihao.toy.dal.domain.ResourceTagDO;
 import com.qihao.toy.dal.persistent.ResourceMapper;
 import com.qihao.toy.dal.persistent.ResourceTagMapper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 @Service
 public class ResourceServiceImpl implements ResourceService {
 	@Autowired

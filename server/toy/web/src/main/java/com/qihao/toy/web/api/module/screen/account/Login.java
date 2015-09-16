@@ -17,13 +17,6 @@
 
 package com.qihao.toy.web.api.module.screen.account;
 
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.alibaba.citrus.service.requestcontext.parser.ParameterParser;
 import com.alibaba.citrus.turbine.Context;
 import com.alibaba.fastjson.JSON;
@@ -31,6 +24,12 @@ import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Map;
+
 
 @Slf4j
 public class Login extends BaseApiScreenAction {

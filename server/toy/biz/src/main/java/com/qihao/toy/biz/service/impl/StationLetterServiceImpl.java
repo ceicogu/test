@@ -1,15 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
 import com.qihao.toy.biz.service.AccountService;
@@ -24,6 +14,14 @@ import com.qihao.toy.dal.domain.enums.MiContentTypeEnum;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
 import com.qihao.toy.dal.persistent.SubscribeMessageMapper;
 import com.xiaomi.xmpush.server.Message;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -76,7 +74,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 					msg.setMessageId(letter.getId());
 					msg.setUserId(user.getId());
 					msg.setSenderId(letter.getSenderId());
-					String miMessageId = MiPushUtils.sendMessageToAlias(message, user.getMiRegId());
+					String miMessageId = MiPushUtils.sendMessageToAlias(message, user.getDeviceToken());
 					if(null != miMessageId) {
 						handleMap.put(user.getId(), miMessageId);
 						msg.setStatus(1);
@@ -98,13 +96,13 @@ public class StationLetterServiceImpl implements StationLetterService {
 						msg.setMessageId(letter.getId());
 						msg.setUserId(user.getId());
 						msg.setSenderId(letter.getSenderId());	
-						if(null == user.getMiRegId()) {
+						if(null == user.getDeviceToken()) {
 							msg.setStatus(0);
 							subscribeMessageMapper.insert(msg);
 							continue;
 						}
 
-						String miMessageId = 	MiPushUtils.sendMessageToAlias(message, user.getMiRegId());
+						String miMessageId = 	MiPushUtils.sendMessageToAlias(message, user.getDeviceToken());
 						if(null != miMessageId) {
 							handleMap.put(user.getId(), miMessageId);
 							msg.setStatus(1);			

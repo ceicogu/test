@@ -36,7 +36,7 @@ public class TypeHandlerRegistry {
     private static Map<Class<?>,Class<?>> typeHandlerMap = Maps.newConcurrentMap();
     static {
     	typeHandlerMap.put(IntEnum.class, IntEnumTypeHandler.class);
-    	typeHandlerMap.put(DescedEnum.class, DescedEnumTypeHandler.class);
+    	//typeHandlerMap.put(DescedEnum.class, DescedEnumTypeHandler.class);
     }
     /**
      * 初始化

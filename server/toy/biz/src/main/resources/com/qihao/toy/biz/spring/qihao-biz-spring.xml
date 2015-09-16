@@ -14,10 +14,12 @@
 		<property name="md5Key" value="1f8b638841b06b291d41" />
 		<property name="aesKey" value="FZG4XCMSTTXU9NBS" />
 		<property name="aesIv" value="D1EW3JSQLCH2DWKV" />
-
+        <!-- 亿美短信发送  -->
 		<property name="messageChannelURL" value="http://sdkhttp.eucp.b2m.cn" />
 		<property name="messageChannelAccount" value="0SDK-EBB-0130-JIULT" />
 		<property name="messageChannelPassword" value="111111" />
+
+
 	</bean>
 	<!-- Solrj -->
 	<bean name="solrOperator" class="com.qihao.toy.biz.solr.DefaultSolrOperator"/>
@@ -27,4 +29,11 @@
 		<property name="baseUrl" value="http://localhost:18080/solr" />
 	</bean>
 	 -->
+	<bean id="messageProvider" class="com.qihao.toy.biz.utils.MessageProvider" scope="singleton"  init-method="init" > 
+		<property name="iosPushCertificatePath" value="PushChat.p12" />
+		<property name="iosPushCertificatePassword" value="8910189101" />
+		<property name="isDevlopment" value="true" />
+		<property name="miPushPackageName" value="box.qihao.com.qihaohao" />
+		<property name="miPushAppSecrtKey" value="eGZnHPky5HHDXGwN1+ON9Q==" />
+	</bean>
 </beans>

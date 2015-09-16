@@ -1,12 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.Date;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.utils.RandomStringHelper;
@@ -14,6 +7,12 @@ import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.service.VerifyCodeService;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Map;
 
 @Service
 public class VerifyCodeServiceImpl implements VerifyCodeService {

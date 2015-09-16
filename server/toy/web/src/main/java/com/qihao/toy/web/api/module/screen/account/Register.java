@@ -63,7 +63,7 @@ public class Register extends BaseApiScreenAction {
 		DataResult<Map<String, Object>> result = new DataResult<Map<String, Object>>();
 		int type = requestParams.getInt("type", UserDO.AccountType.Mobile.intValue());
 		int comeFrom = requestParams.getInt("comeFrom",UserDO.AccoutChannel.Self.intValue());
-		
+		int deviceType = requestParams.getInt("deviceType", UserDO.DeviceType.Android.intValue());
 		UserDO userDO = new UserDO();
 		userDO.setLoginName(requestParams.getString("loginName"));
 		userDO.setPassword(requestParams.getString("pwd"));// 在biz层进行md5
@@ -72,11 +72,20 @@ public class Register extends BaseApiScreenAction {
 		userDO.setComeFrom(IntEnumUtils.valueOf(UserDO.AccoutChannel.class, comeFrom));
 		userDO.setComeSN(requestParams.getString("comeSN"));
 		userDO.setType(IntEnumUtils.valueOf(UserDO.AccountType.class, type));
-		userDO.setMiRegId(requestParams.getString("miRegId"));
+		userDO.setDeviceType(IntEnumUtils.valueOf(UserDO.DeviceType.class, deviceType));
+
+		if (StringUtils.isNumeric(requestParams.getString("deviceToken"))) {
+			userDO.setDeviceToken(requestParams.getString("deviceToken"));
+		}	
 		if (StringUtils.isNumeric(requestParams.getString("invitorId"))) {
 			userDO.setInvitorId(requestParams.getLong("invitorId"));
 		}
-		
+        if (StringUtils.isNotBlank(requestParams.getString("voipClientNo"))) {
+            userDO.setVoipClientNo(requestParams.getString("voipClientNo"));
+        }
+        if (StringUtils.isNotBlank(requestParams.getString("voipClientPwd"))) {
+            userDO.setVoipClientNo(requestParams.getString("voipClientPwd"));
+        }
 		// 1.参数校验(0-手機註冊/1-Toy註冊
 		String code = requestParams.getString("code");
 		if(userDO.getType() == UserDO.AccountType.Mobile){

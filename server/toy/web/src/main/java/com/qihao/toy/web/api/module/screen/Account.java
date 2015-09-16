@@ -115,13 +115,24 @@ public class Account extends BaseApiScreenAction{
 		if(StringUtils.isNotBlank(requestParams.getString("photo"))){
 			user.setPhoto(requestParams.getString("photo"));
 		}		
-		if(StringUtils.isNotBlank(requestParams.getString("voipToken"))){
-			user.setVoipToken(requestParams.getString("voipToken"));
+		if(StringUtils.isNotBlank(requestParams.getString("voipClientNo"))){
+			user.setVoipClientNo(requestParams.getString("voipClientNo"));
 		}
-		if(StringUtils.isNotBlank(requestParams.getString("miRegId"))){
-			user.setMiRegId(requestParams.getString("miRegId"));
+        if(StringUtils.isNotBlank(requestParams.getString("voipClientPwd"))){
+            user.setVoipClientPwd(requestParams.getString("voipClientPwd"));
+        }
+		if(StringUtils.isNotBlank(requestParams.getString("deviceType"))){
+			user.setDeviceType(Enum.valueOf(UserDO.DeviceType.class,requestParams.getString("deviceType")));
 		}
-
+		if(StringUtils.isNotBlank(requestParams.getString("deviceToken"))){
+			user.setDeviceToken(requestParams.getString("deviceToken"));
+		}
+        if(StringUtils.isNotBlank(requestParams.getString("voipClientNo"))){
+            user.setVoipClientNo(requestParams.getString("voipClientNo"));
+        }
+        if(StringUtils.isNotBlank(requestParams.getString("voipClientPwd"))){
+            user.setVoipClientPwd(requestParams.getString("voipClientPwd"));
+        }
 		try{
     		accountService.update(user);
 	    	result.setSuccess(true);
@@ -195,8 +206,8 @@ public class Account extends BaseApiScreenAction{
     	response.getWriter().println(JSON.toJSONString(result));
     }
     /**
-     * 命名Toy＆宝宝 
-     * @param authToken
+     * 命名Toy＆宝宝
+     * @param requestParams
      * @throws IOException
      */
     public void doRenameToy(ParameterParser requestParams) throws IOException {    	
@@ -233,7 +244,7 @@ public class Account extends BaseApiScreenAction{
     		result.setErrorCode(1002);
     		result.setMessage("您无权对该故事机进行命名！");
     		response.getWriter().println(JSON.toJSONString(result));
-    		return;   		
+    		return;
     	}
 
 		if(!toy.getStatus().equals(ToyDO.ToyStatus.Claimed)) {
