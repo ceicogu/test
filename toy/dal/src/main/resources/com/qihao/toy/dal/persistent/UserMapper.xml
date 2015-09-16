@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.UserMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,login_name,status,nick_name,photo,mobile,email,type,come_from,come_sn,invitor_id,mi_reg_id,os_type,voip_token,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,login_name,status,nick_name,photo,mobile,email,type,come_from,come_sn,invitor_id,device_token,device_type,voip_client_no,voip_client_pwd,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.UserDO"
         parameterType="java.lang.Long">
@@ -35,10 +35,10 @@
     <!-- 注册 -->    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.UserDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (
-         login_name,password,status,nick_name,mobile,photo,email,type,come_from,come_sn,invitor_id,mi_reg_id,os_type,voip_token,gmt_created,gmt_modified
+         login_name,password,status,nick_name,mobile,photo,email,type,come_from,come_sn,invitor_id,device_token,device_type,voip_client_no,voip_client_pwd,gmt_created,gmt_modified
         )
         VALUES (
-        #{loginName},#{password},#{status},#{nickName},#{mobile},#{photo},#{email},#{type},#{comeFrom},#{comeSN},#{invitorId},#{miRegId},#{osType},#{voipToken},now(),now()
+        #{loginName},#{password},#{status},#{nickName},#{mobile},#{photo},#{email},#{type},#{comeFrom},#{comeSN},#{invitorId},#{deviceToken},#{deviceType},#{voipClientNo},#{voipClientPwd},now(),now()
         )
     </insert>
     <!-- 修改密码 -->
@@ -59,9 +59,10 @@
         	<if test="comeSN != null"> ,come_sn=#{comeSN}</if>
         	<if test="type != null"> ,type=#{type}</if>
         	<if test="status != null"> ,status=#{status}</if>
-        	<if test="miRegId != null"> ,mi_reg_id=#{miRegId}</if>
-        	<if test="osType != null"> ,os_type=#{osType}</if>
-        	<if test="voipToken != null"> ,voip_token=#{voipToken}</if>
+        	<if test="deviceToken != null"> ,device_token=#{deviceToken}</if>
+        	<if test="deviceType != null"> ,device_type=#{deviceType}</if>
+        	<if test="voipClientNo != null"> ,voip_client_no=#{voipClientNo}</if>
+            <if test="voipClientPwd != null"> ,voip_client_pwd=#{voipClientPwd}</if>
         WHERE id=#{id}
     </update>
     <select id="getAll" resultType="com.qihao.toy.dal.domain.UserDO"
@@ -78,7 +79,10 @@
         	<if test="comeSN != null"> AND come_sn=#{comeSN}</if>
         	<if test="invitorId != null"> AND invitor_id=#{invitorId}</if>
         	<if test="type != null"> AND type=#{type}</if>
-        	<if test="miRegId != null"> AND mi_reg_id=#{miRegId}</if>
+        	<if test="deviceType != null"> AND device_type=#{deviceType}</if>
+        	<if test="deviceToken != null"> AND device_token=#{deviceToken}</if>
+            <if test="voipClientNo != null"> AND voip_client_no=#{voipClientNo}</if>
+            <if test="voipClientPwd != null"> AND voip_client_pwd=#{voipClientPwd}</if>
         	<if test="userIds != null"> AND id IN 
         	  <foreach collection="userIds"  item="userId" open="("    separator="," close=")">
    						#{userId}

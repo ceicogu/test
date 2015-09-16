@@ -62,6 +62,11 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.teaey</groupId>
+            <artifactId>apns4j</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 	 	<!-- 
 		<dependency>
 		  <groupId>edu.cmu.sphinx</groupId>
@@ -94,27 +99,27 @@
    		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>MiPush_SDK_Server</artifactId>
-		    <version>2.2.14</version> 		
- 		</dependency>	
+		    <version>2.2.14</version>
+ 		</dependency>
  		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>json-simple</artifactId>
 		    <version>1.1.1</version>
-		</dependency>  	
-<!--   		<dependency>
-		    <groupId>com.xiaomi.xmpush.server</groupId>
-		    <artifactId>MiPush_SDK_Server</artifactId>
-		    <version>2.2.14</version>
- 		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/MiPush_SDK_Server-2.2.14.jar</systemPath>
-  		</dependency>
-		<dependency>
-		    <groupId>com.xiaomi.xmpush.server</groupId>
-		    <artifactId>json-simple</artifactId>
-		    <version>1.1.1</version> 		    
-		    <scope>system</scope>
-		    <systemPath>${basedir}/lib/json-simple-1.1.1.jar</systemPath>
-		</dependency>	   -->
+		</dependency>
+   		<!--<dependency>-->
+		    <!--<groupId>com.xiaomi.xmpush.server</groupId>-->
+		    <!--<artifactId>MiPush_SDK_Server</artifactId>-->
+		    <!--<version>2.2.14</version>-->
+ 		    <!--<scope>system</scope>-->
+		    <!--<systemPath>${basedir}/lib/MiPush_SDK_Server-2.2.14.jar</systemPath>-->
+  		<!--</dependency>-->
+		<!--<dependency>-->
+		    <!--<groupId>com.xiaomi.xmpush.server</groupId>-->
+		    <!--<artifactId>json-simple</artifactId>-->
+		    <!--<version>1.1.1</version> 		    -->
+		    <!--<scope>system</scope>-->
+		    <!--<systemPath>${basedir}/lib/json-simple-1.1.1.jar</systemPath>-->
+		<!--</dependency>-->
     </dependencies>
     <repositories>
         <repository>

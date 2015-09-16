@@ -1,18 +1,16 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.common.collect.Maps;
 import com.qihao.toy.biz.config.GlobalConfig;
 import com.qihao.toy.biz.service.MessageChannelService;
 import com.qihao.toy.biz.utils.SendSMSUtils;
 import com.qihao.toy.biz.utils.VelocityUtils;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
 @Slf4j
 @Service
 public class MessageChannelServiceImpl implements MessageChannelService {	

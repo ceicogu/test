@@ -17,14 +17,15 @@ public class MiPushUtils {
 	private final static String PACKAGENAME = "box.qihao.com.qihaohao";
 	private final static String APP_SECRET_KEY = "eGZnHPky5HHDXGwN1+ON9Q==";
 	
-	/**
-	 * 构造推送消息体
-	 * @param messagePayload
-	 * @param title
-	 * @param description
-	 * @return
-	 * @throws Exception
-	 */
+
+    /**
+     * 构造推送消息体
+     * @param title
+     * @param description
+     * @param commandMessage
+     * @return
+     * @throws Exception
+     */
 	public static Message buildMessage(String title, String description,Object commandMessage) throws Exception {
 	     Message message = new Message.Builder()
 	             .title(title)
@@ -32,7 +33,7 @@ public class MiPushUtils {
 	             .payload(JSON.toJSONString(commandMessage))
 	             .restrictedPackageName(PACKAGENAME)
 	             .passThrough(1)  //消息使用透传方式
-	             .notifyType(1)     // 使用默认提示音提示
+	             .notifyType(1)  // 使用默认提示音提示
 	             .build();
 	     return message;
 	}

@@ -10,8 +10,13 @@ public class GlobalConfig {
 	//AES加解密
 	private String aesKey;
 	private String aesIv;
-	//短信消息通道配置
+	//小米短信消息通道配置
 	private String	messageChannelURL;
 	private String	messageChannelAccount;
 	private String	messageChannelPassword;
+
+    //苹果消息推送通道配置
+    private String  iosPushHost;
+    private String  iosPushCertificatePath;
+    private String  iosPushCertificatePassword;
 }

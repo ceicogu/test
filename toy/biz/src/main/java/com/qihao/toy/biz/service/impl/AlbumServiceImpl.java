@@ -1,12 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.qihao.toy.biz.service.AlbumService;
@@ -18,6 +11,12 @@ import com.qihao.toy.dal.persistent.AlbumMapper;
 import com.qihao.toy.dal.persistent.AlbumResourceMapper;
 import com.qihao.toy.dal.persistent.AlbumTagMapper;
 import com.qihao.toy.dal.persistent.ResourceMapper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 @Service
 public class AlbumServiceImpl implements AlbumService {
 	@Autowired

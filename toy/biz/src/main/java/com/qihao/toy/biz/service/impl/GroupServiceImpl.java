@@ -1,12 +1,5 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.qihao.toy.biz.service.GroupService;
@@ -14,6 +7,12 @@ import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.persistent.MyGroupMapper;
 import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 群管理

@@ -44,8 +44,5 @@
 	init-method="init">
 		<property name="scanPackage" value="com.qihao.toy.dal.domain" />
 	</bean>
-<!-- 	<bean id="typeHandlerService" class="com.qihao.toy.dal.domain.typehandlers.TypeHandlerRegistry"
-	init-method="init">
-		<property name="scanPackage" value="com.qihao.toy.dal.domain.enums;com.qihao.toy.dal.domain" />
-	</bean> -->
+
 </beans>

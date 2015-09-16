@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config description="自动配置">
-
     <group name="qihao-logging">
-		<property name="logging.output" description="idc data center日志目录" /> 
-		<property name="logging.level"  description="idc data center日志级别" />
+		<property name="loggingRoot" description="idc data center日志目录" /> 
+		<property name="loggingLevel"  description="idc data center日志级别" />
     </group>
     <group name="qihao-biz-config">
  		<property name="qihao.biz.md5key" defaultValue="1f8b638841b06b291d41" description="" />
@@ -27,10 +26,8 @@
 	</group>
 
 	<script>
-		<generate template="qihao-dal-config.properties.vm" destfile="WEB-INF/classes/config/qihao-dal-config.properties"
-			charset="UTF-8" />
-		<generate template="qihao-biz-config.properties.vm" destfile="WEB-INF/classes/config/qihao-biz-config.properties"
-			charset="UTF-8" />
-		<generate template="log4j.xml.vm" destfile="WEB-INF/classes/log4j.xml" charset="UTF-8"/>
+		<generate template="qihao-dal-config.properties.vm" destfile="WEB-INF/config/qihao-dal-config.properties" charset="UTF-8" />
+		<generate template="qihao-biz-config.properties.vm" destfile="WEB-INF/config/qihao-biz-config.properties" charset="UTF-8" />
+        <generate template="web.xml.vm" destfile="WEB-INF/web.xml" charset="UTF-8" />
 	</script>
 </config>
