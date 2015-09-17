@@ -2,7 +2,7 @@
     #if (!$field.valid) $field.message #end
 #end
 
-<form action="$petstoreRegisterLink" method="post">
+<form action="" method="post">
   $csrfToken.hiddenField
   <input type="hidden" name="action" value="RegisterAction"/>
 
