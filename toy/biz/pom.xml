@@ -16,10 +16,6 @@
             <artifactId>citrus-webx-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.qihao.toy</groupId>
             <artifactId>qihao-toy-base</artifactId>
         </dependency>        
@@ -95,31 +91,25 @@
 		  <groupId>org.nlpcn</groupId>
 		  <artifactId>nlp-lang</artifactId>
 		  <version>0.3</version>
-		</dependency>	
+		</dependency>
    		<dependency>
 		    <groupId>com.xiaomi.xmpush.server</groupId>
 		    <artifactId>MiPush_SDK_Server</artifactId>
 		    <version>2.2.14</version>
- 		</dependency>
- 		<dependency>
-		    <groupId>com.xiaomi.xmpush.server</groupId>
+ 		    <!--<scope>system</scope>-->
+		    <!--<systemPath>${project.basedir}/lib/MiPush_SDK_Server-2.2.14.jar</systemPath>-->
+  		</dependency>
+		<dependency>
+		    <groupId>org.json</groupId>
 		    <artifactId>json-simple</artifactId>
 		    <version>1.1.1</version>
 		</dependency>
-   		<!--<dependency>-->
-		    <!--<groupId>com.xiaomi.xmpush.server</groupId>-->
-		    <!--<artifactId>MiPush_SDK_Server</artifactId>-->
-		    <!--<version>2.2.14</version>-->
- 		    <!--<scope>system</scope>-->
-		    <!--<systemPath>${basedir}/lib/MiPush_SDK_Server-2.2.14.jar</systemPath>-->
-  		<!--</dependency>-->
-		<!--<dependency>-->
-		    <!--<groupId>com.xiaomi.xmpush.server</groupId>-->
-		    <!--<artifactId>json-simple</artifactId>-->
-		    <!--<version>1.1.1</version> 		    -->
-		    <!--<scope>system</scope>-->
-		    <!--<systemPath>${basedir}/lib/json-simple-1.1.1.jar</systemPath>-->
-		<!--</dependency>-->
+        <!-- 条形码&二维码 -->
+        <dependency>
+            <groupId>net.sf.barcode4j</groupId>
+            <artifactId>barcode4j</artifactId>
+            <version>2.1</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
