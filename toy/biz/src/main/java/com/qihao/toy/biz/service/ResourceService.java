@@ -27,24 +27,24 @@ import com.qihao.toy.dal.domain.ResourceDO;
 public interface ResourceService {
 	/**
 	 * 添加
-	 * @param tagType
-	 * @param tagName
+	 * @param resourc
 	 * @return
 	 */
 	Long insert(ResourceDO resourc);
-	/**
-	 * 修改
-	 * @param resouceId
-	 * @param resource
-	 * @return
-	 */
+
+    /**
+     * 修改
+     * @param resourceId
+     * @param resource
+     * @return
+     */
 	Boolean update(Long resourceId, ResourceDO resource);
 	/**
 	 * 逻辑删除
 	 * @param resourceId
 	 * @return
 	 */
-	Boolean deleteById(Long resouceId);
+	Boolean deleteById(Long resourceId);
 	/**
 	 *  获取单ID
 	 * @param resouceId
@@ -53,7 +53,7 @@ public interface ResourceService {
 	ResourceDO getById(Long resouceId);
 	/**
 	 * 批量获取
-	 * @param resource
+	 * @param tag
 	 * @return
 	 */
 	List<ResourceDO> getAll(ResourceDO tag);

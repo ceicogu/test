@@ -30,7 +30,7 @@ public interface AccountService {
     /**
      * 登录用户，如果用户名和密码正确，则返回相应的用户信息。
      *
-     * @param userName   用户名
+     * @param loginName   用户名
      * @param password 密码
      * @return 用户信息，如果用户名或密码不正确，则返回<code>null</code>
      */
@@ -84,7 +84,7 @@ public interface AccountService {
 
     /**
      * 获取我的好友列表
-     * @param userId
+     * @param myId
      * @return
      */
     List<MyFriendDO> getMyFriends(long myId);
@@ -104,7 +104,7 @@ public interface AccountService {
     /**
      * 判断是否是我的好友
      * @param myId
-     * @param firendId
+     * @param friendId
      * @return
      */
     Boolean isMyFriend(long myId, long friendId);
@@ -112,7 +112,7 @@ public interface AccountService {
      * 判断是否是我管理toy的好友
      * @param myId
      * @param toyUserId
-     * @param firendId
+     * @param friendId
      * @return
      */
     Boolean isMyToyFriend(long myId, long toyUserId, long friendId);

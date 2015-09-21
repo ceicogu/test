@@ -53,7 +53,7 @@ public interface AlbumService {
 	AlbumDO getById(Long albumId);
 	/**
 	 * 批量获取
-	 * @param resource
+	 * @param album
 	 * @return
 	 */
 	List<AlbumDO> getAll(AlbumDO album);
@@ -65,7 +65,7 @@ public interface AlbumService {
 	List<Long> getAlbumIdsByTag(Long tagId);
 	/**
 	 * 根据标签ID获取对应资源列表(分页)
-	 * @param tagId
+	 * @param albumId
 	 * @return
 	 */
 	List<AlbumDO> getAlbumsByTag(Long albumId);
@@ -79,7 +79,7 @@ public interface AlbumService {
 	List<AlbumDO> getAlbumsByTag(Long tagId, Integer page, Integer pageSize);
 	/**
 	 * 根据专辑ID获取资源表
-	 * @param alibumId
+	 * @param albumId
 	 * @return
 	 */
 	List<ResourceDO> getResourcesByAlbumId(Long albumId);

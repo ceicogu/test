@@ -25,11 +25,13 @@ import com.qihao.toy.dal.domain.VerifyCodeDO;
  */
 public interface VerifyCodeService {
 
-	/**
-	 * 创建对应类型的验证码
-	 * @param verifyCode				验证码对象
-	 * @return
-	 */
+    /**
+     * 创建对应类型的验证码
+     * @param invitorId
+     * @param codeType
+     * @param mobile
+     * @return
+     */
 	public boolean createVerifyCode( Long invitorId,VerifyCodeDO.VerifyCodeType codeType, String mobile);
 	public boolean createVerifyCode(Long invitorId, VerifyCodeDO.VerifyCodeType codeType, String mobile, Integer codeLength);
 	/**
@@ -48,9 +50,11 @@ public interface VerifyCodeService {
      * @return
      */
     boolean checkVerifyCode(VerifyCodeDO.VerifyCodeType codeType,String mobile, String code);
+
     /**
      * 确认验证码已验证
-     * @param userId
+     * @param codeType
+     * @param mobile
      * @param code
      * @return
      */
