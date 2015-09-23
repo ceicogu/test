@@ -8,4 +8,6 @@ import com.qihao.toy.dal.domain.MyFriendDO;
 public interface MyFriendMapper extends CRUDMapper<MyFriendDO> {
 	
 	Integer modifyRelation(@Param("myId") Long myId, @Param("friendId")  Long friendId, @Param("relation") String relation);
+
+    MyFriendDO getItemByFriendId(@Param("myId") Long myId, @Param("friendId")  Long friendId);
 }

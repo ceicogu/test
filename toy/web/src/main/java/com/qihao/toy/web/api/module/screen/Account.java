@@ -445,6 +445,50 @@ public class Account extends BaseApiScreenAction{
     	response.getWriter().println(JSON.toJSONString(result));      	
     }
     /**
+     * 获得我管理toy的好友列表
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doRenameMyToyFriend(ParameterParser requestParams) throws IOException {
+        Assert.notNull(currentUser, "用户未登录!");
+        SimpleResult result = new SimpleResult();
+        if(!StringUtils.isNumeric(requestParams.getString("toyUserId"))) {
+            result.setSuccess(false);
+            result.setErrorCode(1000);
+            result.setMessage("请指定所管理toy的ID！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;
+        }
+        if(!StringUtils.isNumeric(requestParams.getString("friendId"))) {
+            result.setSuccess(false);
+            result.setErrorCode(1000);
+            result.setMessage("请指定所管理toy的friendId！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;
+        }
+        if(StringUtils.isEmpty(requestParams.getString("relation"))){
+            result.setSuccess(false);
+            result.setErrorCode(1000);
+            result.setMessage("请指定所管理名字！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;
+        }
+        Long toyUserId= requestParams.getLong("toyUserId");
+        Long friendId= requestParams.getLong("friendId");
+        String relation = requestParams.getString("relation");
+        //是我管理的Toy吗？
+        if(!accountService.isMyToyFriend(currentUser.getId(), toyUserId,friendId)){
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请所管理toy的Friend无效！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;
+        }
+        boolean bOK = accountService.toRenameMyFriend(toyUserId, friendId, relation);
+        result.setSuccess(bOK);
+        response.getWriter().println(JSON.toJSONString(result));
+    }
+    /**
      * 获取我创建/参与的所有群
      * @param requestParams
      * @throws IOException

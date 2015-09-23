@@ -11,7 +11,13 @@
         <include refid="All_Fields" />
         FROM my_friend
         WHERE id=#{id}
-    </select>    
+    </select>
+    <select id="getItemByFriendId" resultType="com.qihao.toy.dal.domain.MyFriendDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_friend
+        WHERE my_id=#{myId} AND friend_id=#{friendId}
+    </select>
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyFriendDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO my_friend (
          my_id,friend_id,relation,status,gmt_invited,gmt_confirmed,gmt_created,gmt_modified

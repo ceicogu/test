@@ -20,7 +20,7 @@
 		<property name="mipush.appsecret" defaultValue="eGZnHPky5HHDXGwN1+ON9Q=="		description="" />
 	</group>
     <group name="qihao-dal-config">
- 		<property name="database.userName" defaultValue="root" description="" />
+ 		<property name="database.username" defaultValue="mysql" description="" />
 		<property name="database.password" defaultValue="123456"		description="" />
 		<property name="database.url" defaultValue="jdbc:mysql://182.92.162.223:3306/qihao_toy?zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=utf-8" description="" />
 	</group>
