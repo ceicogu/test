@@ -10,6 +10,9 @@ import com.qihao.toy.biz.service.AccountService;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.biz.service.StationLetterService;
 import com.qihao.toy.biz.service.ToyService;
+import com.qihao.toy.biz.solr.DefaultSolrOperator;
+import com.qihao.toy.biz.solr.domain.AccountSolrDO;
+import com.qihao.toy.biz.utils.ObjectDynamicCreator;
 import com.qihao.toy.dal.domain.*;
 import com.qihao.toy.dal.persistent.MyFriendMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
@@ -42,6 +45,8 @@ public class AccountServiceImpl implements AccountService {
     private VerifyCodeMapper verifyCodeMapper;
     @Autowired
     private GlobalConfig globalConfig;
+    @Autowired
+    private DefaultSolrOperator solrOperator;
 
     public UserDO login(String loginName, String password) {
         Preconditions.checkArgument(StringUtils.isNotBlank(loginName), "用户名不能为空");
@@ -247,7 +252,19 @@ public class AccountServiceImpl implements AccountService {
             myFriend.setGmtInvited(new Date());
             myFriend.setGmtConfirmed(new Date());
             myFriend.setStatus(MyFriendDO.FriendStatus.IsFriend);
-            myFriendMapper.insert(myFriend);
+            long id = myFriendMapper.insert(myFriend);
+            {//添加到索引中
+                AccountSolrDO solrDO = new AccountSolrDO();
+                solrDO.setId(id);
+                solrDO.setMyId(userBId);
+                solrDO.setFriendId(userAId);
+                solrDO.setRelation(myFriend.getRelation());
+                try{
+                    solrOperator.writeSolrDocument("account", ObjectDynamicCreator.getFieldVlaue(solrDO));
+                } catch (Exception e){
+                    //do nothing
+                }
+            }
             needPushMessage = true;
         } else {
             MyFriendDO dbMyFriend = resp.get(0);
@@ -361,7 +378,25 @@ public class AccountServiceImpl implements AccountService {
 
     public Boolean toRenameMyFriend(long myId, long friendId, String relation) {
         try {
-            return myFriendMapper.modifyRelation(myId, friendId, relation) > 0;
+            MyFriendDO myFriendDO = myFriendMapper.getItemByFriendId(myId,friendId);
+            if(null == myFriendDO) {
+                return false;
+            }
+            boolean bOK = myFriendMapper.modifyRelation(myId, friendId, relation) > 0;
+            if(bOK){
+                AccountSolrDO solrDO = new AccountSolrDO();
+                solrDO.setId(myFriendDO.getId());
+                solrDO.setMyId(myId);
+                solrDO.setFriendId(friendId);
+                solrDO.setRelation(relation);
+
+                try{
+                    solrOperator.writeSolrDocument("account", ObjectDynamicCreator.getFieldVlaue(solrDO));
+                }catch (Exception e){
+                    //do nothing
+                }
+            }
+            return bOK;
         } catch (Exception e) {
             return false;
         }

@@ -1,6 +1,6 @@
-mvn install:install-file -Dfile=MiPush_SDK_Sever_2_2_12.jar -Dpackaging=jar -DgroupId=com.xiaomi.mipush -DartifactId=MiPush_SDK_Sever -Dversion=2.2.12  
+mvn install:install-file -Dfile=MiPush_SDK_Server-2.2.14.jar -Dpackaging=jar -DgroupId=com.xiaomi.xmpush.server -DartifactId=MiPush_SDK_Server -Dversion=2.2.14
 
-mvn install:install-file -Dfile=json-simple-1.1.1.jar -Dpackaging=jar -DgroupId=org.json.simple -DartifactId=json-simple -Dversion=1.1.1  
+mvn install:install-file -Dfile=json-simple-1.1.1.jar -Dpackaging=jar -DgroupId=org.json -DartifactId=json-simple -Dversion=1.1.1
 
 <dependency>
     <groupId>com.xiaomi.mipush</groupId>

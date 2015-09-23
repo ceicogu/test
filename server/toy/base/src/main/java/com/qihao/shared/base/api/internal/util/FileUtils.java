@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 类File.java的实现描述：TODO 类实现描述
  * 
- * @author zhihua.zhangzh Mar 14, 2014 1:55:54 PM
+ * @author
  */
 public class FileUtils {
 

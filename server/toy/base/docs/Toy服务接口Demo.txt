@@ -1,0 +1,38 @@
+1.登录(mobile)
+http://182.92.162.223/api/account/login.json?login_name=18600361168&pwd=123456
+
+{"data":{"authToken":"TnlJ9qZfh4tH+lfGVzFnVA+2gySCQ5KY44Y+eWNh2Jo=","nickName":"18600361168","userId":36},"success":true}
+
+2.获取我管理Toys
+http://127.0.0.1:8081/api/account/getMyToys.json?auth_token=QablbSYU%2BmtaEkauWDg6dtLj%2FtyKg%2Fxl9Hpsm922608%3D
+
+{"data":[{"activatorId":37,"kidName":"大宝","ownerId":36,"toyName":"云宝","toySN":"123456789"}],"success":true}
+
+3.获取我管理toy的好友列表
+http://127.0.0.1:8081/api/account/getMyToyFriends.json?toy_user_id=37&auth_token=QablbSYU%2BmtaEkauWDg6dtLj%2FtyKg%2Fxl9Hpsm922608%3D
+
+{"data":[{"friendId":36,"relation":"妈妈"},{"friendId":40,"relation":"爸爸"}],"success":true}
+
+4.给我管理toy的好友换名
+http://127.0.0.1:8081/api/account/renameMyToyFriend.json?toy_user_id=37&friend_id=40&relation=父亲&auth_token=QablbSYU%2BmtaEkauWDg6dtLj%2FtyKg%2Fxl9Hpsm922608%3D
+
+5.语义分析(以toy身份）
+5.1 toy登录
+http://127.0.0.1:8081/api/account/login.json?login_name=mac0001&pwd=123456
+
+{"data":{"authToken":"jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp+NDqPAcE=","nickName":"大宝","userId":37},"success":true}
+5.2 toy语音识别(找人)
+http://127.0.0.1:8081/api/syntax/analysis.json?q=我想找爸爸&auth_token=jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp%2BNDqPAcE%3D
+
+{"data":{"answer":"我的好友|xxx","info":[{"friendId":40,"relation":"爸爸"}],"question":"我想找爸爸","type":"CALL"},"message":"搜索成功!","success":true}
+5.3 toy语音识别(找故事)
+http://127.0.0.1:8081/api/syntax/analysis.json?q=我想听酒狂&auth_token=jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp%2BNDqPAcE%3D
+
+{"data":{"answer":"故事|A|A","info":[{"id":"8","url":"yuequ/酒狂.mp3"}],"question":"我想听酒狂","type":"PLAY"},"message":"搜索成功!","success":true}
+5.4 toy语音识别(自动应答)
+http://127.0.0.1:8081/api/syntax/analysis.json?q=你都有什么本领啊&auth_token=jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp%2BNDqPAcE%3D
+
+{"data":{"answer":"我会讲故事，会唱儿歌，还会回答你的问题，陪你聊天，每天我都在学习中","question":"你都有什么本领啊","type":"ANSWER"},"message":"搜索成功!","success":true}
+
+
+

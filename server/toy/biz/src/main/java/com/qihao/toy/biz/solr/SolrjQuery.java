@@ -92,6 +92,8 @@ public class SolrjQuery {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (Exception e){
+				e.printStackTrace();
 			}
 	    }
 	    public void write(Object obj){

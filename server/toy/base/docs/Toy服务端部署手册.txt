@@ -1,0 +1,9 @@
+mvn clean install -Dmaven.test.skip=true
+scp web/target/qihaobox.war admin@182.92.162.223:/tmp
+ssh admin@182.92.162.223
+cd /opt/jetty/webapps/wwwroot/toy/
+sudo -s
+mv /tmp/qihaobox.war .
+source /etc/profile
+jar xvf qihaobox.war
+../../../bin/jetty.sh restart

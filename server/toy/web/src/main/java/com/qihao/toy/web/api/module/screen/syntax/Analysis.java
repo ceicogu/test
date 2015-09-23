@@ -162,11 +162,10 @@ public class Analysis extends BaseApiScreenAction{
     	List<String>  fields = Lists.newArrayList();
     	fields.add("friendId");
     	fields.add("relation");
-    	fields.add("friendMobile");
+    	
     	SolrDocumentList resp = solrOperator.querySolrResult("account",(Object)accountSolrDO, null, fields,null, null);
-    	//增加同义词识别逻辑，前期简单些
-
-    	if(CollectionUtils.isEmpty(resp)) {
+    
+    	if(CollectionUtils.isEmpty(resp)) {//增加同义词识别逻辑，前期简单些
         	Map<String,String> relationMap = Maps.newLinkedHashMap();
         	relationMap.put("外婆", "姥姥");
         	relationMap.put("外公", "姥爷");
