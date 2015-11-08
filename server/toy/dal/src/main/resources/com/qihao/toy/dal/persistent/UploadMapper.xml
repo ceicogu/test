@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.UploadMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,file_name,file_suffix,file_type,duration,uploader,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.UploadDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM upload
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.UploadDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO upload (
+         file_name,file_suffix,file_type,duration,uploader,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{fileName},#{fileSuffix},#{fileType},#{duration},#{uploader},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.UploadDO">
+        UPDATE upload
+        SET
+        gmt_modified=now()
+        <if test="fileSuffix != null"> ,file_suffix=#{fileSuffix}</if>
+        <if test="fileType != null"> ,file_type=#{fileType}</if>
+        <if test="duration != null"> ,duration=#{duration}</if>
+        <if test="uploader != null"> ,uploader=#{uploader}</if>
+        WHERE id=#{id}
+    </update>
+    <update id="deleteById" parameterType="long">
+        UPDATE upload
+        SET
+        gmt_modified=now(),is_deleted=1
+        WHERE id=#{id}
+    </update>    
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.UploadDO"
+        parameterType="com.qihao.toy.dal.domain.UploadDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM upload
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+	        <if test="fileName != null"> AND file_name=#{fileName}</if>
+	        <if test="fileSuffix != null"> AND file_suffix=#{fileSuffix}</if>
+	        <if test="fileType != null"> AND file_type=#{fileType}</if>
+	        <if test="uploader != null"> AND uploader=#{uploader}</if>        
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        
