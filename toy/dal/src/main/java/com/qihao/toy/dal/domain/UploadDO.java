@@ -22,21 +22,22 @@ import com.qihao.shared.base.IntEnum;
 import lombok.Getter;
 import lombok.Setter;
 /**
- * 发布消息表
+ * 上传文件信息表
  * @author luqiao
  *
  */
 @Setter @Getter
-public class StationLetterDO  extends PageDO {
+public class UploadDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
-	public static enum MediaType implements IntEnum{
-		TEXT(0),//文字
-		SOUND(1);//语音
+	public static enum FileType implements IntEnum{
+		TEXT(0),//文本文件
+		SOUND(1),//语音文件
+		VIDEO(2);//视频文件
 
 	    private int    intValue;
 
-	    private MediaType(int intValue){
+	    private FileType(int intValue){
 	        this.intValue = intValue;
 	    }
 
@@ -45,10 +46,9 @@ public class StationLetterDO  extends PageDO {
 			return intValue;
 		}
 	}
-    private Long		senderId;		//消息发送者		
-    private Integer		acceptorType;	//消息接收者类型:0-单个用户/1-我的好友/2-我的交流群
-    private Long		acceptorId;		//好友ID/我的交流群ID(当type=1是记得是userId)
-    private MediaType	type;			//类型0-文字/1-语音
-    private String		content;		//消息内容
-    private String		url;			//资源存储URL
+    private Long		uploader;		//文件上传者ID		
+    private String		fileName;		//上传文件服务端存储文件名
+    private String		fileSuffix;     //上传文件后缀
+    private FileType	fileType;		//上传文件类型
+    private Integer		duration;		//音频和视频文件播放时长
 }
