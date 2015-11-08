@@ -115,12 +115,6 @@ public class Account extends BaseApiScreenAction{
 		if(StringUtils.isNotBlank(requestParams.getString("photo"))){
 			user.setPhoto(requestParams.getString("photo"));
 		}		
-		if(StringUtils.isNotBlank(requestParams.getString("voipClientNo"))){
-			user.setVoipClientNo(requestParams.getString("voipClientNo"));
-		}
-        if(StringUtils.isNotBlank(requestParams.getString("voipClientPwd"))){
-            user.setVoipClientPwd(requestParams.getString("voipClientPwd"));
-        }
 		if(StringUtils.isNotBlank(requestParams.getString("deviceType"))){
 			user.setDeviceType(Enum.valueOf(UserDO.DeviceType.class,requestParams.getString("deviceType")));
 		}

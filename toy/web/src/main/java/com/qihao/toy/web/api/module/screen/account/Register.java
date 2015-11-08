@@ -84,7 +84,7 @@ public class Register extends BaseApiScreenAction {
             userDO.setVoipClientNo(requestParams.getString("voipClientNo"));
         }
         if (StringUtils.isNotBlank(requestParams.getString("voipClientPwd"))) {
-            userDO.setVoipClientNo(requestParams.getString("voipClientPwd"));
+            userDO.setVoipClientPwd(requestParams.getString("voipClientPwd"));
         }
 		// 1.参数校验(0-手機註冊/1-Toy註冊
 		String code = requestParams.getString("code");
@@ -96,23 +96,16 @@ public class Register extends BaseApiScreenAction {
 				response.getWriter().println(JSON.toJSONString(result));
 				return;				
 			}
-			if(null != userDO.getMobile()){
-				result.setSuccess(false);
-				result.setErrorCode(2001);
-				result.setMessage("手机号码不能为空!");
-				response.getWriter().println(JSON.toJSONString(result));
-				return;				
-			}
-			try {
-				verifyCodeService.checkVerifyCode(
-						VerifyCodeDO.VerifyCodeType.Reg_VerifyCode, userDO.getMobile(), code);
-			} catch (Exception e) {
-				result.setSuccess(false);
-				result.setErrorCode(2001);
-				result.setMessage("验证码无效!");
-				response.getWriter().println(JSON.toJSONString(result));
-				return;	
-			}
+//			try {
+//				verifyCodeService.checkVerifyCode(
+//						VerifyCodeDO.VerifyCodeType.Reg_VerifyCode, userDO.getMobile(), code);
+//			} catch (Exception e) {
+//				result.setSuccess(false);
+//				result.setErrorCode(2001);
+//				result.setMessage("验证码无效!");
+//				response.getWriter().println(JSON.toJSONString(result));
+//				return;
+//			}
 		}
 		
 		try {
