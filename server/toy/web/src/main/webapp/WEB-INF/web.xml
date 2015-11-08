@@ -45,7 +45,7 @@
              - 此处将所有静态html、图片文件交给servlet引擎直接处理；但/qihao/images下的图片仍由pipeline来处理。
             -->
             <param-name>excludes</param-name>
-            <param-value>*.html, *.jpg, *.gif, *.png, *.mp3, *.pcm,!/qihao/images</param-value>
+            <param-value>*.html, *.jpg, *.gif, *.png, *.mp3, *.pcm, *.amr,!/qihao/images</param-value>
         </init-param>
         <init-param>
             <!--

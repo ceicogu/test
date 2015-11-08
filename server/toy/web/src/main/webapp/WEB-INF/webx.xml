@@ -54,7 +54,7 @@
 		<request-contexts:lazy-commit />
 		<request-contexts:parser>
 			<filters>
-				<parser-filters:uploaded-file-whitelist extensions="jpg, gif, png,mp3,pcm" />
+				<parser-filters:uploaded-file-whitelist extensions="jpg, gif, png,mp3,pcm,amr" />
 			</filters>
 		</request-contexts:parser>
 		<request-contexts:set-locale defaultLocale="zh_CN" defaultCharset="UTF-8" />
@@ -71,7 +71,7 @@
 	</services:request-contexts>
 
 	<!-- 支持上传文件。 -->
-	<services:upload sizeMax="5M" />
+	<services:upload sizeMax="10M" />
 
 	<!-- 将beans暴露给模板。这里定义的tools可被所有components之间共享。 -->
 	<services:pull>
