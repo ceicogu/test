@@ -298,10 +298,10 @@ public class ZXingUtils {
                 BufferedImage bufferedImage = codeMatrix(MatrixToImageWriter.toBufferedImage(bitMatrix), content);
                 ImageIO.write(bufferedImage, "png", new File(imagePath));
             } else {
-//                Path path = FileSystems.getDefault().getPath(imagePath);
-//                MatrixToImageWriter.writeToPath(bitMatrix, "png", path);// 输出图像
-                MatrixToImageWriter
-                        .writeToFile(bitMatrix, "png", new File(imagePath));
+                Path path = FileSystems.getDefault().getPath(imagePath);
+                MatrixToImageWriter.writeToPath(bitMatrix, "png", path);// 输出图像
+//                MatrixToImageWriter
+//                        .writeToFile(bitMatrix, "png", new File(imagePath));
             }
         } catch (Exception e) {
             System.out.println("编码待生成条形码图片的文本时发生异常,堆栈轨迹如下");
@@ -348,7 +348,7 @@ public class ZXingUtils {
         // 益达无糖口香糖的条形码
         String content = "6923450657713";
 
-        //int width = 200, height = 100;
+        //int width = 200, height = 100;     //TODO 当width＝200时解析条形码失败，具体原因待查
         int width = 205, height = 100;
         encodeEAN13CodeImage(content,  imgPath, width, height);
 
