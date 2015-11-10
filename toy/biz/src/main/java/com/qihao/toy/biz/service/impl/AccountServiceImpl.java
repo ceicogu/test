@@ -1,5 +1,19 @@
 package com.qihao.toy.biz.service.impl;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.google.common.base.Preconditions;
@@ -13,20 +27,17 @@ import com.qihao.toy.biz.service.ToyService;
 import com.qihao.toy.biz.solr.DefaultSolrOperator;
 import com.qihao.toy.biz.solr.domain.AccountSolrDO;
 import com.qihao.toy.biz.utils.ObjectDynamicCreator;
-import com.qihao.toy.dal.domain.*;
+import com.qihao.toy.dal.domain.MyFriendDO;
+import com.qihao.toy.dal.domain.MyGroupDO;
+import com.qihao.toy.dal.domain.MyGroupMemberDO;
+import com.qihao.toy.dal.domain.StationLetterDO;
+import com.qihao.toy.dal.domain.ToyDO;
+import com.qihao.toy.dal.domain.UserDO;
+import com.qihao.toy.dal.domain.VerifyCodeDO;
 import com.qihao.toy.dal.persistent.MyFriendMapper;
+import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -39,6 +50,8 @@ public class AccountServiceImpl implements AccountService {
     private StationLetterService stationLetterService;
     @Autowired
     private MyFriendMapper myFriendMapper;
+    @Autowired
+    private MyGroupMemberMapper myGroupMemberMapper;
     @Autowired
     private GroupService groupService;
     @Autowired
@@ -112,6 +125,8 @@ public class AccountServiceImpl implements AccountService {
                     //未注册或未激活
                     throw new IllegalArgumentException("故事机未激活，不能扫码注册");
                 }
+            } else if (accountChannel.equals(UserDO.AccoutChannel.Proxy)) {//代理toy直接邀请注册
+            	
             } else {//自主注册
                 //do nothing
                 user.setInvitorId(null);
@@ -146,11 +161,12 @@ public class AccountServiceImpl implements AccountService {
             //toy自己激活Toy
             toyService.toAcitvateToy(user.getId(), user.getComeSN(), user.getLoginName());
             //激活者认领toy
+            UserDO invitor = this.getUser(user.getInvitorId());
             toyService.toClaimToy(user.getInvitorId(), user.getComeSN());
             //创建一个家庭群
             Long groupId = groupService.createGroup(user.getId(), "我的家庭群", MyGroupDO.GroupType.Family);
-            groupService.insertGroupMember(groupId, user.getId(), user.getNickName());
-            groupService.insertGroupMember(groupId, user.getInvitorId(), null);
+            groupService.insertGroupMember(groupId, user.getId(), user.getNickName(),user.getPhoto());
+            groupService.insertGroupMember(groupId, invitor.getId(),invitor.getNickName(),invitor.getPhoto());
             //与Toy互为好友
             this.focusA2B(user.getInvitorId(), user.getId());
             this.focusA2B(user.getId(), user.getInvitorId());
@@ -205,14 +221,47 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
             }
-        } else {//自主注册
+        } else if (accountChannel.equals(UserDO.AccoutChannel.Proxy)) {//代理toy直接邀请注册
+            //获取Ｔｏｙ帐号
+            List<ToyDO> resp2 = toyService.getMyManageToys(user.getInvitorId());
+            for(ToyDO toy : resp2) {
+	            //加入Toy家庭群
+	            List<MyGroupDO> resp4 = groupService.getMyCreatedGroups(toy.getActivatorId(), MyGroupDO.GroupType.Family);
+	            if (!CollectionUtils.isEmpty(resp4)) {
+	                groupService.insertGroupMember(resp4.get(0).getId(), user.getId(), user.getNickName());
+	            }
+	            //验证码
+	            //与Toy互为好友
+	            this.focusA2B(toy.getActivatorId(), user.getId());
+	            this.focusA2B(user.getId(), toy.getActivatorId());
+            }
+            return user.getId();        	
+        }else {//自主注册
             //do nothing
         }
         return user.getId();
     }
 
     public boolean update(UserDO user) {
-        return userMapper.update(user);
+        boolean bOK = userMapper.update(user);
+        if(bOK && StringUtils.isBlank(user.getPhoto())){
+        	
+        	if(user.getId() != null) {
+        		//修改对应的群昵称
+	        	MyGroupMemberDO myGroupMemberDO = new MyGroupMemberDO();
+	        	myGroupMemberDO.setMemberId(user.getId());
+	        	myGroupMemberDO.setMemberPhoto(user.getPhoto());
+	        	myGroupMemberMapper.update(myGroupMemberDO);
+	        	//修改好友列表中的昵称
+	        	MyFriendDO myFriendDO = new MyFriendDO();
+	        	myFriendDO.setFriendId(user.getId());
+	        	myFriendDO.setPhoto(user.getPhoto());
+	        	myFriendMapper.update(myFriendDO);
+        	}
+        	
+        	
+        }
+        return bOK;
     }
 
     public UserDO getUser(long userId) {
@@ -246,6 +295,7 @@ public class AccountServiceImpl implements AccountService {
         myFriend.setMyId(userBId);
         myFriend.setFriendId(userAId);
         myFriend.setRelation(userA.getNickName());
+        myFriend.setPhoto(userA.getPhoto());
         List<MyFriendDO> resp = myFriendMapper.getAll(myFriend);
         boolean needPushMessage = false;
         if (CollectionUtils.isEmpty(resp)) {
@@ -299,7 +349,9 @@ public class AccountServiceImpl implements AccountService {
 
         try {
             String json = JSON.toJSONString(param);
-            return CryptoCoder.aesEncrypt(json, globalConfig.getAesKey(), globalConfig.getAesIv());
+            String aesStr = CryptoCoder.aesEncrypt(json, globalConfig.getAesKey(), globalConfig.getAesIv());
+            return URLEncoder.encode(aesStr,"utf-8");
+ //           return CryptoCoder.aesEncrypt(json, globalConfig.getAesKey(), globalConfig.getAesIv());
         } catch (Exception e) {
             throw new RuntimeException("加密失败!");
         }
@@ -307,7 +359,8 @@ public class AccountServiceImpl implements AccountService {
 
     public UserDO validateAuthToken(String authToken) {
         try {
-            String json = CryptoCoder.aesDecrypt(authToken, globalConfig.getAesKey(), globalConfig.getAesIv());
+        	String decodeStr = URLDecoder.decode(authToken,"utf-8");
+            String json = CryptoCoder.aesDecrypt(decodeStr, globalConfig.getAesKey(), globalConfig.getAesIv());
             Map<String, Object> param = JSON.parseObject(json, new TypeReference<Map<String, Object>>() {
             });
 
@@ -353,7 +406,7 @@ public class AccountServiceImpl implements AccountService {
         return !CollectionUtils.isEmpty(resp);
     }
 
-    public List<Long> getMyFamilyGroupId(long myId) {
+    public List<MyGroupDO> getMyFamilyGroupId(long myId) {
         return groupService.getMyJoinedGroups(myId, MyGroupDO.GroupType.Family);
     }
 

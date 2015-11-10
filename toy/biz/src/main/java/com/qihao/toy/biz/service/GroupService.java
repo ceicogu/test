@@ -68,6 +68,7 @@ public interface GroupService {
      * @return
      */
     Long insertGroupMember(long groupId, long memberId, String memberName);
+    Long insertGroupMember(long groupId, long memberId, String memberName, String photo);
     /**
      * 获取我创建的群
      * @param myId
@@ -79,8 +80,8 @@ public interface GroupService {
      * @param myId
      * @return
      */
-    List<Long> getMyJoinedGroups(long myId);
-    List<Long> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType);
+    List<MyGroupDO> getMyJoinedGroups(long myId);
+    List<MyGroupDO> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType);
     
     /**
      * 获取指定群的所有成员

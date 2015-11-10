@@ -56,6 +56,9 @@ public class GroupServiceImpl implements GroupService {
 		return !CollectionUtils.isEmpty(resp); 
 	}
 	public Long insertGroupMember(long groupId, long memberId, String memberName) {
+		return insertGroupMember(groupId,memberId,memberName,null);
+	}
+	public Long insertGroupMember(long groupId, long memberId, String memberName,String photo) {
 		boolean bExist = this.isGroupMember(groupId, memberId);
 		Preconditions.checkArgument(false ==bExist,"该用户已是群成员");
 		
@@ -63,6 +66,7 @@ public class GroupServiceImpl implements GroupService {
 		myGroupMember.setGroupId(groupId);
 		myGroupMember.setMemberId(memberId);
 		myGroupMember.setMemberName(memberName);
+		myGroupMember.setMemberPhoto(photo);
 		return myGroupMemberMapper.insert(myGroupMember)>0? myGroupMember.getId() : null;
 	}
 	public List<MyGroupDO> getMyCreatedGroups(long myId, MyGroupDO.GroupType groupType) {
@@ -74,10 +78,10 @@ public class GroupServiceImpl implements GroupService {
 		return myGroupMapper.getAll(myGroup);
 	}
 
-	public List<Long> getMyJoinedGroups(long myId) {
+	public List<MyGroupDO> getMyJoinedGroups(long myId) {
 		return this.getMyJoinedGroups(myId,null);
 	}
-	public List<Long> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType) {
+	public List<MyGroupDO> getMyJoinedGroups(long myId,MyGroupDO.GroupType groupType) {
 		MyGroupMemberDO myGroupMember = new MyGroupMemberDO();
 		myGroupMember.setMemberId(myId);
 		myGroupMember.setGroupType(groupType);
@@ -97,7 +101,10 @@ public class GroupServiceImpl implements GroupService {
 			}
 			
 		}
-		return groupIds;
+		MyGroupDO myGroup = new MyGroupDO();
+		myGroup.setGroupIds(groupIds);
+		return myGroupMapper.getAll(myGroup);
+
 	}
 
 	public List<MyGroupMemberDO> getGroupMembersByGroupId(long groupId) {
