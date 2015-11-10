@@ -18,6 +18,7 @@
 package com.qihao.toy.web.api.module.screen;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import com.alibaba.citrus.turbine.dataresolver.Param;
 import com.alibaba.citrus.turbine.dataresolver.Params;
 import com.alibaba.citrus.util.StringUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.qihao.shared.base.DataResult;
@@ -76,6 +78,8 @@ public class Account extends BaseApiScreenAction{
     @Autowired
     private DefaultSolrOperator solrOperator;
     
+	private static SimpleDateFormat format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+	
     /**验证二维码是否有效*/
     public void doValidateQRCode(ParameterParser requestParams) throws IOException{
     	//签名验证
@@ -95,6 +99,67 @@ public class Account extends BaseApiScreenAction{
 		response.getWriter().println(JSON.toJSONString(result));
 		return;  
     }
+    /**
+     * 代理注册
+     * @param requestParams
+     * @param context
+     * @throws Exception
+     */
+	public void doProxyRegister(ParameterParser requestParams)
+			throws IOException {
+		Assert.notNull(currentUser, "用户未登录!");
+		// 参数校验
+		DataResult<Map<String, Object>> result = new DataResult<Map<String, Object>>();
+		List<ToyDO> resp = toyService.getMyManageToys(currentUser.getId());
+        if (CollectionUtils.isEmpty(resp)) {
+			log.error("代理注册失败!");
+			result.setSuccess(false);
+			result.setErrorCode(2001);
+			response.getWriter().println(JSON.toJSONString(result));
+			return ;
+        }	
+        if(StringUtils.isBlank(requestParams.getString("mobile"))){
+			result.setSuccess(false);
+			result.setErrorCode(2001);
+			result.setMessage("手机号码不能为空!");
+			response.getWriter().println(JSON.toJSONString(result));
+			return ;
+        }
+        if(StringUtils.isBlank(requestParams.getString("nickName"))){
+			result.setSuccess(false);
+			result.setErrorCode(2001);
+			result.setMessage("昵称不能为空!");
+			response.getWriter().println(JSON.toJSONString(result));
+			return ;
+        }
+		String mobile = requestParams.getString("mobile");
+		String nickName = requestParams.getString("nickName");
+		
+		UserDO userDO = new UserDO();
+		userDO.setLoginName(mobile);
+		userDO.setPassword(mobile);// 在biz层进行md5
+		userDO.setMobile(mobile);
+		userDO.setNickName(nickName);
+		userDO.setComeFrom(UserDO.AccoutChannel.Proxy);
+		userDO.setType(UserDO.AccountType.Mobile);
+		userDO.setInvitorId(currentUser.getId());
+		
+		try {
+			// 3.注册
+			accountService.register(userDO);
+			
+			result.setSuccess(true);
+			response.getWriter().println(JSON.toJSONString(result));
+			return;
+		} catch (Exception e) {
+			log.error("注册失败!userDO={},exception={}", userDO, e);
+			result.setSuccess(false);
+			result.setErrorCode(2001);
+			result.setMessage("注册失败！原因:" +e.getMessage());
+			response.getWriter().println(JSON.toJSONString(result));
+			return;
+		}
+	}
     /** 修改用户信息 */
     public void doModifyProfile(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
@@ -139,13 +204,19 @@ public class Account extends BaseApiScreenAction{
 
         response.getWriter().println(JSON.toJSONString(result));
     }
-    /** 获取登录用户信息     */
-    public void doGetUserInfo() throws IOException {    	
+    /** 获取用户信息     */
+    public void doGetUserInfo(@Param("userId") Long userId) throws IOException {    	
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Map<String,Object>> result = new DataResult<Map<String, Object>>();
-
+    	UserDO userDO = null;
+    	if(null == userId) {
+    		userDO = currentUser;
+    	}else {
+    		//TODO 检查所查用户是否自己可见
+    		userDO = accountService.getUser(userId);
+    	}
         result.setSuccess(true);
-        result.setData(super.userDO2Map(currentUser));
+        result.setData(super.userDO2Map(userDO));
         response.getWriter().println(JSON.toJSONString(result));
         return;    
     }
@@ -395,6 +466,7 @@ public class Account extends BaseApiScreenAction{
     		Map<String,Object> item = Maps.newTreeMap();
     		item.put("friendId",myFriend.getFriendId());
     		item.put("relation",myFriend.getRelation());
+    		item.put("photo", myFriend.getPhoto());
     		data.add(item);
     	}
     	result.setSuccess(true);
@@ -432,6 +504,7 @@ public class Account extends BaseApiScreenAction{
     		Map<String,Object> item = Maps.newTreeMap();
     		item.put("friendId",myFriend.getFriendId());
     		item.put("relation",myFriend.getRelation());
+    		item.put("photo", myFriend.getPhoto());
     		data.add(item);
     	}
     	result.setSuccess(true);
@@ -490,9 +563,21 @@ public class Account extends BaseApiScreenAction{
     public void doGetMyGroups(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<MyGroupDO>> result = new DataResult<List<MyGroupDO>>();
-	
-    	//获取自己创建的群    	
-    	List<MyGroupDO>  data = groupService.getMyCreatedGroups(currentUser.getId(),null);
+    	String type = requestParams.getString("type","Leader");
+    	MyGroupDO.GroupType groupType = null;
+    	try{
+    		groupType = Enum.valueOf(MyGroupDO.GroupType.class, requestParams.getString("groupType"));
+    	}catch(Exception e) {
+        	groupType = null;
+    	}
+    	
+    	List<MyGroupDO>  data =  null;
+    	if("LEADER".equalsIgnoreCase(type)) {
+	    	//获取自己创建的群    	
+	    	data = groupService.getMyCreatedGroups(currentUser.getId(),groupType);
+    	} else {//FOLLOWER
+    		data = groupService.getMyJoinedGroups(currentUser.getId(),groupType);
+    	}
     	result.setSuccess(true);
     	result.setData(data);
     	response.getWriter().println(JSON.toJSONString(result));    	
@@ -561,6 +646,7 @@ public class Account extends BaseApiScreenAction{
             response.getWriter().println(JSON.toJSONString(result));
             return;    
     	}
+
     	//判断自己是否在该群
     	Long groupId = requestParams.getLong("groupId");
     	boolean bOK = groupService.isGroupMember(groupId, currentUser.getId());
@@ -573,8 +659,23 @@ public class Account extends BaseApiScreenAction{
     	}
     	//分页获取群信息
     	int page = requestParams.getInt("page",1);
+    	StationLetterDO searchDO = new StationLetterDO();
+    	searchDO.setAcceptorType(2);
+    	searchDO.setAcceptorId(groupId);
+    	searchDO.setPage(page);
+    	searchDO.setLimit(20);
+    	Long time = requestParams.getLong("gmtCreated",-1L);
+    	if(-1L != time) {
+            try {           	
+				searchDO.setGmtCreated(format.parse(format.format(time)));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	
-    	result= stationLetterService.getMyLetters(1, groupId, page, 20);
+    	}
+    	
+    	result= stationLetterService.getMyLetters(searchDO);
     	
         response.getWriter().println(JSON.toJSONString(result));
         return;       
@@ -660,7 +761,31 @@ public class Account extends BaseApiScreenAction{
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
     }   
-
+    public void doGetLastItemsBySenderIds(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+    	if(StringUtils.isBlank(requestParams.getString("senderIds"))) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请指定senderID！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    
+    	}
+    	Iterable<String> split = Splitter.onPattern("[,|，]")
+    			.omitEmptyStrings()
+    			.split(requestParams.getString("senderIds"));
+    	List<Long> senderIds = Lists.newArrayList();
+    	for(String item : split) {
+    		senderIds.add(Long.valueOf(item));
+    	}
+    	Integer acceptorType = requestParams.getInt("acceptorType",-1);   	
+    	Long acceptorId = requestParams.getLong("acceptorId",-1);
+    	if(-1 == acceptorType) acceptorType = null;
+    	if(-1 == acceptorId) acceptorId = null;
+    	result = stationLetterService.getLastItemsBySenderIds(senderIds, acceptorType, acceptorId);
+    	response.getWriter().println(JSON.toJSONString(result));
+        return;
+    }
     public void doAnalysis(@Param("q") String query) throws Exception {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<List<String>> result  = new DataResult<List<String>>();
