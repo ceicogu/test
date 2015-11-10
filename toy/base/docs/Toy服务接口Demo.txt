@@ -33,6 +33,10 @@ http://127.0.0.1:8081/api/syntax/analysis.json?q=我想听酒狂&auth_token=jmoF
 http://127.0.0.1:8081/api/syntax/analysis.json?q=你都有什么本领啊&auth_token=jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp%2BNDqPAcE%3D
 
 {"data":{"answer":"我会讲故事，会唱儿歌，还会回答你的问题，陪你聊天，每天我都在学习中","question":"你都有什么本领啊","type":"ANSWER"},"message":"搜索成功!","success":true}
+5.5 toy语音识别（下指令）：
+http://182.92.162.223/api/syntax/analysis.json?q=%E4%B8%8B%E4%B8%80%E9%A6%96&authToken=jmoFqdU4MesmSu9qZ10l3cPQnIzcMr0Y8Wp%2BNDqPAcE%3D
+
+{"data":{"answer":"下一首","question":"下一首","type":"CONTROL"},"message":"搜索成功!","success":true}
 
 
 
