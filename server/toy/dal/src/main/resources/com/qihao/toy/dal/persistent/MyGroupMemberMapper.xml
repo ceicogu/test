@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.MyGroupMemberMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,group_id,member_id,member_name,is_deleted]]>
+		<![CDATA[id,group_id,member_id,member_name,member_photo,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.MyGroupMemberDO"
         parameterType="java.lang.Long">
@@ -14,10 +14,10 @@
     </select>    
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyGroupMemberDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO my_group_member (
-         group_id,member_id,member_name,gmt_created,gmt_modified
+         group_id,member_id,member_name,member_photo,gmt_created,gmt_modified
         )
         VALUES (
-        #{groupId},#{memberId},#{memberName},now(),now()
+        #{groupId},#{memberId},#{memberName},#{memberPhoto},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.MyGroupMemberDO">
@@ -26,12 +26,18 @@
         gmt_modified=now()
         <if test="memberId != null"> ,member_id=#{memberId}</if>
         <if test="memberName != null"> ,member_name=#{memberName}</if>
-        WHERE id=#{id}
+        <if test="memberPhoto != null"> ,member_photo=#{memberPhoto}</if>
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="groupId != null"> AND a.group_id=#{groupId}</if>
+	        <if test="memberId != null"> AND a.member_id=#{memberId}</if>
+	        <if test="groupType != null"> AND b.group_type=#{groupType}</if>
+        </where>
     </update>
     <select id="getAll" resultType="com.qihao.toy.dal.domain.MyGroupMemberDO"
         parameterType="com.qihao.toy.dal.domain.MyGroupMemberDO">
         SELECT
-        a.id,a.group_id,b.group_type,a.member_id,a.member_name,a.is_deleted
+        a.id,a.group_id,b.group_type,a.member_id,a.member_name,a.member_photo,a.is_deleted
         FROM my_group_member as a
         LEFT JOIN my_group as b ON a.group_id=b.id
         <where>

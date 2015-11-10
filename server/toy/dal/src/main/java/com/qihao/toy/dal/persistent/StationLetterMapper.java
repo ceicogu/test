@@ -13,4 +13,10 @@ public interface StationLetterMapper extends CRUDMapper<StationLetterDO> {
 	 * @return
 	 */
 	List<StationLetterDO> getAllForO2O(Map<String, String> map);
+	/**
+	 * 获取每个sender最新一条记录
+	 * @param searchDO
+	 * @return
+	 */
+	List<StationLetterDO> getLastItemsBySenderIds(StationLetterDO searchDO);
 }

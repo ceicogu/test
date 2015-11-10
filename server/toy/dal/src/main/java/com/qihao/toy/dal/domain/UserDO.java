@@ -60,6 +60,7 @@ public class UserDO  extends PageDO {
 	public static enum AccoutChannel implements IntEnum{
 		Scan(0),//扫码注册
 		Self(1),//自主注册
+		Proxy(2),//代理注册
 		Invite(9);//邀请注册
 	    
 	    private int    intValue;
