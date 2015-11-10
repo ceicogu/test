@@ -20,6 +20,7 @@ package com.qihao.toy.biz.service;
 import java.util.List;
 
 import com.qihao.toy.dal.domain.MyFriendDO;
+import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.UserDO;
 
 /**
@@ -121,7 +122,7 @@ public interface AccountService {
      * @param myId
      * @return
      */
-    List<Long> getMyFamilyGroupId(long myId);
+    List<MyGroupDO> getMyFamilyGroupId(long myId);
     /**
      * 修改我的好友名称
      * @param myId

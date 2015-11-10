@@ -120,6 +120,9 @@
     <orderEntry type="library" name="Maven: org.json:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.zxing:core:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.zxing:javase:3.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.notnoop.apns:apns:0.1.6" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.4.0" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.4.0" level="project" />
   </component>
 </module>
 

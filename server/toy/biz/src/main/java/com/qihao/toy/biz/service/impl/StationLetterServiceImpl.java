@@ -14,7 +14,9 @@ import com.qihao.toy.dal.domain.enums.MiContentTypeEnum;
 import com.qihao.toy.dal.persistent.StationLetterMapper;
 import com.qihao.toy.dal.persistent.SubscribeMessageMapper;
 import com.xiaomi.xmpush.server.Message;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -149,22 +151,16 @@ public class StationLetterServiceImpl implements StationLetterService {
 	}
 
 	public DataResult<List<StationLetterDO>> getMyLetters( int acceptorType, long acceptorId, Integer page , Integer maxPageSize) {
-		DataResult<List<StationLetterDO>> result = new DataResult<List<StationLetterDO>>();
 		if(null == page || page<1) page=1;
 		if(null == maxPageSize || maxPageSize<1) maxPageSize=5;
 		
 		StationLetterDO letter = new StationLetterDO();
-		List<StationLetterDO> data = null;
 		letter.setAcceptorType(acceptorType);
 		letter.setAcceptorId(acceptorId);		
 		letter.setLimit(maxPageSize);
 		letter.setOffset((page-1)*maxPageSize);
 		
-		data = stationLetterMapper.getAll(letter);
-	
-		result.setSuccess(true);
-		result.setData(data);
-		return result;
+		return getMyLetters(letter);
 	}
 	public DataResult<List<StationLetterDO>> getMyLetters( long o2oId1, long o2oId2, Integer page , Integer maxPageSize){
 		DataResult<List<StationLetterDO>> result = new DataResult<List<StationLetterDO>>();
@@ -184,9 +180,41 @@ public class StationLetterServiceImpl implements StationLetterService {
 		return result;
 		
 	}
+	public DataResult<List<StationLetterDO>> getMyLetters(
+			StationLetterDO searchDO) {
+		DataResult<List<StationLetterDO>> result = new DataResult<List<StationLetterDO>>();
+		
+		List<StationLetterDO> data = stationLetterMapper.getAll(searchDO);
+	
+		result.setSuccess(true);
+		result.setData(data);
+		return result;
+	}
 	public DataResult<StationLetterDO> getMyLetter(long letterId) {
 		DataResult<StationLetterDO> result = new DataResult<StationLetterDO>();
 		StationLetterDO data = stationLetterMapper.getById(letterId);	
+		result.setSuccess(true);
+		result.setData(data);
+		return result;
+	}
+
+	public DataResult<Map<Long, StationLetterDO>> getLastItemsBySenderIds(
+			List<Long> senderIds, Integer acceptorType, Long acceptorId) {
+		DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+		if(CollectionUtils.isEmpty(senderIds)){
+			result.setSuccess(false);
+			result.setMessage("发送者不能为空!");
+			return result;
+		}
+		StationLetterDO searchDO = new StationLetterDO();
+		searchDO.setSenderIds(senderIds);
+		searchDO.setAcceptorType(acceptorType);
+		searchDO.setAcceptorId(acceptorId);
+		Map<Long,StationLetterDO> data = Maps.newLinkedHashMap();
+		List<StationLetterDO> resp = stationLetterMapper.getLastItemsBySenderIds(searchDO);
+		for(StationLetterDO item : resp) {
+			data.put(item.getSenderId(), item);
+		}
 		result.setSuccess(true);
 		result.setData(data);
 		return result;
