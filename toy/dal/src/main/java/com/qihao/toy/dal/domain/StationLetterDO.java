@@ -17,10 +17,12 @@
 
 package com.qihao.toy.dal.domain;
 
-import com.qihao.shared.base.IntEnum;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import com.qihao.shared.base.IntEnum;
 /**
  * 发布消息表
  * @author luqiao
@@ -51,4 +53,7 @@ public class StationLetterDO  extends PageDO {
     private MediaType	type;			//类型0-文字/1-语音
     private String		content;		//消息内容
     private String		url;			//资源存储URL
+    
+    //查询用
+    private List<Long>  senderIds;
 }

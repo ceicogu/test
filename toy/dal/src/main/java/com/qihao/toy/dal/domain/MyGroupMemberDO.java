@@ -33,4 +33,5 @@ public class MyGroupMemberDO  extends PageDO {
     private MyGroupDO.GroupType			groupType;		//群类型
     private Long			memberId;		//群成员用户ID
     private String			memberName;		//群成员群中昵称
+    private String			memberPhoto;	//群成员群中头像
 }

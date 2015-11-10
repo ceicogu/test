@@ -48,6 +48,7 @@ public class MyFriendDO  extends PageDO {
     private Long		friendId;		//好友ID
     private String	relation;		//自己对好友的关系称谓
     private FriendStatus status;			//好友状态:0-邀请中/1-已关注/1-取消关注
+    private String		photo;
     private Date		gmtInvited;//邀请时间
     private Date		gmtConfirmed;//关注时间
 }

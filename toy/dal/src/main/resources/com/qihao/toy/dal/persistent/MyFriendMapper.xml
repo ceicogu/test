@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.MyFriendMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,my_id,friend_id,relation,status,gmt_invited,gmt_confirmed,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id,my_id,friend_id,relation,status,photo,gmt_invited,gmt_confirmed,gmt_created,gmt_modified,is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.MyFriendDO"
         parameterType="java.lang.Long">
@@ -20,10 +20,10 @@
     </select>
     <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyFriendDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO my_friend (
-         my_id,friend_id,relation,status,gmt_invited,gmt_confirmed,gmt_created,gmt_modified
+         my_id,friend_id,relation,status,photo,gmt_invited,gmt_confirmed,gmt_created,gmt_modified
         )
         VALUES (
-        #{myId},#{friendId},#{relation},#{status},#{gmtInvited},#{gmtConfirmed},now(),now()
+        #{myId},#{friendId},#{relation},#{status},#{photo},#{gmtInvited},#{gmtConfirmed},now(),now()
         )
     </insert>
     <update id="update" parameterType="com.qihao.toy.dal.domain.MyFriendDO">
@@ -31,10 +31,16 @@
         SET
         gmt_modified=now()
         <if test="status != null"> ,status=#{status}</if>
+        <if test="photo != null"> ,photo=#{photo}</if>
         <if test="relation != null"> ,relation=#{relation}</if>
         <if test="gmtInvited != null"> ,gmt_invited=#{gmtInvited}</if>
         <if test="gmtConfirmed != null"> ,gmt_confirmed=#{gmtConfirmed}</if>
-        WHERE id=#{id}
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="myId != null"> AND my_id=#{myId}</if>
+        	<if test="friendId != null"> AND friend_id=#{friendId}</if>
+        	<if test="status != null"> AND status=#{status}</if>
+        </where>
     </update>
     <update id="modifyRelation">
         UPDATE my_friend

@@ -39,6 +39,7 @@
         	<if test="senderId != null"> AND sender_id=#{senderId}</if>
             <if test="acceptorType != null"> AND acceptor_type=#{acceptorType}</if>
             <if test="acceptorId != null"> AND acceptor_id=#{acceptorId}</if>
+            <if test="gmtCreated != null"> AND gmt_created >= #{gmtCreated}</if>
         </where>
         limit #{offset},#{limit}
     </select>    
@@ -48,6 +49,23 @@
         FROM station_letter
         WHERE acceptor_type=0 and ((sender_id=#{senderId} AND acceptor_id=#{acceptorId}) OR (sender_id=#{acceptorId} AND acceptor_id=#{senderId}))
         limit #{offset},#{limit}
-    </select>       
+    </select>  
+    <select id="getLastItemsBySenderIds" resultType="com.qihao.toy.dal.domain.StationLetterDO"
+        parameterType="com.qihao.toy.dal.domain.StationLetterDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM station_letter
+        <where>
+            <if test="senderIds != null"> AND sender_id IN 
+        	  <foreach collection="senderIds"  item="senderId" open="("    separator="," close=")">
+   						#{senderId}
+  				</foreach>
+  			</if>
+  			<if test="acceptorType != null"> AND acceptor_type=#{acceptorType}</if>
+  			<if test="acceptorId != null"> AND acceptor_id=#{acceptorId}</if>
+        </where>
+        ORDER BY sender_id,gmt_created
+        limit #{offset},#{limit}
+    </select>      
 </mapper>
         
