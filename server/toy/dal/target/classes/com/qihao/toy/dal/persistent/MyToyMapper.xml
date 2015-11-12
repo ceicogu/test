@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.MyToyMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,my_id,toy_sn,toy_user_id,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.MyToyDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_toy
+        WHERE id=#{id}
+    </select>    
+    <select id="getItemByToySN" resultType="com.qihao.toy.dal.domain.MyToyDO" parameterType="java.lang.String">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_toy
+        WHERE toy_sn=#{toySN}
+    </select>       
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyToyDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO my_toy (
+         my_id,toy_sn,toy_user_id,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{myId},#{toySN},#{toyUserId},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.MyToyDO">
+        UPDATE my_toy
+        SET
+        gmt_modified=now()
+         <if test="isDeleted != null"> , is_deleted=#{isDeleted}</if>
+         <if test="myId != null"> , my_id=#{myId}</if>
+         <if test="toySN != null"> , toy_sn=#{toySN}</if>
+         <if test="toyUserId != null"> , toy_user_id=#{toyUserId}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.MyToyDO"
+        parameterType="com.qihao.toy.dal.domain.MyToyDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_toy
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="myId != null"> AND my_id=#{myId}</if>
+        	<if test="toySN != null"> AND toy_sn=#{toySN}</if>
+        	<if test="toyUserId != null"> AND toy_user_id=#{toyUserId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+    <select id="getMyToyUserIds" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT
+        toy_user_id
+        FROM my_toy
+        WHERE my_id=#{myId}
+    </select>    
+</mapper>
+        

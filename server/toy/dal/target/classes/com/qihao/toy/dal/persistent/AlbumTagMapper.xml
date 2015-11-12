@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.AlbumTagMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,album_id,tag_id,tag_type,tag_name,gmt_created,gmt_modified]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.AlbumTagDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album_tag
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.AlbumTagDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO album_tag (
+         album_id,tag_id,tag_type,tag_name,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{albumId},#{tagId},#{tagType},#{tagName},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.AlbumTagDO">
+        UPDATE album_tag
+        SET
+        gmt_modified=now()
+        <if test="albumId != null"> ,album_id=#{albumId}</if>
+        <if test="tagId != null"> ,tag_id=#{tagId}</if>
+        <if test="tagType != null"> ,tag_type=#{tagType}</if>
+        <if test="tagName != null"> ,tag_name=#{tagName}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.AlbumTagDO"
+        parameterType="com.qihao.toy.dal.domain.AlbumTagDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album_tag
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+	        <if test="albumId != null"> AND album_id=#{albumId}</if>
+	        <if test="tagId != null"> AND tag_id=#{tagId}</if>
+	        <if test="tagType != null"> AND tag_type=#{tagType}</if>
+	        <if test="tagName != null"> AND tag_name=#{tagName}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        
