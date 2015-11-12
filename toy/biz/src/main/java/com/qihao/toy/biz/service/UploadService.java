@@ -25,7 +25,7 @@ import com.qihao.toy.dal.domain.UploadDO;
  * 文件上传
  */
 public interface UploadService {
-	Long insert(String fileName, String fileSuffix, UploadDO.FileType fileType,Integer duration, Long uploader);
+	Long insert(String fileName, String fileSuffix, UploadDO.FileType fileType, Long uploader);
 	Boolean update(Long id, UploadDO uploadDO);
 	Boolean deleteById(Long id);
 	UploadDO getById(Long id);

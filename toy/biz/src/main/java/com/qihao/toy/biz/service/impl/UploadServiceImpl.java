@@ -16,13 +16,12 @@ public class UploadServiceImpl implements UploadService {
 	@Autowired 
 	private UploadMapper uploadMapper;
 	
-	public Long insert(String fileName, String fileSuffix, UploadDO.FileType fileType,Integer duration, Long uploader) {
+	public Long insert(String fileName, String fileSuffix, UploadDO.FileType fileType, Long uploader) {
 		Preconditions.checkArgument(StringUtils.isNotBlank(fileName),"文件名不能为空");
 		UploadDO uploadDO = new UploadDO();
 		uploadDO.setFileName(fileName);
 		uploadDO.setFileSuffix(fileSuffix);
 		uploadDO.setFileType(fileType);
-		uploadDO.setDuration(duration);
 		uploadDO.setUploader(uploader);
 		uploadMapper.insert(uploadDO);
 		return uploadDO.getId();

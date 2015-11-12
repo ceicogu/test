@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.ToyMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,toy_sn,toy_name,toy_mac,activator_id,status,kid_name,kid_gender,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.ToyDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM toy
+        WHERE id=#{id}
+    </select>    
+    <select id="getItemByToySN" resultType="com.qihao.toy.dal.domain.ToyDO" parameterType="java.lang.String">
+        SELECT
+        <include refid="All_Fields" />
+        FROM toy
+        WHERE toy_sn=#{toySN}
+    </select>        
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.ToyDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO toy (
+         toy_sn,toy_name,toy_mac,status,activator_id,kid_name,kid_gender,kid_birth,owner_id,gmt_owned,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{toySN},#{toyName},#{toyMac},#{status},#{activatorId},#{kidName},#{kidGender},#{kidBirth},#{ownerId},#{gmtOwned},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.ToyDO">
+        UPDATE toy
+        SET
+        gmt_modified=now()
+        <if test="isDeleted != null"> , is_deleted=#{isDeleted}</if>
+        <if test="status != null"> , status=#{status}</if>
+        <if test="activatorId != null"> , activator_id=#{activatorId}</if>
+        <if test="toyName != null"> , toy_name=#{toyName}</if>
+        <if test="toyMac != null"> , toy_mac=#{toyMac}</if>
+        <if test="kidName != null"> , kid_name=#{kidName}</if>
+        <if test="kidGender != null"> , kid_gender=#{kidGender}</if>
+        <if test="kidBirth != null"> , kid_birth=#{kidBirth}</if>
+        <if test="ownerId != null"> , owner_id=#{ownerId}</if>
+        <if test="gmtOwned != null"> , gmt_owned=#{gmtOwned}</if>
+        WHERE toy_sn=#{toySN}
+    </update>    
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.ToyDO"
+        parameterType="com.qihao.toy.dal.domain.ToyDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM toy
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="toySN != null"> AND toy_sn=#{toySN}</if>
+        	<if test="toyName != null"> AND toy_name=#{toyName}</if>
+        	<if test="toyMac != null"> AND toy_mac=#{toyMac}</if>
+        	<if test="status != null"> AND status=#{status}</if>
+        	<if test="activatorId != null"> AND activator_id=#{activatorId}</if>
+        	<if test="ownerId != null"> AND owner_id=#{ownerId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select> 
+    <select id="getMyManageToys" resultType="com.qihao.toy.dal.domain.ToyDO"
+        parameterType="long">
+        SELECT
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
+        WHERE my_toy.my_id = #{myId} and toy.is_deleted !=1
+    </select>  
+    <select id="getMyManageToy" resultType="com.qihao.toy.dal.domain.ToyDO">
+        SELECT
+        toy.id,toy.toy_sn,toy.toy_name,toy.toy_mac,toy.activator_id,toy.status,toy.kid_name,toy.kid_gender,toy.kid_birth,toy.owner_id,toy.gmt_owned,toy.gmt_created,toy.gmt_modified,toy.is_deleted
+        FROM toy left join my_toy on toy.toy_sn=my_toy.toy_sn
+        WHERE my_toy.my_id = #{myId} and my_toy.toy_user_id=#{toyUserId} and toy.is_deleted !=1
+    </select>          
+</mapper>
+        

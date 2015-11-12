@@ -201,9 +201,9 @@ public class StationLetterServiceImpl implements StationLetterService {
 	public DataResult<Map<Long, StationLetterDO>> getLastItemsBySenderIds(
 			List<Long> senderIds, Integer acceptorType, Long acceptorId) {
 		DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
-		if(CollectionUtils.isEmpty(senderIds)){
+		if(CollectionUtils.isEmpty(senderIds) && null == acceptorId){
 			result.setSuccess(false);
-			result.setMessage("发送者不能为空!");
+			result.setMessage("发送者和接收者不能同时为空!");
 			return result;
 		}
 		StationLetterDO searchDO = new StationLetterDO();

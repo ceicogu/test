@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.AlbumMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,title,summary,photo,creator_id,gmt_created,gmt_modified,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.AlbumDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.AlbumDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO album (
+         title,summary,photo,creator_id,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{title},#{summary},#{photo},#{creatorId},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.AlbumDO">
+        UPDATE album
+        SET
+        gmt_modified=now()
+        <if test="title != null"> ,title=#{title}</if>
+        <if test="summary != null"> ,summary=#{summary}</if>
+        <if test="content != null"> ,content=#{content}</if>
+        <if test="photo != null"> ,photo=#{photo}</if>
+        <if test="creatorId != null"> ,creatorId=#{creatorId}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.AlbumDO"
+        parameterType="com.qihao.toy.dal.domain.AlbumDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM album
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+	        <if test="title != null"> AND title=#{title}</if>
+	        <if test="summary != null"> AND summary=#{summary}</if>
+	        <if test="photo != null"> AND photo=#{photo}</if>
+	        <if test="creatorId != null"> AND creatorId=#{creatorId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

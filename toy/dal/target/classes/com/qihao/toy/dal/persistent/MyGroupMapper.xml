@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.MyGroupMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,my_id,group_name,group_type,is_deleted]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.MyGroupDO"
+        parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_group
+        WHERE id=#{id}
+    </select>    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.MyGroupDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO my_group (
+         my_id,group_name,group_type,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{myId},#{groupName},#{groupType},now(),now()
+        )
+    </insert>
+    <update id="update" parameterType="com.qihao.toy.dal.domain.MyGroupDO">
+        UPDATE my_group
+        SET
+        gmt_modified=now()
+        <if test="groupName != null"> ,group_name=#{groupName}</if>
+        <if test="groupType != null"> ,group_type=#{groupType}</if>
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.MyGroupDO"
+        parameterType="com.qihao.toy.dal.domain.MyGroupDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM my_group
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="myId != null"> AND my_id=#{myId}</if>
+	        <if test="groupName != null"> AND group_name=#{groupName}</if>
+	        <if test="groupType != null"> AND group_type=#{groupType}</if>
+        	<if test="groupIds != null"> AND id IN 
+        	    <foreach collection="groupIds"  item="groupId" open="("    separator="," close=")">
+   						#{groupId}
+  				</foreach>
+  			</if>	        
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

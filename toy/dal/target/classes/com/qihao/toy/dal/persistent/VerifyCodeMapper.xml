@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.VerifyCodeMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id,mobile, code,type,status,invitor_id,gmt_invited,gmt_created,gmt_modified]]>
+	</sql>
+    <select id="getById" resultType="com.qihao.toy.dal.domain.VerifyCodeDO" parameterType="java.lang.Long">
+        SELECT
+        <include refid="All_Fields" />
+        FROM verify_code
+        WHERE id=#{id}
+    </select>    
+    <select id="getValidItem" resultType="com.qihao.toy.dal.domain.VerifyCodeDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM verify_code
+        WHERE type=#{type} AND mobile=#{mobile} AND code=#{code} AND status = 0
+    </select>        
+    <!--  -->    
+    <insert id="insert" parameterType="com.qihao.toy.dal.domain.VerifyCodeDO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO verify_code (
+         mobile,code,type,status,invitor_id,gmt_invited,gmt_created,gmt_modified
+        )
+        VALUES (
+        #{mobile},#{code},#{type},#{status},#{invitorId},#{gmtInvited},now(),now()
+        )
+    </insert>
+    <update id="updateStatusById" >
+        UPDATE verify_code
+        SET
+        status=#{status},gmt_modified=now()
+        WHERE id=#{id}
+    </update>
+    <select id="getAll" resultType="com.qihao.toy.dal.domain.VerifyCodeDO"
+        parameterType="com.qihao.toy.dal.domain.VerifyCodeDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM verify_code
+        <where>
+        	<if test="id != null"> AND id=#{id}</if>
+        	<if test="type != null"> AND type=#{type}</if>
+        	<if test="mobile != null"> AND mobile=#{mobile}</if>
+        	<if test="code != null"> AND code=#{code}</if>
+        	<if test="status != null"> AND status=#{status}</if>
+        	<if test="invitorId != null"> AND invitor_id=#{invitorId}</if>
+        </where>
+        limit #{offset},#{limit}
+    </select>    
+</mapper>
+        

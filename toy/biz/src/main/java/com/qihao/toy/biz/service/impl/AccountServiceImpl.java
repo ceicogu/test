@@ -359,8 +359,9 @@ public class AccountServiceImpl implements AccountService {
 
     public UserDO validateAuthToken(String authToken) {
         try {
-        	String decodeStr = URLDecoder.decode(authToken,"utf-8");
-            String json = CryptoCoder.aesDecrypt(decodeStr, globalConfig.getAesKey(), globalConfig.getAesIv());
+        	//String decodeStr = URLDecoder.decode(authToken,"utf-8");
+            //String json = CryptoCoder.aesDecrypt(decodeStr, globalConfig.getAesKey(), globalConfig.getAesIv());
+        	String json = CryptoCoder.aesDecrypt(authToken, globalConfig.getAesKey(), globalConfig.getAesIv());
             Map<String, Object> param = JSON.parseObject(json, new TypeReference<Map<String, Object>>() {
             });
 
