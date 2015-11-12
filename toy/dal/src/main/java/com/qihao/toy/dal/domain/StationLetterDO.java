@@ -53,7 +53,8 @@ public class StationLetterDO  extends PageDO {
     private MediaType	type;			//类型0-文字/1-语音
     private String		content;		//消息内容
     private String		url;			//资源存储URL
-    
+    private Integer		duration;		//音频和视频文件播放时长
     //查询用
     private List<Long>  senderIds;
+    private Long		readerId;		//阅读者
 }
