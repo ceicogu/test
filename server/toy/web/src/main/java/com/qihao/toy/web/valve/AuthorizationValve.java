@@ -1,5 +1,6 @@
 package com.qihao.toy.web.valve;
 
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,9 @@ public class AuthorizationValve extends AbstractValve {
             //排除JS CSS 图片和白名单页面等
             if (nowBucPermisson.lastIndexOf(".") <= 0 && !isInWhite(nowBucPermisson)) {
             	String authToken = rundata.getParameters().getString("authToken");
+        		 if("POST".equals(request.getMethod())){
+        		 	authToken = URLDecoder.decode(authToken,"utf-8");
+        		 }
             	try{
 	            	UserDO user = checkUserPermission(authToken);
 	            	request.setAttribute("currentUser", user);
