@@ -51,9 +51,11 @@ import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
 import com.qihao.toy.dal.domain.StationLetterDO;
+import com.qihao.toy.dal.domain.StationLetterRecordDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.persistent.StationLetterRecordMapper;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
 /**
@@ -73,6 +75,8 @@ public class Account extends BaseApiScreenAction{
     private VerifyCodeService verifyCodeService;    
     @Autowired
     private StationLetterService stationLetterService;    
+    @Autowired
+    private StationLetterRecordMapper stationLetterRecordMapper;  
     @Autowired
     private MessageChannelService messageChannelService;
     @Autowired
@@ -607,7 +611,7 @@ public class Account extends BaseApiScreenAction{
         response.getWriter().println(JSON.toJSONString(letter));
         return;    	
     }
-    public void doSendLetter(ParameterParser requestParams) throws IOException {
+    public void doSendNotification(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Long> result = new DataResult<Long>();
 
@@ -619,13 +623,37 @@ public class Account extends BaseApiScreenAction{
             return;    
     	}
     	
-    	String	type			=	requestParams.getString("type",StationLetterDO.MediaType.TEXT.name());    	
-    	StationLetterDO.MediaType mediaType = Enum.valueOf(StationLetterDO.MediaType.class, type);
+    	String	type			=	requestParams.getString("type",StationLetterDO.MediaType.TEXT.name()) ;
+    	StationLetterDO.MediaType mediaType = null;
+    	try {
+    		mediaType = Enum.valueOf(StationLetterDO.MediaType.class, type);  
+    	}catch (Exception e){
+    		mediaType = StationLetterDO.MediaType.TEXT;
+    	}
+  	
     	int     acceptorType = requestParams.getInt("acceptorType",0);
     	long acceptorId		=	requestParams.getLong("acceptorId");
     	String content			= requestParams.getString("content");
     	String url						= requestParams.getString("url");
-    	result = stationLetterService.createLetter(currentUser.getId(), acceptorType, acceptorId, mediaType,content, url);
+    	Integer duration	=	requestParams.getInt("duration",0);
+    	if(!type.equalsIgnoreCase(StationLetterDO.MediaType.TEXT.name())) {
+    		if(StringUtils.isBlank(url) || 0== duration) {
+                result.setSuccess(false);
+                result.setErrorCode(2000);
+                result.setMessage("请文件及时长！");
+                response.getWriter().println(JSON.toJSONString(result));
+                return;   			
+    		}
+    	}
+    	StationLetterDO letter = new StationLetterDO();
+    	letter.setSenderId(currentUser.getId());
+    	letter.setAcceptorType(acceptorType);
+    	letter.setAcceptorId(acceptorId);
+    	letter.setContent(content);
+    	letter.setUrl(url);
+    	letter.setDuration(duration);
+    	letter.setType(mediaType);
+    	result = stationLetterService.createLetter(letter);
     	
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
@@ -664,6 +692,13 @@ public class Account extends BaseApiScreenAction{
     	searchDO.setAcceptorId(groupId);
     	searchDO.setPage(page);
     	searchDO.setLimit(20);
+    	
+    	Long readerId= requestParams.getLong("readerId",-1L);
+    	if(-1L != readerId)
+    		searchDO.setReaderId(readerId);
+    	else
+    		searchDO.setReaderId(currentUser.getId());
+    	
     	Long time = requestParams.getLong("gmtCreated",-1L);
     	if(-1L != time) {
             try {           	
@@ -715,6 +750,34 @@ public class Account extends BaseApiScreenAction{
         return;       
     }
     /**
+     * 标示消息已读
+     * @param requestParams
+     * @throws IOException
+     */
+    public void doReadNotification(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	SimpleResult result = new SimpleResult();
+
+    	if(StringUtils.isBlank(requestParams.getString("letterId"))) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("请指定消息ID！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    
+    	}
+    	Long letterId = requestParams.getLong("letterId");
+    	StationLetterRecordDO record = new StationLetterRecordDO();
+    	record.setReaderId(currentUser.getId());
+    	record.setLetterId(letterId);
+    	List<StationLetterRecordDO> resp = stationLetterRecordMapper.getAll(record);
+    	if(CollectionUtils.isEmpty(resp)){
+    		stationLetterRecordMapper.insert(record);
+    	}
+    	result.setSuccess(true);
+        response.getWriter().println(JSON.toJSONString(result));
+        return;    	
+    }
+    /**
      * 获取指定消息信息
      * @param requestParams
      * @throws IOException
@@ -761,6 +824,7 @@ public class Account extends BaseApiScreenAction{
         response.getWriter().println(JSON.toJSONString(result));
         return;        			
     }   
+    
     public void doGetLastItemsBySenderIds(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
@@ -778,6 +842,36 @@ public class Account extends BaseApiScreenAction{
     	for(String item : split) {
     		senderIds.add(Long.valueOf(item));
     	}
+    	Integer acceptorType = requestParams.getInt("acceptorType",-1);   	
+    	Long acceptorId = requestParams.getLong("acceptorId",-1);
+    	if(-1 == acceptorType) acceptorType = null;
+    	if(-1 == acceptorId) acceptorId = null;
+    	result = stationLetterService.getLastItemsBySenderIds(senderIds, acceptorType, acceptorId);
+    	response.getWriter().println(JSON.toJSONString(result));
+        return;
+    }
+    public void doGetLastNotifications(ParameterParser requestParams) throws IOException {
+    	Assert.notNull(currentUser, "用户未登录!");
+    	DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+    	if(StringUtils.isBlank(requestParams.getString("acceptorId"))
+    			&& StringUtils.isBlank(requestParams.getString("senderIds"))) {
+            result.setSuccess(false);
+            result.setErrorCode(2000);
+            result.setMessage("senderIds和acceptorId不能同时为空！");
+            response.getWriter().println(JSON.toJSONString(result));
+            return;    
+    	}
+    	List<Long> senderIds = null;
+    	if(!StringUtils.isBlank(requestParams.getString("senderIds"))) {
+        	Iterable<String> split = Splitter.onPattern("[,|，]")
+        			.omitEmptyStrings()
+        			.split(requestParams.getString("senderIds"));
+        	senderIds = Lists.newArrayList();
+        	for(String item : split) {
+        		senderIds.add(Long.valueOf(item));
+        	}   
+    	}
+
     	Integer acceptorType = requestParams.getInt("acceptorType",-1);   	
     	Long acceptorId = requestParams.getLong("acceptorId",-1);
     	if(-1 == acceptorType) acceptorType = null;

@@ -69,8 +69,7 @@ public class Resource  extends BaseApiScreenAction{
     public void doUpload(ParameterParser requestParams,
     		@Param("authToken") String authToken, 
     		@Param("myFile") FileItem myFile, 
-    		@Param("fileType") String fileType,
-    		@Param("duration") Integer duration
+    		@Param("fileType") String fileType
     		) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
     	DataResult<Map<String,Object>> result =  new DataResult<Map<String,Object>>();
@@ -96,13 +95,12 @@ public class Resource  extends BaseApiScreenAction{
     	if(null == fileTypeEnum) {
     		fileTypeEnum = UploadDO.FileType.SOUND;
     	}
-    	Long id = uploadService.insert(fileName, fileSuffix, fileTypeEnum, duration,currentUser.getId());
+    	Long id = uploadService.insert(fileName, fileSuffix, fileTypeEnum,currentUser.getId());
     	Map<String, Object> data = Maps.newLinkedHashMap();
     	data.put("id", id);
     	data.put("fileName", fileName);
     	data.put("fileType", fileTypeEnum.name());
     	data.put("fileSuffix", fileSuffix);
-    	data.put("duration",duration);
     	result.setSuccess(true);
     	result.setMessage("文件上传成功!");
     	result.setData(data);
@@ -141,7 +139,6 @@ public class Resource  extends BaseApiScreenAction{
     	data.put("fileName", uploadDO.getFileName());
     	data.put("fileType", uploadDO.getFileType().name());
     	data.put("fileSuffix", uploadDO.getFileSuffix());
-    	data.put("duration",uploadDO.getDuration());
     	result.setSuccess(true);
     	result.setMessage("文件上传成功!");
     	result.setData(data);
