@@ -8,10 +8,35 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
+
 import com.alibaba.citrus.util.io.StreamUtil;
 
 public class AnnexUtils {
 	 private final static String UPLOAD_DIR = "/data/resource/res";
+	 
+	public static void saveAppFile(FileItem fileItem) throws IOException {
+		if (fileItem != null) {
+			File destFile = new File(UPLOAD_DIR + "/upload" + "/app" + fileItem.getName());
+			InputStream inputStream = null;
+			try {
+				inputStream = fileItem.getInputStream();
+				FileUtils.copyInputStreamToFile(inputStream, destFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				if (inputStream != null) {
+					try {
+						inputStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+		}
+	}
 	 
 	public static String saveAnnex(FileItem inFileItem) throws IOException {
 		if(null == inFileItem) return null;
