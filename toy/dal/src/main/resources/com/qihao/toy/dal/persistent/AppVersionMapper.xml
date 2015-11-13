@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qihao.toy.dal.persistent.AppVersionMapper">
+	<!-- 所有字段 -->
+	<sql id="All_Fields">
+		<![CDATA[id, deviceType, platformType, versionCode, versionName, forcedUpdate, downloadUrl, description, publishTime]]>
+	</sql>
+	
+	<insert id="addNewVersionApp" parameterType="com.qihao.toy.dal.domain.AppVersionDO">
+		insert into app_version (
+			deviceType, platformType, versionCode, versionName, 
+			forcedUpdate, downloadUrl, description, publishTime
+		) values (
+			#{deviceType}, #{platformType}, #{versionCode}, #{versionName},
+			#{forcedUpdate}, #{downloadUrl}, #{description}, #{publishTime}
+		)
+	</insert>
+	
+	<select id="findLatestVersionApp" resultType="com.qihao.toy.dal.domain.AppVersionDO">
+		select tmp.versionCode,tmp.versionName, tmp.publishTime, tmp.forcedUpdate, tmp.downloadUrl, tmp.description
+		from (
+			select versionCode, versionName, publishTime,forcedUpdate, downloadUrl, description
+			from app_version 
+			where deviceType = #{deviceType}
+			and platformType = #{platformType}
+			order by versionCode desc
+		) tmp
+		order by publishTime desc limit 1
+	</select>
+	
+</mapper>
+        

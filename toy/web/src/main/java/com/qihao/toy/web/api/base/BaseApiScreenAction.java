@@ -105,6 +105,7 @@ public class BaseApiScreenAction {
     	data.put("deviceToken", user.getDeviceToken());
         data.put("voipClientNo", user.getVoipClientNo());
         data.put("voipClientPwd", user.getVoipClientPwd());
+        data.put("mobile", user.getMobile());
     	return data;
     }
 }
