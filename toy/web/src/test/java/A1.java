@@ -12,6 +12,8 @@ public class A1 {
          boolean c2 = new Integer(128) == 128;
          boolean c3 = 128 == Integer.valueOf(128);
          
+         System.out.println(b1);
+         
 	}
 
 }

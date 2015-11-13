@@ -54,7 +54,7 @@
 		<request-contexts:lazy-commit />
 		<request-contexts:parser>
 			<filters>
-				<parser-filters:uploaded-file-whitelist extensions="txt,jpg, gif, png,mp3,pcm,amr,wav,avr" />
+				<parser-filters:uploaded-file-whitelist extensions="txt,jpg, gif, png,mp3,pcm,amr,wav,avr,apk" />
 			</filters>
 		</request-contexts:parser>
 		<request-contexts:set-locale defaultLocale="zh_CN" defaultCharset="UTF-8" />
