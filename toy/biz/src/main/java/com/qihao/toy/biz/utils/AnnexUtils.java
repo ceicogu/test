@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
@@ -17,7 +18,7 @@ public class AnnexUtils {
 	 
 	public static void saveAppFile(FileItem fileItem) throws IOException {
 		if (fileItem != null) {
-			File destFile = new File(UPLOAD_DIR + "/upload" + "/app" + fileItem.getName());
+			File destFile = new File(UPLOAD_DIR + "/upload/app/" + URLDecoder.decode(fileItem.getName(), "utf-8"));
 			InputStream inputStream = null;
 			try {
 				inputStream = fileItem.getInputStream();
@@ -86,5 +87,18 @@ public class AnnexUtils {
             //throw new StoreManagerException("Could not get upload directory from ResourceLoader: " + UPLOAD_DIR);
             return null;
         }
+	}
+	
+	public static File getAppFile(String fileName) {
+		File uploadFile = null;
+		try {
+			uploadFile = new File(UPLOAD_DIR + "/upload/app/" + fileName);
+			if (!uploadFile.exists()) {
+				return null;
+			}
+			return uploadFile;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
