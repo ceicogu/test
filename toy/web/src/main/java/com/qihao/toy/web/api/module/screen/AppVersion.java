@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
@@ -49,6 +50,7 @@ public class AppVersion extends BaseApiScreenAction{
     	appVersion.setPlatformType(platformType);
     	appVersion.setForcedUpdate(forcedUpdate);
     	appVersion.setDescription(description);
+    	appVersion.setPublishTime(new Date());
     	String downloadUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getLocalPort() +"/" + request.getContextPath() +"/api/appVersion/download.json?file=" + URLDecoder.decode(appFile.getName(), "utf-8");
     	appVersion.setDownloadUrl(downloadUrl);
     	appVersionService.addNewVersionApp(appVersion);
