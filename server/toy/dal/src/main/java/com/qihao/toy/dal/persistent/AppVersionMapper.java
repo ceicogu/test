@@ -9,6 +9,6 @@ public interface AppVersionMapper {
 	public Long addNewVersionApp(AppVersionDO appVersion);
 
 	public AppVersionDO findLatestVersionApp(@Param("deviceType") int deviceType,
-			@Param("deviceType") int platformType);
+			@Param("platformType") int platformType);
 
 }
