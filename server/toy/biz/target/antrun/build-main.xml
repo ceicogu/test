@@ -3,8 +3,8 @@
 <target name="main">
   <echo message="project home:        /Users/luqiao/workspace/qihao/server/toy/biz"/>
   <echo message="java home:           /Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/jre"/>
-  <echo message="java source version: 1.5"/>
-  <echo message="java target version: 1.5"/>
+  <echo message="java source version: 1.7"/>
+  <echo message="java target version: 1.7"/>
   <echo message="java source charset: UTF-8"/>
 </target>
 </project>
