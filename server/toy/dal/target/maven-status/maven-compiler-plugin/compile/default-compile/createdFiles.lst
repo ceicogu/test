@@ -11,6 +11,7 @@ com/qihao/toy/dal/persistent/BabyHelperMapper.class
 com/qihao/toy/dal/domain/ToyDO$Gender.class
 com/qihao/toy/dal/domain/AlbumTagDO.class
 com/qihao/toy/dal/domain/StationLetterRecordDO.class
+com/qihao/toy/dal/domain/AppVersionDO.class
 com/qihao/toy/dal/persistent/AlbumMapper.class
 com/qihao/toy/dal/domain/StationLetterDO$MediaType.class
 com/qihao/toy/dal/domain/typehandlers/IntEnumTypeHandler.class
@@ -45,10 +46,13 @@ com/qihao/toy/dal/domain/enums/OperateTypeEnum.class
 com/qihao/toy/dal/persistent/StationLetterMapper.class
 com/qihao/toy/dal/persistent/MyGroupMemberMapper.class
 com/qihao/toy/dal/domain/VerifyCodeDO$VerifyCodeStatus.class
+com/qihao/toy/dal/persistent/AppVersionMapper.class
 com/qihao/toy/dal/domain/MiPushCommandMessage.class
 com/qihao/toy/dal/persistent/CRUDMapper.class
 com/qihao/toy/dal/domain/AlbumDO.class
+com/qihao/toy/dal/persistent/MyResourceMapper.class
 com/qihao/toy/dal/domain/VerifyCodeDO$VerifyCodeType.class
+com/qihao/toy/dal/domain/MyResourceDO.class
 com/qihao/toy/dal/domain/MyFriendDO$FriendStatus.class
 com/qihao/toy/dal/domain/UserDO$DeviceType.class
 com/qihao/toy/dal/domain/VerifyCodeDO.class
