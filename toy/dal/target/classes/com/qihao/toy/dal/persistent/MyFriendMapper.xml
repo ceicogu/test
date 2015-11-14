@@ -3,7 +3,7 @@
 <mapper namespace="com.qihao.toy.dal.persistent.MyFriendMapper">
 	<!-- 所有字段 -->
 	<sql id="All_Fields">
-		<![CDATA[id,my_id,friend_id,relation,status,photo,gmt_invited,gmt_confirmed,gmt_created,gmt_modified,is_deleted]]>
+		<![CDATA[id, my_id as myId, friend_id as friendId, relation, status,photo,gmt_invited as gmtInvited, gmt_confirmed as gmtConfirmed, gmt_created as gmtCreated, gmt_modified as gmtModified, is_deleted]]>
 	</sql>
     <select id="getById" resultType="com.qihao.toy.dal.domain.MyFriendDO"
         parameterType="java.lang.Long">

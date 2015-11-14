@@ -59,7 +59,7 @@
             <if test="acceptorId != null"> AND d1.acceptor_id=#{acceptorId}</if>
             <if test="gmtCreated != null"> AND d1.gmt_created >= #{gmtCreated}</if>
 
-        
+        ORDER BY  d1.id desc
         limit #{offset},#{limit}
     </select>    
      <select id="getAllForO2O" resultType="com.qihao.toy.dal.domain.StationLetterDO"   parameterType="java.util.Map">
