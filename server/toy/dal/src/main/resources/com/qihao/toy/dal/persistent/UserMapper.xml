@@ -90,6 +90,35 @@
   			</if>
         </where>
         limit #{offset},#{limit}
-    </select>    
+    </select>
+    
+    <select id="getByMobile" resultType="com.qihao.toy.dal.domain.UserDO">
+        SELECT
+        <include refid="All_Fields" />
+        FROM user
+        WHERE mobile = #{mobile} AND is_deleted=0
+    </select>
+    
+    <select id="getMyFriendByHisMobile" resultType="com.qihao.toy.dal.domain.UserDO">
+    	select
+    	<include refid="All_Fields" />
+    	from user
+    	where id in (
+    		select friend_id
+    		from my_friend
+    		where my_id = #{userId}
+    		and is_deleted = 0
+    	)
+    	and mobile = #{friendMobile}
+    	and is_deleted = 0
+    </select>
+    
+    <insert id="addFriend" parameterType="com.qihao.toy.dal.domain.MyFriendDO">
+    	insert into my_friend (
+    		gmt_created, gmt_modified, gmt_invited, gmt_confirmed, my_id, friend_id, relation
+    	) values (
+    		now(), now(), now(), now(), #{myId}, #{friendId}, #{relation}
+    	)
+    </insert>
 </mapper>
         

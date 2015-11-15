@@ -2,6 +2,7 @@ package com.qihao.toy.dal.persistent;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.qihao.toy.dal.domain.MyFriendDO;
 import com.qihao.toy.dal.domain.UserDO;
 
 /**
@@ -23,4 +24,10 @@ public interface UserMapper extends CRUDMapper<UserDO> {
 	 * @return
 	 */
 	Integer modifyPassword(@Param("id") Long id, @Param("oldPassword")  String oldPassword, @Param("password") String password);
+
+	UserDO getByMobile(@Param("mobile")String mobile);
+
+	UserDO getMyFriendByHisMobile(@Param("userId") Long userId, @Param("friendMobile") String friendMobile);
+
+	void addFriend(MyFriendDO myFriendDO);
 }
