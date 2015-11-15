@@ -95,4 +95,5 @@ public interface GroupService {
      * @return
      */
     List<Long> getUserIdsByGroupId(long groupId);
+	MyGroupDO getMyFamilyGroup(Long userId);
 }

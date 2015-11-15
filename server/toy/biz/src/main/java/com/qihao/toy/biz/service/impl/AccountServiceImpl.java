@@ -1,13 +1,10 @@
 package com.qihao.toy.biz.service.impl;
 
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,8 @@ import com.qihao.toy.dal.persistent.MyFriendMapper;
 import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import com.qihao.toy.dal.persistent.UserMapper;
 import com.qihao.toy.dal.persistent.VerifyCodeMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -455,5 +454,20 @@ public class AccountServiceImpl implements AccountService {
             return false;
         }
     }
+
+	@Override
+	public UserDO getUserByMobile(String mobile) {
+		return userMapper.getByMobile(mobile);
+	}
+
+	@Override
+	public UserDO getMyFriendByHisMobile(Long userId, String friendMobile) {
+		return userMapper.getMyFriendByHisMobile(userId, friendMobile);
+	}
+
+	@Override
+	public void addFriend(MyFriendDO myFriendDO) {
+		userMapper.addFriend(myFriendDO);
+	}
 
 }

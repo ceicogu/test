@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.qihao.toy.biz.service.GroupService;
 import com.qihao.toy.dal.domain.MyGroupDO;
 import com.qihao.toy.dal.domain.MyGroupMemberDO;
+import com.qihao.toy.dal.domain.MyGroupDO.GroupType;
 import com.qihao.toy.dal.persistent.MyGroupMapper;
 import com.qihao.toy.dal.persistent.MyGroupMemberMapper;
 import org.apache.commons.lang.StringUtils;
@@ -128,5 +129,10 @@ public class GroupServiceImpl implements GroupService {
 		MyGroupDO myGroup = new MyGroupDO();
 		myGroup.setGroupIds(groupIds);
 		return myGroupMapper.getAll(myGroup);	
+	}
+
+	@Override
+	public MyGroupDO getMyFamilyGroup(Long userId) {
+		return getMyJoinedGroups(userId, GroupType.Family).get(0);
 	}
 }

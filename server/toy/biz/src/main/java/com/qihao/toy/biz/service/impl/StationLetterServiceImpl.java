@@ -198,9 +198,9 @@ public class StationLetterServiceImpl implements StationLetterService {
 		return result;
 	}
 
-	public DataResult<Map<Long, StationLetterDO>> getLastItemsBySenderIds(
+	public DataResult<Map<String,Object>> getLastItemsBySenderIds(
 			List<Long> senderIds, Integer acceptorType, Long acceptorId) {
-		DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+		DataResult<Map<String,Object>> result = new DataResult<>();
 		if(CollectionUtils.isEmpty(senderIds) && null == acceptorId){
 			result.setSuccess(false);
 			result.setMessage("发送者和接收者不能同时为空!");
@@ -210,10 +210,12 @@ public class StationLetterServiceImpl implements StationLetterService {
 		searchDO.setSenderIds(senderIds);
 		searchDO.setAcceptorType(acceptorType);
 		searchDO.setAcceptorId(acceptorId);
-		Map<Long,StationLetterDO> data = Maps.newLinkedHashMap();
+		Map<String,Object> data = Maps.newLinkedHashMap();
 		List<StationLetterDO> resp = stationLetterMapper.getLastItemsBySenderIds(searchDO);
 		for(StationLetterDO item : resp) {
-			data.put(item.getSenderId(), item);
+//			data.put(item.getSenderId(), item);
+			data.put("senderId", item.getSenderId());
+			data.put("item", item);
 		}
 		result.setSuccess(true);
 		result.setData(data);

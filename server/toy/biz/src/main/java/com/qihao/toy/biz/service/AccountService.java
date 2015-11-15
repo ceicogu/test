@@ -131,5 +131,17 @@ public interface AccountService {
      * @return
      */
     Boolean toRenameMyFriend(long myId, long friendId, String relation);
+
+    /**
+     * 	根据mobile获取user
+     * */
+	UserDO getUserByMobile(String mobile);
+
+	/**
+	 * 	
+	 * */
+	UserDO getMyFriendByHisMobile(Long userId, String friendMobile);
+
+	void addFriend(MyFriendDO myFriendDO);
     
 }
