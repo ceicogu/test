@@ -20,6 +20,8 @@ package com.qihao.toy.web.api.module.screen;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +57,9 @@ import com.qihao.toy.dal.domain.StationLetterRecordDO;
 import com.qihao.toy.dal.domain.ToyDO;
 import com.qihao.toy.dal.domain.UserDO;
 import com.qihao.toy.dal.domain.VerifyCodeDO;
+import com.qihao.toy.dal.domain.MyGroupDO.GroupType;
+import com.qihao.toy.dal.domain.UserDO.AccountType;
+import com.qihao.toy.dal.domain.UserDO.AccoutChannel;
 import com.qihao.toy.dal.persistent.StationLetterRecordMapper;
 import com.qihao.toy.web.api.base.BaseApiScreenAction;
 
@@ -827,7 +832,7 @@ public class Account extends BaseApiScreenAction{
     
     public void doGetLastItemsBySenderIds(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+    	DataResult<Map<String,Object>> result = new DataResult<>();
     	if(StringUtils.isBlank(requestParams.getString("senderIds"))) {
             result.setSuccess(false);
             result.setErrorCode(2000);
@@ -852,7 +857,7 @@ public class Account extends BaseApiScreenAction{
     }
     public void doGetLastNotifications(ParameterParser requestParams) throws IOException {
     	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<Map<Long,StationLetterDO>> result = new DataResult<Map<Long,StationLetterDO>>();
+    	DataResult<Map<String,Object>> result = new DataResult<>();
     	if(StringUtils.isBlank(requestParams.getString("acceptorId"))
     			&& StringUtils.isBlank(requestParams.getString("senderIds"))) {
             result.setSuccess(false);
@@ -880,15 +885,100 @@ public class Account extends BaseApiScreenAction{
     	response.getWriter().println(JSON.toJSONString(result));
         return;
     }
-    public void doAnalysis(@Param("q") String query) throws Exception {
-    	Assert.notNull(currentUser, "用户未登录!");
-    	DataResult<List<String>> result  = new DataResult<List<String>>();
-    	List<String> resp = solrOperator.anlysisSolrResult("account",query);
-     	result.setSuccess(true);
-     	result.setMessage("分词成功!");
-     	result.setData(resp);
-         response.getWriter().println(JSON.toJSONString(result));
-         return;    	
+
+	public void doAnalysis(@Param("q") String query) throws Exception {
+		Assert.notNull(currentUser, "用户未登录!");
+		DataResult<List<String>> result = new DataResult<List<String>>();
+		List<String> resp = solrOperator.anlysisSolrResult("account", query);
+		result.setSuccess(true);
+		result.setMessage("分词成功!");
+		result.setData(resp);
+		response.getWriter().println(JSON.toJSONString(result));
+		return;
+	}
+    
+	public void doAddFriend(@Param("userId") Long userId, 
+			@Param("friendName")String friendName,
+			@Param("relation")String relation,
+			@Param("friendMobile") String friendMobile,
+			@Param("groupType") Integer groupType
+			) throws Exception{
+		Assert.notNull(currentUser, "用户未登录!");
+		DataResult<Map<String, Object>> result  = new DataResult<>();
+		Map<String, Object> map = new HashMap<>();
+		if (userId == null || friendName == null || relation == null || friendMobile == null || groupType == null) {
+			result.setSuccess(false);
+			result.setMessage("invalid request params");
+			response.getWriter().println(JSON.toJSONString(result));
+			return;
+		}
+		try {
+			UserDO user = accountService.getUser(userId);
+			//检查是否已是我的好友
+			UserDO friendUser = accountService.getMyFriendByHisMobile(userId, friendMobile);
+			if (friendUser != null) {
+				map.put("friendId", friendUser.getId());
+				result.setSuccess(false);
+				result.setMessage("该用户已是你的好友");
+				result.setData(map);
+				response.getWriter().println(JSON.toJSONString(result));
+				return;
+			}
+			//检查是否存在该账号，不存在则为其生成账号
+			friendUser = accountService.getUserByMobile(friendMobile);
+			if(friendUser == null){
+				friendUser = new UserDO();
+				friendUser.setLoginName(friendMobile);
+				friendUser.setNickName(friendName);
+				friendUser.setPassword("123456");
+				friendUser.setType(AccountType.Mobile);
+				friendUser.setComeFrom(AccoutChannel.Proxy);
+				friendUser.setMobile(friendMobile);
+				friendUser.setInvitorId(userId);
+				Long id = accountService.register(friendUser);
+				friendUser.setId(id);
+			}
+			//建立好友关系
+			MyFriendDO myFriendDO = new MyFriendDO();
+			myFriendDO.setFriendId(friendUser.getId());
+			myFriendDO.setMyId(userId);
+			myFriendDO.setGmtCreated(new Date());
+			myFriendDO.setRelation(relation);
+			accountService.addFriend(myFriendDO);
+			
+			//创建二人世界群
+			Long groupId = 0L;
+			if(groupType == GroupType.General.intValue()){
+				groupId = groupService.createGroup(userId, friendMobile, GroupType.General);
+				groupService.insertGroupMember(groupId, userId, user.getNickName());
+				groupService.insertGroupMember(groupId, friendUser.getId(), friendMobile);
+			}
+			if(groupType == GroupType.Family.intValue()){
+				MyGroupDO familyGroup = groupService.getMyFamilyGroup(userId);
+				if(familyGroup != null){
+					groupId = familyGroup.getId();
+					groupService.insertGroupMember(groupId, friendUser.getId(), friendName);
+				}else{
+					result.setSuccess(false);
+					result.setMessage("家庭组不存在");
+					response.getWriter().println(JSON.toJSONString(result));
+					return;
+				}
+			}
+			map.put("friendId", friendUser.getId());
+			map.put("groupId", groupId);
+			result.setData(map);
+			result.setSuccess(true);
+			response.getWriter().println(JSON.toJSONString(result));
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false);
+			result.setMessage("error");
+			response.getWriter().println(JSON.toJSONString(result));
+			log.error(e.getMessage());
+			return;
+		}
     }
 }
 
