@@ -33,7 +33,7 @@ public class MyGroupDO  extends PageDO {
 
 	private static final long serialVersionUID = 1L;
 	public static enum GroupType implements IntEnum{
-		Family(0),//我的家庭群
+		Family(1),//我的家庭群
 		General(9);//普通用户群
 
 	    private int    intValue;
