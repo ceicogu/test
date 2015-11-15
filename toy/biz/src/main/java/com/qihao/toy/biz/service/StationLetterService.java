@@ -30,7 +30,7 @@ public interface StationLetterService {
 	 * @param acceptorId    可空
 	 * @return
 	 */
-	DataResult<Map<Long,StationLetterDO>> getLastItemsBySenderIds(List<Long> senderIds, Integer acceptorType, Long acceptorId);
+	DataResult<Map<String,Object>> getLastItemsBySenderIds(List<Long> senderIds, Integer acceptorType, Long acceptorId);
 	/**
 	 * 按站内信ID获取消息具体内容
 	 * @param letterId
